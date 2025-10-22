@@ -119,4 +119,20 @@ public class PieceManager : MonoBehaviour
 
         return piece;
     }
+
+    public void ShowHidePossibleMoves(Piece piece, Square startSquare, bool show)
+    {
+        PieceMovesSO possibleMoves = piece.PossibleMoves;
+        int startX = startSquare.SquareX;
+        int startY = startSquare.SquareY;
+        Square moveSquare;
+
+        foreach (Vector2Int move in possibleMoves.PossibleMoves)
+        {
+            moveSquare = BoardManager.Instance.GetSquare(startX + move.x, startY + move.y);
+            Debug.Log($"{startX + move.x} {startY + move.y}");
+            if (moveSquare != null)
+                moveSquare.ShowHidePossibleMoveIndicator(show);
+        }
+    }
 }
