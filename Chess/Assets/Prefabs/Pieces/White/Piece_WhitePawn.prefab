@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2853347227251929474}
   - component: {fileID: 5344473007139696054}
-  - component: {fileID: -8967479341328061733}
+  - component: {fileID: 1587446543384050391}
   m_Layer: 7
   m_Name: Piece_WhitePawn
   m_TagString: Untagged
@@ -170,7 +170,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &-8967479341328061733
+--- !u!114 &1587446543384050391
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,7 +179,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2472447219008109554}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741a96d17ecd85c4b98c6fe1a2aae1b1, type: 3}
+  m_Script: {fileID: 11500000, guid: e2299c6243886c2419848ba5e56c5b8d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Piece
-  _possibleMoves: {fileID: 11400000, guid: 66582d3a4ba035048b0564ffb7b23639, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::PiecePawn
+  _basicMoves:
+  - {x: 0, y: 1}
+  _firstMove: {x: 0, y: 2}
+  _captureMoves:
+  - {x: 1, y: 1}
+  - {x: -1, y: 1}

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
@@ -36,6 +37,8 @@ public class PieceManager : MonoBehaviour
         int fileIndex;
         string currentChar;
         GameObject piece;
+        GameObject newPiece;
+        Square squareToSpawnPieceOn;
 
         for (int i = rankStrings.Length - 1; i >= 0; i--)
         {
@@ -59,9 +62,12 @@ public class PieceManager : MonoBehaviour
                 else
                 {
                     // character is not a number so it is a piece
-                    piece = GetPieceGOFromText(currentChar);
-                    Vector3 spawnPos = new(fileIndex, i, 0f);
-                    Instantiate(piece, spawnPos, Quaternion.identity, _pieceHolder);
+                    piece = GetPieceGOFromText(currentChar, out bool isWhite);
+                    squareToSpawnPieceOn = BoardManager.Instance.GetSquare(fileIndex, i);
+                    Vector3 spawnPos = new(squareToSpawnPieceOn.SquareX, squareToSpawnPieceOn.SquareY, 0f);
+                    newPiece = Instantiate(piece, spawnPos, Quaternion.identity, _pieceHolder);
+                    newPiece.GetComponent<Piece>().SetupPiece(squareToSpawnPieceOn, isWhite);
+                    squareToSpawnPieceOn.SetPieceOnSquare(newPiece.GetComponent<Piece>());
                     fileIndex++;
                 }
             }
@@ -73,66 +79,63 @@ public class PieceManager : MonoBehaviour
         LoadPosition(_defaultPosition);
     }
 
-    private GameObject GetPieceGOFromText(string character)
+    private GameObject GetPieceGOFromText(string character, out bool isWhite)
     {
         GameObject piece = _whiteKing;
+        isWhite = true;
 
         switch (character)
         {
             case "K":
                 piece = _whiteKing;
+                isWhite = true;
                 break;
             case "Q":
                 piece = _whiteQueen;
+                isWhite = true;
                 break;
             case "R":
                 piece = _whiteRook;
+                isWhite = true;
                 break;
             case "B":
                 piece = _whiteBishop;
+                isWhite = true;
                 break;
             case "N":
                 piece = _whiteKnight;
+                isWhite = true;
                 break;
             case "P":
                 piece = _whitePawn;
+                isWhite = true;
                 break;
             case "k":
                 piece = _blackKing;
+                isWhite = false;
                 break;
             case "q":
                 piece = _blackQueen;
+                isWhite = false;
                 break;
             case "r":
                 piece = _blackRook;
+                isWhite = false;
                 break;
             case "b":
                 piece = _blackBishop;
+                isWhite = false;
                 break;
             case "n":
                 piece = _blackKnight;
+                isWhite = false;
                 break;
             case "p":
                 piece = _blackPawn;
+                isWhite = false;
                 break;
         }
 
         return piece;
-    }
-
-    public void ShowHidePossibleMoves(Piece piece, Square startSquare, bool show)
-    {
-        PieceMovesSO possibleMoves = piece.PossibleMoves;
-        int startX = startSquare.SquareX;
-        int startY = startSquare.SquareY;
-        Square moveSquare;
-
-        foreach (Vector2Int move in possibleMoves.PossibleMoves)
-        {
-            moveSquare = BoardManager.Instance.GetSquare(startX + move.x, startY + move.y);
-            Debug.Log($"{startX + move.x} {startY + move.y}");
-            if (moveSquare != null)
-                moveSquare.ShowHidePossibleMoveIndicator(show);
-        }
     }
 }

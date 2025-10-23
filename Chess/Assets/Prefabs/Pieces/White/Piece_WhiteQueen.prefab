@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2322154331467571608}
   - component: {fileID: -4899313255608563125}
-  - component: {fileID: 5224015256877304544}
+  - component: {fileID: -8031751025566692197}
   m_Layer: 7
   m_Name: Piece_WhiteQueen
   m_TagString: Untagged
@@ -170,7 +170,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &5224015256877304544
+--- !u!114 &-8031751025566692197
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,7 +179,49 @@ MonoBehaviour:
   m_GameObject: {fileID: 8154244088392242919}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741a96d17ecd85c4b98c6fe1a2aae1b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 3902c0a6a1b06b340b6aac74bfb73cbd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Piece
-  _possibleMoves: {fileID: 11400000, guid: 260ec7b79abc1fb4a929b6c0f3a21174, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::PieceQueen
+  _basicMoves:
+  - {x: 1, y: 1}
+  - {x: 2, y: 2}
+  - {x: 3, y: 3}
+  - {x: 4, y: 4}
+  - {x: 5, y: 5}
+  - {x: 6, y: 6}
+  - {x: 7, y: 7}
+  - {x: -1, y: -1}
+  - {x: -2, y: -2}
+  - {x: -3, y: -3}
+  - {x: -4, y: -4}
+  - {x: -5, y: -5}
+  - {x: -6, y: -6}
+  - {x: -7, y: -7}
+  - {x: 0, y: 1}
+  - {x: 0, y: 2}
+  - {x: 0, y: 3}
+  - {x: 0, y: 4}
+  - {x: 0, y: 5}
+  - {x: 0, y: 6}
+  - {x: 0, y: 7}
+  - {x: 0, y: -1}
+  - {x: 0, y: -2}
+  - {x: 0, y: -3}
+  - {x: 0, y: -4}
+  - {x: 0, y: -5}
+  - {x: 0, y: -6}
+  - {x: 0, y: -7}
+  - {x: 1, y: 0}
+  - {x: 2, y: 0}
+  - {x: 3, y: 0}
+  - {x: 4, y: 0}
+  - {x: 5, y: 0}
+  - {x: 6, y: 0}
+  - {x: 7, y: 0}
+  - {x: -1, y: 0}
+  - {x: -2, y: 0}
+  - {x: -3, y: 0}
+  - {x: -4, y: 0}
+  - {x: -5, y: 0}
+  - {x: -6, y: 0}
+  - {x: -7, y: 0}

@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1035008118449386788}
   - component: {fileID: 1289047915986332249}
-  - component: {fileID: -2932036602777881141}
+  - component: {fileID: -3060706387384749962}
   m_Layer: 7
   m_Name: Piece_BlackRook
   m_TagString: Untagged
@@ -170,7 +170,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &-2932036602777881141
+--- !u!114 &-3060706387384749962
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,7 +179,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 7844577150792718309}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741a96d17ecd85c4b98c6fe1a2aae1b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 7094ef77a47b32d49b391315accd9b0d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Piece
-  _possibleMoves: {fileID: 11400000, guid: 62c5651cdd8c6ac498b0f785a504a0b4, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::PieceRook
+  _basicMoves:
+  - {x: 1, y: 0}
+  - {x: 2, y: 0}
+  - {x: 3, y: 0}
+  - {x: 4, y: 0}
+  - {x: 5, y: 0}
+  - {x: 6, y: 0}
+  - {x: 7, y: 0}
+  - {x: -1, y: 0}
+  - {x: -2, y: 0}
+  - {x: -3, y: 0}
+  - {x: -4, y: 0}
+  - {x: -5, y: 0}
+  - {x: -6, y: 0}
+  - {x: -7, y: 0}
+  - {x: 0, y: 1}
+  - {x: 0, y: 2}
+  - {x: 0, y: 3}
+  - {x: 0, y: 4}
+  - {x: 0, y: 5}
+  - {x: 0, y: 6}
+  - {x: 0, y: 7}
+  - {x: 0, y: -1}
+  - {x: 0, y: -2}
+  - {x: 0, y: -3}
+  - {x: 0, y: -4}
+  - {x: 0, y: -5}
+  - {x: 0, y: -6}
+  - {x: 0, y: -7}

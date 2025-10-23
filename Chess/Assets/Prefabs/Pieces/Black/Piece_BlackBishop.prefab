@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3484368244349068125}
   - component: {fileID: -9184999290636633210}
-  - component: {fileID: -5741930728309946408}
+  - component: {fileID: 9123926224695275840}
   m_Layer: 7
   m_Name: Piece_BlackBishop
   m_TagString: Untagged
@@ -170,7 +170,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &-5741930728309946408
+--- !u!114 &9123926224695275840
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,7 +179,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 5785921992157234918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741a96d17ecd85c4b98c6fe1a2aae1b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d909440e675f9641b5545cb4074d186, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Piece
-  _possibleMoves: {fileID: 11400000, guid: 52ce69c271c85814da4c587ed0f291dd, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::PieceBishop
+  _basicMoves:
+  - {x: 1, y: 1}
+  - {x: 2, y: 2}
+  - {x: 3, y: 3}
+  - {x: 4, y: 4}
+  - {x: 5, y: 5}
+  - {x: 6, y: 6}
+  - {x: 7, y: 7}
+  - {x: -1, y: -1}
+  - {x: -2, y: -2}
+  - {x: -3, y: -3}
+  - {x: -4, y: -4}
+  - {x: -5, y: -5}
+  - {x: -6, y: -6}
+  - {x: -7, y: -7}

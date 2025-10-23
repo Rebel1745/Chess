@@ -13,7 +13,7 @@ public class InputManager : MonoBehaviour
     public Vector2 _mousePosition;
     public bool _isMovingPiece = false;
     public bool _isAwaitingMove = false;
-    public GameObject _selectedPiece;
+    public Piece _selectedPiece;
     public Square _selectedPieceStartSquare;
 
     public Square _currentSquare;
@@ -78,8 +78,16 @@ public class InputManager : MonoBehaviour
     {
         if (_currentPiece == null && !_isAwaitingMove) return;
 
+        if (_selectedPiece != null)
+        {
+            _selectedPiece.ShowHideAvailableMoves(false);
+        }
+
         if (_currentPiece != null && _currentSquare != null)
-            PieceManager.Instance.ShowHidePossibleMoves(_currentPiece, _currentSquare, true);
+        {
+            _currentPiece.CalculateAvailableMoves();
+            _currentPiece.ShowHideAvailableMoves(true);
+        }
 
         if (_isAwaitingMove && _selectedPiece != null)
         {
@@ -90,7 +98,7 @@ public class InputManager : MonoBehaviour
         else
         {
             _isMovingPiece = true;
-            _selectedPiece = _currentPiece.gameObject;
+            _selectedPiece = _currentPiece;
             _selectedPieceStartSquare = _currentSquare;
         }
     }
@@ -112,9 +120,9 @@ public class InputManager : MonoBehaviour
             _isAwaitingMove = true;
         else
         {
-            PieceManager.Instance.ShowHidePossibleMoves(_currentPiece, _selectedPieceStartSquare, false);
+            _selectedPiece.ShowHideAvailableMoves(false);
             _isAwaitingMove = false;
-            _selectedPiece = _currentPiece.gameObject;
+            _selectedPiece = _currentPiece;
             _selectedPieceStartSquare = _currentSquare;
         }
     }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3669417563652996296}
   - component: {fileID: -4111650336851106381}
-  - component: {fileID: -5283005287323767009}
+  - component: {fileID: -2934174456633700948}
   m_Layer: 7
   m_Name: Piece_BlackKnight
   m_TagString: Untagged
@@ -80,7 +80,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &-5283005287323767009
+--- !u!114 &-2934174456633700948
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -89,10 +89,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 5071265626488628164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 741a96d17ecd85c4b98c6fe1a2aae1b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 5de5cf0922c8e2443966e6e3293edefa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Piece
-  _possibleMoves: {fileID: 11400000, guid: 5d4993b7feec5e14ba9d5b0643c55ea4, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::PieceKnight
+  _basicMoves:
+  - {x: -1, y: 2}
+  - {x: 1, y: 2}
+  - {x: 2, y: -1}
+  - {x: 2, y: 1}
+  - {x: -1, y: -2}
+  - {x: 1, y: -2}
+  - {x: -2, y: -1}
+  - {x: -2, y: 1}
 --- !u!1 &7941158159418784132
 GameObject:
   m_ObjectHideFlags: 0
