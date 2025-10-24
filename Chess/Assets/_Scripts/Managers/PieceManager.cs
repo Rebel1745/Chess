@@ -1,6 +1,5 @@
 using System;
-using System.Linq;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
@@ -22,8 +21,10 @@ public class PieceManager : MonoBehaviour
     [SerializeField] private GameObject _blackKnight;
     [SerializeField] private GameObject _blackPawn;
 
+    private List<Piece> _allPieces = new();
+
     private string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    //private string _defaultPosition = "r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1";
+    //private string _defaultPosition = "r1bk3r/p2pBpNp/n4n2/1pN1P2P/6P1/3P4/P1P1K3/q5b1";
 
     private void Awake()
     {
@@ -37,7 +38,8 @@ public class PieceManager : MonoBehaviour
         int fileIndex;
         string currentChar;
         GameObject piece;
-        GameObject newPiece;
+        GameObject newPieceGO;
+        Piece newPiece;
         Square squareToSpawnPieceOn;
 
         for (int i = rankStrings.Length - 1; i >= 0; i--)
@@ -65,12 +67,25 @@ public class PieceManager : MonoBehaviour
                     piece = GetPieceGOFromText(currentChar, out bool isWhite);
                     squareToSpawnPieceOn = BoardManager.Instance.GetSquare(fileIndex, i);
                     Vector3 spawnPos = new(squareToSpawnPieceOn.SquareX, squareToSpawnPieceOn.SquareY, 0f);
-                    newPiece = Instantiate(piece, spawnPos, Quaternion.identity, _pieceHolder);
-                    newPiece.GetComponent<Piece>().SetupPiece(squareToSpawnPieceOn, isWhite);
-                    squareToSpawnPieceOn.SetPieceOnSquare(newPiece.GetComponent<Piece>());
+                    newPieceGO = Instantiate(piece, spawnPos, Quaternion.identity, _pieceHolder);
+                    newPiece = newPieceGO.GetComponent<Piece>();
+                    newPiece.SetupPiece(squareToSpawnPieceOn, isWhite);
+                    squareToSpawnPieceOn.SetPieceOnSquare(newPiece);
+                    _allPieces.Add(newPiece);
                     fileIndex++;
+                    newPieceGO.name = currentChar + " " + i;
+                    // if the piece is a pawn, and it is on the stating rank, mark it as first move
+                    if ((currentChar == "p" && i == 6) || (currentChar == "P" && i == 1))
+                    {
+                        newPiece.SetIsFirstMove(true);
+                    }
                 }
             }
+        }
+
+        foreach (Piece p in _allPieces)
+        {
+            p.CalculateAvailableMoves();
         }
     }
 

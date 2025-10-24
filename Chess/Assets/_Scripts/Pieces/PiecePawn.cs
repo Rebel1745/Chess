@@ -23,6 +23,8 @@ public class PiecePawn : Piece
         {
             possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
 
+            if (possibleMoveSquare == null) continue;
+
             if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
                 _availableMoves.Add(possibleMoveSquare);
         }
