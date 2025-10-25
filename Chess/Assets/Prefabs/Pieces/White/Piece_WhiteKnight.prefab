@@ -182,6 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5de5cf0922c8e2443966e6e3293edefa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceKnight
+  _pieceType: 1
   _basicMoves:
   - {x: -1, y: 2}
   - {x: 1, y: 2}

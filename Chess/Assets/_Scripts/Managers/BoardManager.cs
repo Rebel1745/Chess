@@ -35,7 +35,7 @@ public class BoardManager : MonoBehaviour
             {
                 squarePrefab = isLightSquare ? _lightSquarePrefab : _darkSquarePrefab;
                 newSquareGO = Instantiate(squarePrefab, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
-                newSquareGO.name = "(" + x + ", " + y + ") (" + _fileNames[x] + (y + 1) + ")";
+                newSquareGO.name = "Square " + _fileNames[x] + (y + 1);
                 currentSquare = newSquareGO.GetComponent<Square>();
                 currentSquare.SetupSquareDetails(x, y);
                 _squares[x, y] = currentSquare;

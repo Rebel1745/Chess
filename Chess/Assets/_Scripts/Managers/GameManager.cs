@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public GameState State { get; private set; }
     public GameState PreviousState { get; private set; }
 
-    private bool _isCurrentPlayerWhite = true;
+    public bool _isCurrentPlayerWhite = true;
     public bool IsCurrentPlayerWhite { get { return _isCurrentPlayerWhite; } }
 
     private void Awake()

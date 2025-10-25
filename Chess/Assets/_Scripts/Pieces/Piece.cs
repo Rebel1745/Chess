@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
+    [SerializeField] private PIECE_TYPE _pieceType;
+    public PIECE_TYPE PieceType { get { return _pieceType; } }
     [SerializeField] private Vector2Int[] _basicMoves;
     protected bool _isWhite;
     protected Square _square;
@@ -32,7 +34,7 @@ public class Piece : MonoBehaviour
     // TODO: Ignore rest of current direction if the piece is able to capture an enemy piece
     // i.e. dont show moves past the captured piece as being legal
 
-    public virtual void CalculateAvailableMoves()
+    public virtual void CalculateAvailableMoves(bool checkForChecks)
     {
         _availableMoves.Clear();
 
@@ -67,8 +69,41 @@ public class Piece : MonoBehaviour
                 _availableMoves.Add(possibleMoveSquare);
 
             // if we land on an oponent piece, we can't move past it
-            // if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
-            //     ignoreCurrentDirection = true;
+            if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
+            {
+                ignoreCurrentDirection = true;
+                lastXSign = Mathf.Sign(move.x);
+                lastYSign = Mathf.Sign(move.y);
+            }
+        }
+    }
+
+    public void RemovePinnedPieceMovesFromAvailableMoves()
+    {
+        Square currentSquare;
+        bool remove;
+
+        // loop backwards through the list so elements can be removed as we go
+        for (int i = _availableMoves.Count - 1; i >= 0; i--)
+        {
+            remove = false;
+            currentSquare = _square;
+            // move to valid square
+            SetPieceSquare(_availableMoves[i]);
+            _availableMoves[i].SetPieceOnSquare(this);
+            currentSquare.SetPieceOnSquare(null);
+
+            // check to see if on this new square the player would be in check
+            // if they are that means that the piece was pinned and shouldn't be able to move
+            if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(!_isWhite))
+                remove = true;
+
+            // reset pieces and squares
+            SetPieceSquare(currentSquare);
+            _availableMoves[i].SetPieceOnSquare(null);
+            currentSquare.SetPieceOnSquare(this);
+
+            if (remove) _availableMoves.RemoveAt(i);
         }
     }
 
@@ -87,4 +122,26 @@ public class Piece : MonoBehaviour
         if (_availableMoves.Contains(square)) return true;
         else return false;
     }
+
+    // if the piece can take the king, that means that the king would be in check
+    public bool CheckIfPieceCanTakeKing()
+    {
+        foreach (Square square in _availableMoves)
+        {
+            if (square.PieceOnSquare != null && square.PieceOnSquare.PieceType == PIECE_TYPE.King)
+                return true;
+        }
+
+        return false;
+    }
+}
+
+public enum PIECE_TYPE
+{
+    Pawn,
+    Knight,
+    Bishop,
+    Rook,
+    Queen,
+    King
 }

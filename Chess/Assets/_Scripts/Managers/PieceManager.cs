@@ -73,7 +73,7 @@ public class PieceManager : MonoBehaviour
                     squareToSpawnPieceOn.SetPieceOnSquare(newPiece);
                     _allPieces.Add(newPiece);
                     fileIndex++;
-                    newPieceGO.name = currentChar + " " + i;
+                    newPieceGO.name = (isWhite ? "White " : "Black ") + newPiece.PieceType.ToString();
                     // if the piece is a pawn, and it is on the stating rank, mark it as first move
                     if ((currentChar == "p" && i == 6) || (currentChar == "P" && i == 1))
                     {
@@ -85,7 +85,7 @@ public class PieceManager : MonoBehaviour
 
         foreach (Piece p in _allPieces)
         {
-            p.CalculateAvailableMoves();
+            p.CalculateAvailableMoves(false);
         }
     }
 
@@ -152,5 +152,20 @@ public class PieceManager : MonoBehaviour
         }
 
         return piece;
+    }
+
+    public bool CheckIfAnyPieceCanTakeKing(bool isWhite)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (piece.IsWhite != isWhite) continue;
+
+            piece.CalculateAvailableMoves(false);
+
+            if (piece.CheckIfPieceCanTakeKing())
+                return true;
+        }
+
+        return false;
     }
 }

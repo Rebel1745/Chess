@@ -83,20 +83,10 @@ public class InputManager : MonoBehaviour
             // if there is already a piece seleced, hide their available moves
             if (_selectedPiece) _selectedPiece.ShowHideAvailableMoves(false);
 
-            //if (_selectedPiece != _currentPiece)
-            //{
-            // set the selected piece and show its move
             _selectedPiece = _currentPiece;
-            _selectedPiece.CalculateAvailableMoves();
+            _selectedPiece.CalculateAvailableMoves(true);
             _selectedPiece.ShowHideAvailableMoves(true);
             _isMovingPiece = true;
-            //}
-            /*else
-            {
-                // if this is the second time we click the piece, hide the moves
-                _selectedPiece.ShowHideAvailableMoves(false);
-                _selectedPiece = null;
-            }*/
         }
     }
 
@@ -138,58 +128,6 @@ public class InputManager : MonoBehaviour
         if (isValid)
             piece.SetIsFirstMove(false);
     }
-
-    /*private void OnClickStarted(InputAction.CallbackContext context)
-    {
-        if (_currentPiece == null && !_isAwaitingMove) return;
-
-        _selectedPiece?.ShowHideAvailableMoves(false);
-
-        if (_currentPiece != null && _currentSquare != null)
-        {
-            _currentPiece.CalculateAvailableMoves();
-            _currentPiece.ShowHideAvailableMoves(true);
-        }
-
-        if (_isAwaitingMove && _selectedPiece != null)
-        {
-            _selectedPiece.transform.position = _currentSquare.transform.position;
-            _selectedPiece = null;
-            _selectedPieceStartSquare = null;
-        }
-        else
-        {
-            _isMovingPiece = true;
-            _selectedPiece = _currentPiece;
-            _selectedPieceStartSquare = _currentSquare;
-        }
-    }
-
-    private void OnClickCanceled(InputAction.CallbackContext context)
-    {
-        if (_currentPiece == null || _selectedPiece == null) return;
-
-        _isMovingPiece = false;
-
-        if (_selectedPiece.CheckIfValidMove(_currentSquare))
-        {
-            _selectedPiece.transform.position = _currentSquare.transform.position;
-
-            if (_selectedPieceStartSquare == _currentSquare)
-                _isAwaitingMove = true;
-            else
-            {
-                _selectedPiece.ShowHideAvailableMoves(false);
-                _isAwaitingMove = false;
-                _selectedPiece = _currentPiece;
-                _selectedPieceStartSquare = _currentSquare;
-            }
-        }
-        else
-        {
-            _selectedPiece.transform.position = _selectedPiece.Square.transform.position;
-        }
-    }*/
 
     private void UpdateMovePiece()
     {
