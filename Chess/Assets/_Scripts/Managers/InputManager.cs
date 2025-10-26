@@ -103,30 +103,46 @@ public class InputManager : MonoBehaviour
 
         if (_currentSquare)
         {
-            // check if the current square is part of the available moves set of the piece
+            // check if the current square is part of the available move set of the piece
             if (_selectedPiece.CheckIfValidMove(_currentSquare))
-                MovePiece(_selectedPiece, _currentSquare, true);
+                MovePiece(_selectedPiece, _currentSquare);
             else
             {
-                MovePiece(_selectedPiece, _selectedPiece.Square, false);
+                ResetPiecePosition(_selectedPiece, _selectedPiece.Square);
             }
         }
     }
 
-    private void MovePiece(Piece piece, Square square, bool isValid)
+    private void MovePiece(Piece piece, Square square)
     {
+        // if there is a piece on the square, capture it
+        if (square.PieceOnSquare != null)
+            PieceManager.Instance.TakePiece(square.PieceOnSquare);
+
+        // remove the piece from the current square
         piece.Square.SetPieceOnSquare(null);
+        // set the pieces position to the new squares position
         piece.transform.position = square.transform.position;
         piece.ShowHideAvailableMoves(false);
+        // set the new square of the piece
         piece.SetPieceSquare(square);
         _selectedPiece = null;
+        // set the piece as the new piece on the square
         square.SetPieceOnSquare(piece);
         _currentSquare = null;
         _isMovingPiece = false;
 
-        // the move was valid (i.e an actual move rather then resetting the piece to the origingal position)
-        if (isValid)
-            piece.SetIsFirstMove(false);
+        piece.SetIsFirstMove(false);
+        GameManager.Instance.UpdateGameState(GameState.NextTurn);
+    }
+
+    private void ResetPiecePosition(Piece piece, Square square)
+    {
+        piece.transform.position = square.transform.position;
+        piece.ShowHideAvailableMoves(false);
+        _selectedPiece = null;
+        _currentSquare = null;
+        _isMovingPiece = false;
     }
 
     private void UpdateMovePiece()

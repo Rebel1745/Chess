@@ -6,12 +6,13 @@ public class Piece : MonoBehaviour
 {
     [SerializeField] private PIECE_TYPE _pieceType;
     public PIECE_TYPE PieceType { get { return _pieceType; } }
-    [SerializeField] private Vector2Int[] _basicMoves;
+    [SerializeField] protected Vector2Int[] _basicMoves;
     protected bool _isWhite;
     protected Square _square;
     public Square Square { get { return _square; } }
     public bool IsWhite { get { return _isWhite; } }
-    protected bool _isFirstMove = false; // only used for pawns so can default to false
+    protected bool _isFirstMove = true;
+    public bool IsFirstMove { get { return _isFirstMove; } }
 
     protected List<Square> _availableMoves = new();
 
@@ -82,12 +83,18 @@ public class Piece : MonoBehaviour
     {
         Square currentSquare;
         bool remove;
+        Piece capturedPiece;
 
         // loop backwards through the list so elements can be removed as we go
         for (int i = _availableMoves.Count - 1; i >= 0; i--)
         {
             remove = false;
             currentSquare = _square;
+
+            if (_availableMoves[i].PieceOnSquare != null)
+                capturedPiece = _availableMoves[i].PieceOnSquare;
+            else capturedPiece = null;
+
             // move to valid square
             SetPieceSquare(_availableMoves[i]);
             _availableMoves[i].SetPieceOnSquare(this);
@@ -95,12 +102,12 @@ public class Piece : MonoBehaviour
 
             // check to see if on this new square the player would be in check
             // if they are that means that the piece was pinned and shouldn't be able to move
-            if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(!_isWhite))
+            if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(!_isWhite, capturedPiece))
                 remove = true;
 
             // reset pieces and squares
             SetPieceSquare(currentSquare);
-            _availableMoves[i].SetPieceOnSquare(null);
+            _availableMoves[i].SetPieceOnSquare(capturedPiece);
             currentSquare.SetPieceOnSquare(this);
 
             if (remove) _availableMoves.RemoveAt(i);

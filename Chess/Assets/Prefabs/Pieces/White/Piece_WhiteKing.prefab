@@ -192,3 +192,5 @@ MonoBehaviour:
   - {x: 1, y: -1}
   - {x: 1, y: 0}
   - {x: 1, y: 1}
+  _castleKingSide: {x: 2, y: 0}
+  _castleQueenSide: {x: -2, y: 0}

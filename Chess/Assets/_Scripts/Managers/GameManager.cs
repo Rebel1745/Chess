@@ -1,3 +1,4 @@
+using System.Data;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -33,6 +34,11 @@ public class GameManager : MonoBehaviour
             case GameState.SetupPieces:
                 SetupPieces();
                 break;
+            case GameState.WaitingForMove:
+                break;
+            case GameState.NextTurn:
+                NextTurn();
+                break;
         }
     }
 
@@ -44,6 +50,13 @@ public class GameManager : MonoBehaviour
     private void SetupPieces()
     {
         PieceManager.Instance.LoadDefaultPosition();
+        UpdateGameState(GameState.WaitingForMove);
+    }
+
+    private void NextTurn()
+    {
+        _isCurrentPlayerWhite = !_isCurrentPlayerWhite;
+        UpdateGameState(GameState.WaitingForMove);
     }
 }
 
@@ -51,5 +64,7 @@ public enum GameState
 {
     None,
     CreateBoard,
-    SetupPieces
+    SetupPieces,
+    WaitingForMove,
+    NextTurn
 }

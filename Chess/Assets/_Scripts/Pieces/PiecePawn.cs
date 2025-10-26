@@ -7,9 +7,17 @@ public class PiecePawn : Piece
 
     public override void CalculateAvailableMoves(bool checkForChecks)
     {
-        base.CalculateAvailableMoves(checkForChecks);
+        // don't run the base function as the basic movement for a pawn does not allow taking another piece
+        //base.CalculateAvailableMoves(checkForChecks);
 
+        _availableMoves.Clear();
         Square possibleMoveSquare;
+
+        // check the base move
+        possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + _basicMoves[0].x, _square.SquareY + _basicMoves[0].y);
+
+        if (possibleMoveSquare.PieceOnSquare == null)
+            _availableMoves.Add(possibleMoveSquare);
 
         // only check to see if we can move two squares if we can already move one
         if (_availableMoves.Count == 1 && _isFirstMove)

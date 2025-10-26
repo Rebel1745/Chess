@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 4907767384800147275}
   - component: {fileID: 5631569416297549577}
   m_Layer: 0
-  m_Name: PossibileMoveIndicator
+  m_Name: PossibleMoveIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

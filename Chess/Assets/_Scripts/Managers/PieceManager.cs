@@ -73,7 +73,7 @@ public class PieceManager : MonoBehaviour
                     squareToSpawnPieceOn.SetPieceOnSquare(newPiece);
                     _allPieces.Add(newPiece);
                     fileIndex++;
-                    newPieceGO.name = (isWhite ? "White " : "Black ") + newPiece.PieceType.ToString();
+                    newPieceGO.name = (isWhite ? "White " : "Black ") + newPiece.PieceType.ToString() + " " + fileIndex;
                     // if the piece is a pawn, and it is on the stating rank, mark it as first move
                     if ((currentChar == "p" && i == 6) || (currentChar == "P" && i == 1))
                     {
@@ -154,10 +154,13 @@ public class PieceManager : MonoBehaviour
         return piece;
     }
 
-    public bool CheckIfAnyPieceCanTakeKing(bool isWhite)
+    public bool CheckIfAnyPieceCanTakeKing(bool isWhite, Piece pieceToIgnore = null)
     {
         foreach (Piece piece in _allPieces)
         {
+            // piece to ignore allows us to simulate a capture without altering the pieces list
+            if (pieceToIgnore != null && piece == pieceToIgnore) continue;
+
             if (piece.IsWhite != isWhite) continue;
 
             piece.CalculateAvailableMoves(false);
@@ -167,5 +170,11 @@ public class PieceManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void TakePiece(Piece piece)
+    {
+        _allPieces.Remove(piece);
+        Destroy(piece.gameObject);
     }
 }
