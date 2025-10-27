@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Scripting.APIUpdating;
 
 public class InputManager : MonoBehaviour
 {
@@ -76,6 +77,8 @@ public class InputManager : MonoBehaviour
     #region Move Piece
     private void OnClickStarted(InputAction.CallbackContext context)
     {
+        if (GameManager.Instance.State != GameState.WaitingForMove) return;
+
         if (_currentPiece)
         {
             if (_currentPiece.IsWhite != GameManager.Instance.IsCurrentPlayerWhite) return;
@@ -104,8 +107,8 @@ public class InputManager : MonoBehaviour
         if (_currentSquare)
         {
             // check if the current square is part of the available move set of the piece
-            if (_selectedPiece.CheckIfValidMove(_currentSquare))
-                MovePiece(_selectedPiece, _currentSquare);
+            if (_selectedPiece.CheckIfValidMove(_currentSquare, out MoveDetails move))
+                MovePiece(move);
             else
             {
                 ResetPiecePosition(_selectedPiece, _selectedPiece.Square);
@@ -113,27 +116,61 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void MovePiece(Piece piece, Square square)
+    private void MovePiece(MoveDetails move)
     {
         // if there is a piece on the square, capture it
-        if (square.PieceOnSquare != null)
-            PieceManager.Instance.TakePiece(square.PieceOnSquare);
+        if (move.MoveToSquare.PieceOnSquare != null)
+            PieceManager.Instance.TakePiece(move.MoveToSquare.PieceOnSquare);
 
         // remove the piece from the current square
-        piece.Square.SetPieceOnSquare(null);
+        move.PieceToMove.Square.SetPieceOnSquare(null);
         // set the pieces position to the new squares position
-        piece.transform.position = square.transform.position;
-        piece.ShowHideAvailableMoves(false);
+        move.PieceToMove.transform.position = move.MoveToSquare.transform.position;
+        move.PieceToMove.ShowHideAvailableMoves(false);
         // set the new square of the piece
-        piece.SetPieceSquare(square);
+        move.PieceToMove.SetPieceSquare(move.MoveToSquare);
         _selectedPiece = null;
         // set the piece as the new piece on the square
-        square.SetPieceOnSquare(piece);
+        move.MoveToSquare.SetPieceOnSquare(move.PieceToMove);
+
+        move.PieceToMove.SetIsFirstMove(false);
+
+        // if we are castling, we need to move the rook as well
+        if (move.SecondPieceToMove != null && move.SecondMoveToSquare != null)
+        {
+            // remove the piece from the current square
+            move.SecondPieceToMove.Square.SetPieceOnSquare(null);
+            // set the pieces position to the new squares position
+            move.SecondPieceToMove.transform.position = move.SecondMoveToSquare.transform.position;
+            move.SecondPieceToMove.ShowHideAvailableMoves(false);
+            // set the new square of the piece
+            move.SecondPieceToMove.SetPieceSquare(move.SecondMoveToSquare);
+            // set the piece as the new piece on the square
+            move.SecondMoveToSquare.SetPieceOnSquare(move.SecondPieceToMove);
+
+            move.SecondPieceToMove.SetIsFirstMove(false);
+        }
+
         _currentSquare = null;
         _isMovingPiece = false;
 
-        piece.SetIsFirstMove(false);
-        GameManager.Instance.UpdateGameState(GameState.NextTurn);
+        // check for check
+        if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
+        {
+            if (PieceManager.Instance.CheckForMate())
+            {
+                // check mate baby
+                Debug.Log("CheckMate");
+                GameManager.Instance.UpdateGameState(GameState.GameOver);
+            }
+            else
+            {
+                Debug.Log("Check");
+                GameManager.Instance.UpdateGameState(GameState.NextTurn);
+            }
+        }
+        else
+            GameManager.Instance.UpdateGameState(GameState.NextTurn);
     }
 
     private void ResetPiecePosition(Piece piece, Square square)

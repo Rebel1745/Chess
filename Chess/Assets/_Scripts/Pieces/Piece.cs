@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 public class Piece : MonoBehaviour
 {
@@ -14,7 +15,8 @@ public class Piece : MonoBehaviour
     protected bool _isFirstMove = true;
     public bool IsFirstMove { get { return _isFirstMove; } }
 
-    protected List<Square> _availableMoves = new();
+    protected List<MoveDetails> _availableMoves = new();
+    public int AvailableMoveCount { get { return _availableMoves.Count; } }
 
     public void SetupPiece(Square square, bool isWhite)
     {
@@ -67,7 +69,11 @@ public class Piece : MonoBehaviour
             }
 
             if (!ignoreCurrentDirection)
-                _availableMoves.Add(possibleMoveSquare);
+                _availableMoves.Add(new MoveDetails
+                {
+                    PieceToMove = this,
+                    MoveToSquare = possibleMoveSquare
+                });
 
             // if we land on an oponent piece, we can't move past it
             if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
@@ -91,13 +97,13 @@ public class Piece : MonoBehaviour
             remove = false;
             currentSquare = _square;
 
-            if (_availableMoves[i].PieceOnSquare != null)
-                capturedPiece = _availableMoves[i].PieceOnSquare;
+            if (_availableMoves[i].MoveToSquare.PieceOnSquare != null)
+                capturedPiece = _availableMoves[i].MoveToSquare.PieceOnSquare;
             else capturedPiece = null;
 
             // move to valid square
-            SetPieceSquare(_availableMoves[i]);
-            _availableMoves[i].SetPieceOnSquare(this);
+            SetPieceSquare(_availableMoves[i].MoveToSquare);
+            _availableMoves[i].MoveToSquare.SetPieceOnSquare(this);
             currentSquare.SetPieceOnSquare(null);
 
             // check to see if on this new square the player would be in check
@@ -107,7 +113,7 @@ public class Piece : MonoBehaviour
 
             // reset pieces and squares
             SetPieceSquare(currentSquare);
-            _availableMoves[i].SetPieceOnSquare(capturedPiece);
+            _availableMoves[i].MoveToSquare.SetPieceOnSquare(capturedPiece);
             currentSquare.SetPieceOnSquare(this);
 
             if (remove) _availableMoves.RemoveAt(i);
@@ -118,24 +124,34 @@ public class Piece : MonoBehaviour
     {
         if (_availableMoves.Count == 0) return;
 
-        foreach (Square square in _availableMoves)
+        foreach (MoveDetails move in _availableMoves)
         {
-            square.ShowHidePossibleMoveIndicator(show);
+            move.MoveToSquare.ShowHidePossibleMoveIndicator(show);
         }
     }
 
-    public bool CheckIfValidMove(Square square)
+    public bool CheckIfValidMove(Square square, out MoveDetails moveDetails)
     {
-        if (_availableMoves.Contains(square)) return true;
-        else return false;
+        moveDetails = new MoveDetails();
+
+        foreach (MoveDetails move in _availableMoves)
+        {
+            if (move.MoveToSquare == square)
+            {
+                moveDetails = move;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // if the piece can take the king, that means that the king would be in check
     public bool CheckIfPieceCanTakeKing()
     {
-        foreach (Square square in _availableMoves)
+        foreach (MoveDetails move in _availableMoves)
         {
-            if (square.PieceOnSquare != null && square.PieceOnSquare.PieceType == PIECE_TYPE.King)
+            if (move.MoveToSquare.PieceOnSquare != null && move.MoveToSquare.PieceOnSquare.PieceType == PIECE_TYPE.King)
                 return true;
         }
 

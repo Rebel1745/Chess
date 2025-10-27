@@ -39,6 +39,9 @@ public class GameManager : MonoBehaviour
             case GameState.NextTurn:
                 NextTurn();
                 break;
+            case GameState.GameOver:
+                GameOver();
+                break;
         }
     }
 
@@ -58,6 +61,11 @@ public class GameManager : MonoBehaviour
         _isCurrentPlayerWhite = !_isCurrentPlayerWhite;
         UpdateGameState(GameState.WaitingForMove);
     }
+
+    private void GameOver()
+    {
+        // game over
+    }
 }
 
 public enum GameState
@@ -66,5 +74,6 @@ public enum GameState
     CreateBoard,
     SetupPieces,
     WaitingForMove,
-    NextTurn
+    NextTurn,
+    GameOver
 }

@@ -23,7 +23,7 @@ public class PieceManager : MonoBehaviour
 
     private List<Piece> _allPieces = new();
 
-    private string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     //private string _defaultPosition = "r1bk3r/p2pBpNp/n4n2/1pN1P2P/6P1/3P4/P1P1K3/q5b1";
 
     private void Awake()
@@ -170,6 +170,23 @@ public class PieceManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    public bool CheckForMate()
+    {
+        // if any piece has moves, its not mate
+        foreach (Piece piece in _allPieces)
+        {
+            // we are checking the other colour, not the one making moves
+            if (piece.IsWhite == GameManager.Instance.IsCurrentPlayerWhite) continue;
+
+            piece.CalculateAvailableMoves(true);
+
+            if (piece.AvailableMoveCount > 0)
+                return false;
+        }
+
+        return true;
     }
 
     public void TakePiece(Piece piece)

@@ -1,3 +1,4 @@
+[System.Serializable]
 public struct MoveDetails
 {
     public Piece PieceToMove;
