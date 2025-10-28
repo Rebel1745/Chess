@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d909440e675f9641b5545cb4074d186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceBishop
-  _pieceType: 2
+  _pieceType: 3
   _basicMoves:
   - {x: 1, y: 1}
   - {x: 2, y: 2}

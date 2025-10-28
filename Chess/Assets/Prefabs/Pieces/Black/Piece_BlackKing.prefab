@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57dee0d1d0cbd8843b765dc1b8c2c7d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceKing
-  _pieceType: 5
+  _pieceType: 6
   _basicMoves:
   - {x: -1, y: -1}
   - {x: -1, y: 0}
@@ -192,5 +192,3 @@ MonoBehaviour:
   - {x: 1, y: -1}
   - {x: 1, y: 0}
   - {x: 1, y: 1}
-  _castleKingSide: {x: 2, y: 0}
-  _castleQueenSide: {x: -2, y: 0}

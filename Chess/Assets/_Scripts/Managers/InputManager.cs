@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Scripting.APIUpdating;
 
 public class InputManager : MonoBehaviour
 {
@@ -11,11 +10,13 @@ public class InputManager : MonoBehaviour
     private bool _inputEnabled = true;
     [SerializeField] private LayerMask _whatIsPiece;
     [SerializeField] private LayerMask _whatIsSquare;
-    public Vector2 _mousePosition;
+    [SerializeField] private LayerMask _whatIsPromotionPiece;
+    private Vector2 _mousePosition;
     public bool _isMovingPiece = false;
     public bool _isAwaitingMove = false;
     public Piece _selectedPiece;
     public Square _selectedPieceStartSquare;
+    private PIECE_TYPE _promotionPieceType;
 
     public Square _currentSquare;
     public Square CurrentSquare { get { return _currentSquare; } }
@@ -42,8 +43,15 @@ public class InputManager : MonoBehaviour
         if (!_inputEnabled) return;
 
         GetMousePosition();
-        CheckForMouseOverPiece();
-        CheckForMouseOverSquare();
+
+        if (GameManager.Instance.State == GameState.WaitingForMove)
+        {
+            CheckForMouseOverPiece();
+            CheckForMouseOverSquare();
+        }
+
+        if (GameManager.Instance.State == GameState.WaitingForPromotion)
+            CheckForMouseOverPromotionPiece();
 
         if (_isMovingPiece)
             UpdateMovePiece();
@@ -64,6 +72,15 @@ public class InputManager : MonoBehaviour
         else _currentPiece = null;
     }
 
+    private void CheckForMouseOverPromotionPiece()
+    {
+        Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _whatIsPromotionPiece);
+
+        if (hit)
+            _promotionPieceType = hit.GetComponent<PromotionPiece>().PieceType;
+        else _promotionPieceType = PIECE_TYPE.None;
+    }
+
     private void CheckForMouseOverSquare()
     {
         Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _whatIsSquare);
@@ -77,6 +94,13 @@ public class InputManager : MonoBehaviour
     #region Move Piece
     private void OnClickStarted(InputAction.CallbackContext context)
     {
+        if (GameManager.Instance.State == GameState.WaitingForPromotion)
+        {
+            if (_promotionPieceType == PIECE_TYPE.None) return;
+
+            PieceManager.Instance.SelectPromotionPiece(_promotionPieceType);
+        }
+
         if (GameManager.Instance.State != GameState.WaitingForMove) return;
 
         if (_currentPiece)
@@ -154,6 +178,14 @@ public class InputManager : MonoBehaviour
         _currentSquare = null;
         _isMovingPiece = false;
 
+        if (move.IsPromotion)
+            PieceManager.Instance.ShowPromotionPieces(move);
+        else
+            PieceMoved();
+    }
+
+    public void PieceMoved()
+    {
         // check for check
         if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
         {

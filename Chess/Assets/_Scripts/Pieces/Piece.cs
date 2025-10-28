@@ -161,6 +161,7 @@ public class Piece : MonoBehaviour
 
 public enum PIECE_TYPE
 {
+    None,
     Pawn,
     Knight,
     Bishop,

@@ -92,6 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2299c6243886c2419848ba5e56c5b8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PiecePawn
+  _pieceType: 1
   _basicMoves:
   - {x: 0, y: -1}
   _firstMove: {x: 0, y: -2}

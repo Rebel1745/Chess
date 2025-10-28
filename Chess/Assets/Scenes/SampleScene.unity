@@ -343,7 +343,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.14600393, g: 0.15159361, b: 0.16037738, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -368,7 +368,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -393,7 +393,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4, y: 4, z: -10}
+  m_LocalPosition: {x: 7, y: 3.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -533,7 +533,9 @@ MonoBehaviour:
   _whatIsSquare:
     serializedVersion: 2
     m_Bits: 64
-  _mousePosition: {x: 0, y: 0}
+  _whatIsPromotionPiece:
+    serializedVersion: 2
+    m_Bits: 256
   _isMovingPiece: 0
   _isAwaitingMove: 0
   _selectedPiece: {fileID: 0}
@@ -584,6 +586,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9d9f1256b4c2c14699f013732cbd3d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  _isCurrentPlayerWhite: 1
 --- !u!1 &750120863
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,6 +675,8 @@ MonoBehaviour:
   _blackBishop: {fileID: 5785921992157234918, guid: ab5ddf5680c95c94586e10cf4523d068, type: 3}
   _blackKnight: {fileID: 5071265626488628164, guid: 55daeb8308dacd04cbfff97d13bf6b37, type: 3}
   _blackPawn: {fileID: 7559596393190870394, guid: 17dba58263e2c8d4e96c3aa04ad2d665, type: 3}
+  _promtionPiecesWhitePrefab: {fileID: 4573902114905135514, guid: e74651dcd7941634bac8687d0add0262, type: 3}
+  _promtionPiecesBlackPrefab: {fileID: 8881507680313807570, guid: d73b6091e604e8644a17c567d13a6a95, type: 3}
 --- !u!1 &1847338073
 GameObject:
   m_ObjectHideFlags: 0

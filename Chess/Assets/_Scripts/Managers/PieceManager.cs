@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 public class PieceManager : MonoBehaviour
 {
@@ -20,11 +22,16 @@ public class PieceManager : MonoBehaviour
     [SerializeField] private GameObject _blackBishop;
     [SerializeField] private GameObject _blackKnight;
     [SerializeField] private GameObject _blackPawn;
+    [SerializeField] private GameObject _promtionPiecesWhitePrefab;
+    private GameObject _promotionPiecesWhite;
+    [SerializeField] private GameObject _promtionPiecesBlackPrefab;
+    private GameObject _promotionPiecesBlack;
+    private Piece _pawnToPromote;
 
     private List<Piece> _allPieces = new();
 
-    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    //private string _defaultPosition = "r1bk3r/p2pBpNp/n4n2/1pN1P2P/6P1/3P4/P1P1K3/q5b1";
+    //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    private readonly string _defaultPosition = "r1bk3r/pP1pBpNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
 
     private void Awake()
     {
@@ -75,13 +82,18 @@ public class PieceManager : MonoBehaviour
                     fileIndex++;
                     newPieceGO.name = (isWhite ? "White " : "Black ") + newPiece.PieceType.ToString() + " " + fileIndex;
                     // if the piece is a pawn, and it is on the stating rank, mark it as first move
-                    if ((currentChar == "p" && i == 6) || (currentChar == "P" && i == 1))
+                    if ((currentChar == "p" && i != 6) || (currentChar == "P" && i != 1))
                     {
-                        newPiece.SetIsFirstMove(true);
+                        newPiece.SetIsFirstMove(false);
                     }
                 }
             }
         }
+
+        _promotionPiecesWhite = Instantiate(_promtionPiecesWhitePrefab, _pieceHolder);
+        _promotionPiecesWhite.SetActive(false);
+        _promotionPiecesBlack = Instantiate(_promtionPiecesBlackPrefab, _pieceHolder);
+        _promotionPiecesBlack.SetActive(false);
 
         foreach (Piece p in _allPieces)
         {
@@ -193,5 +205,57 @@ public class PieceManager : MonoBehaviour
     {
         _allPieces.Remove(piece);
         Destroy(piece.gameObject);
+    }
+
+    public void ShowPromotionPieces(MoveDetails move)
+    {
+        Square promotionSquare = move.MoveToSquare;
+        _pawnToPromote = move.PieceToMove;
+
+        if (GameManager.Instance.IsCurrentPlayerWhite)
+        {
+            _promotionPiecesWhite.transform.position = new Vector3(promotionSquare.transform.position.x, promotionSquare.transform.position.y + 1.5f, 0f);
+            _promotionPiecesWhite.SetActive(true);
+        }
+        else
+        {
+            _promotionPiecesBlack.transform.position = new Vector3(promotionSquare.transform.position.x, promotionSquare.transform.position.y - 1.5f, 0f);
+            _promotionPiecesBlack.SetActive(true);
+        }
+
+        GameManager.Instance.UpdateGameState(GameState.WaitingForPromotion);
+    }
+
+    public void SelectPromotionPiece(PIECE_TYPE newPieceType)
+    {
+        if (GameManager.Instance.IsCurrentPlayerWhite) _promotionPiecesWhite.SetActive(false);
+        else _promotionPiecesBlack.SetActive(false);
+
+        Square promotionSquare = _pawnToPromote.Square;
+        _allPieces.Remove(_pawnToPromote);
+        Destroy(_pawnToPromote.gameObject);
+        GameObject newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteQueen : _blackQueen;
+
+        switch (newPieceType)
+        {
+            case PIECE_TYPE.Knight:
+                newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteKnight : _blackKnight;
+                break;
+            case PIECE_TYPE.Bishop:
+                newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteBishop : _blackBishop;
+                break;
+            case PIECE_TYPE.Rook:
+                newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteRook : _blackRook;
+                break;
+        }
+
+        GameObject newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
+        Piece newPiece = newPieceGO.GetComponent<Piece>();
+        newPiece.SetupPiece(promotionSquare, GameManager.Instance.IsCurrentPlayerWhite);
+        promotionSquare.SetPieceOnSquare(newPiece);
+        _allPieces.Add(newPiece);
+        newPiece.CalculateAvailableMoves(false);
+
+        InputManager.Instance.PieceMoved();
     }
 }

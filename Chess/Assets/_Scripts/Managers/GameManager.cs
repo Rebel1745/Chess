@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.WaitingForMove:
                 break;
+            case GameState.WaitingForPromotion:
+                break;
             case GameState.NextTurn:
                 NextTurn();
                 break;
@@ -74,6 +76,7 @@ public enum GameState
     CreateBoard,
     SetupPieces,
     WaitingForMove,
+    WaitingForPromotion,
     NextTurn,
     GameOver
 }
