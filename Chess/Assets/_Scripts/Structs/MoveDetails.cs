@@ -6,4 +6,6 @@ public struct MoveDetails
     public Piece SecondPieceToMove;
     public Square SecondMoveToSquare;
     public bool IsPromotion;
+    public bool ActivatesEnPassant;
+    public Piece RemovePieceEnPassant;
 }

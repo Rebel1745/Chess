@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
@@ -52,5 +53,40 @@ public class BoardManager : MonoBehaviour
             return null;
 
         return _squares[x, y];
+    }
+
+    public void GenerateBoardPositionFEN()
+    {
+        Square currentSquare;
+        int emptyCount;
+        StringBuilder fen = new();
+
+        for (int rank = 7; rank >= 0; rank--)
+        {
+            emptyCount = 0;
+            for (int file = 0; file < 8; file++)
+            {
+                currentSquare = GetSquare(file, rank);
+
+                if (currentSquare.PieceOnSquare == null)
+                    emptyCount++;
+                else
+                {
+                    if (emptyCount != 0)
+                    {
+                        fen.Append(emptyCount);
+                        emptyCount = 0;
+                    }
+
+                    fen.Append(currentSquare.PieceOnSquare.PieceCode);
+                }
+            }
+            if (emptyCount != 0)
+                fen.Append(emptyCount);
+            if (rank > 0)
+                fen.Append("/");
+        }
+
+        Debug.Log(fen.ToString());
     }
 }

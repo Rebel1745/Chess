@@ -1,25 +1,28 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 
 public class Piece : MonoBehaviour
 {
     [SerializeField] private PIECE_TYPE _pieceType;
     public PIECE_TYPE PieceType { get { return _pieceType; } }
     [SerializeField] protected Vector2Int[] _basicMoves;
+    private string _pieceCode;
+    public string PieceCode { get { return _pieceCode; } }
     protected bool _isWhite;
     protected Square _square;
     public Square Square { get { return _square; } }
     public bool IsWhite { get { return _isWhite; } }
     protected bool _isFirstMove = true;
     public bool IsFirstMove { get { return _isFirstMove; } }
+    private bool _canBeEnPassanted = false;
+    public bool IsCanBeEnPassanted { get { return _canBeEnPassanted; } }
 
     protected List<MoveDetails> _availableMoves = new();
     public int AvailableMoveCount { get { return _availableMoves.Count; } }
 
-    public void SetupPiece(Square square, bool isWhite)
+    public void SetupPiece(string pieceCode, Square square, bool isWhite)
     {
+        _pieceCode = pieceCode;
         _isWhite = isWhite;
         _square = square;
     }
@@ -34,8 +37,10 @@ public class Piece : MonoBehaviour
         _square = square;
     }
 
-    // TODO: Ignore rest of current direction if the piece is able to capture an enemy piece
-    // i.e. dont show moves past the captured piece as being legal
+    public void SetPossibleEnPassant(bool isPossibleEnPassant)
+    {
+        _canBeEnPassanted = isPossibleEnPassant;
+    }
 
     public virtual void CalculateAvailableMoves(bool checkForChecks)
     {

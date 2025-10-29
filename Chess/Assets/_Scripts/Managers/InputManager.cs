@@ -145,6 +145,8 @@ public class InputManager : MonoBehaviour
         // if there is a piece on the square, capture it
         if (move.MoveToSquare.PieceOnSquare != null)
             PieceManager.Instance.TakePiece(move.MoveToSquare.PieceOnSquare);
+        else if (move.RemovePieceEnPassant != null)
+            PieceManager.Instance.TakePiece(move.RemovePieceEnPassant);
 
         // remove the piece from the current square
         move.PieceToMove.Square.SetPieceOnSquare(null);
@@ -156,6 +158,9 @@ public class InputManager : MonoBehaviour
         _selectedPiece = null;
         // set the piece as the new piece on the square
         move.MoveToSquare.SetPieceOnSquare(move.PieceToMove);
+
+        if (move.ActivatesEnPassant)
+            move.PieceToMove.SetPossibleEnPassant(true);
 
         move.PieceToMove.SetIsFirstMove(false);
 
@@ -177,6 +182,9 @@ public class InputManager : MonoBehaviour
 
         _currentSquare = null;
         _isMovingPiece = false;
+
+        // if we didn't en passant this move, set any available en passantable pieces back to not en passantable
+        PieceManager.Instance.SetPiecesAsNotEnPassantable(!GameManager.Instance.IsCurrentPlayerWhite);
 
         if (move.IsPromotion)
             PieceManager.Instance.ShowPromotionPieces(move);

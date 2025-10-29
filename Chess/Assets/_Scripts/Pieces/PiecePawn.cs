@@ -11,8 +11,10 @@ public class PiecePawn : Piece
         //base.CalculateAvailableMoves(checkForChecks);
 
         _availableMoves.Clear();
-        Square possibleMoveSquare;
+        Square possibleMoveSquare, possibleMoveSquare2;
         bool isPromotion = false;
+        bool captureAvailable;
+        Piece enPassantablePiece;
 
         // check the base move
         possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + _basicMoves[0].x, _square.SquareY + _basicMoves[0].y);
@@ -39,24 +41,62 @@ public class PiecePawn : Piece
                 {
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
-                    IsPromotion = isPromotion
+                    IsPromotion = isPromotion,
+                    ActivatesEnPassant = true
                 });
         }
 
         foreach (Vector2Int move in _captureMoves)
         {
+            captureAvailable = false;
             possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
+
             if (possibleMoveSquare != null && ((_isWhite && _square.SquareY == 6) || (!_isWhite && _square.SquareY == 1)))
                 isPromotion = true;
 
             if (possibleMoveSquare == null) continue;
 
             if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
+                captureAvailable = true;
+
+            if (captureAvailable)
                 _availableMoves.Add(new MoveDetails
                 {
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion
+                });
+        }
+
+        // en passant check
+        foreach (Vector2Int move in _captureMoves)
+        {
+            possibleMoveSquare2 = null;
+            enPassantablePiece = null;
+            captureAvailable = false;
+
+            // even it we en passant, move to the normal capture square
+            possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
+
+            // if the pawn is on the 5th rank (or 4th for black) 
+            if ((_isWhite && Square.SquareY == 4) || (!_isWhite && Square.SquareY == 3))
+            {
+                possibleMoveSquare2 = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY);
+                // and the other pawn has just advanced 2 squares on its last move it can be captured as if it had only moved one square
+                if (possibleMoveSquare2 != null && possibleMoveSquare2.PieceOnSquare != null && possibleMoveSquare2.PieceOnSquare.IsCanBeEnPassanted)
+                {
+                    captureAvailable = true;
+                    enPassantablePiece = possibleMoveSquare2.PieceOnSquare;
+                }
+            }
+
+            if (captureAvailable)
+                _availableMoves.Add(new MoveDetails
+                {
+                    PieceToMove = this,
+                    MoveToSquare = possibleMoveSquare,
+                    IsPromotion = isPromotion,
+                    RemovePieceEnPassant = enPassantablePiece
                 });
         }
 

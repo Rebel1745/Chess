@@ -31,7 +31,7 @@ public class PieceManager : MonoBehaviour
     private List<Piece> _allPieces = new();
 
     //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    private readonly string _defaultPosition = "r1bk3r/pP1pBpNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
+    private readonly string _defaultPosition = "r1bk3r/pP1p1pNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
 
     private void Awake()
     {
@@ -76,7 +76,7 @@ public class PieceManager : MonoBehaviour
                     Vector3 spawnPos = new(squareToSpawnPieceOn.SquareX, squareToSpawnPieceOn.SquareY, 0f);
                     newPieceGO = Instantiate(piece, spawnPos, Quaternion.identity, _pieceHolder);
                     newPiece = newPieceGO.GetComponent<Piece>();
-                    newPiece.SetupPiece(squareToSpawnPieceOn, isWhite);
+                    newPiece.SetupPiece(currentChar, squareToSpawnPieceOn, isWhite);
                     squareToSpawnPieceOn.SetPieceOnSquare(newPiece);
                     _allPieces.Add(newPiece);
                     fileIndex++;
@@ -99,6 +99,8 @@ public class PieceManager : MonoBehaviour
         {
             p.CalculateAvailableMoves(false);
         }
+
+        BoardManager.Instance.GenerateBoardPositionFEN();
     }
 
     public void LoadDefaultPosition()
@@ -235,27 +237,40 @@ public class PieceManager : MonoBehaviour
         _allPieces.Remove(_pawnToPromote);
         Destroy(_pawnToPromote.gameObject);
         GameObject newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteQueen : _blackQueen;
+        string newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "Q" : "q";
 
         switch (newPieceType)
         {
             case PIECE_TYPE.Knight:
                 newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteKnight : _blackKnight;
+                newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "N" : "n";
                 break;
             case PIECE_TYPE.Bishop:
                 newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteBishop : _blackBishop;
+                newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "B" : "b";
                 break;
             case PIECE_TYPE.Rook:
                 newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteRook : _blackRook;
+                newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "R" : "r";
                 break;
         }
 
         GameObject newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
         Piece newPiece = newPieceGO.GetComponent<Piece>();
-        newPiece.SetupPiece(promotionSquare, GameManager.Instance.IsCurrentPlayerWhite);
+        newPiece.SetupPiece(newPieceCode, promotionSquare, GameManager.Instance.IsCurrentPlayerWhite);
         promotionSquare.SetPieceOnSquare(newPiece);
         _allPieces.Add(newPiece);
         newPiece.CalculateAvailableMoves(false);
 
         InputManager.Instance.PieceMoved();
+    }
+
+    public void SetPiecesAsNotEnPassantable(bool isWhite)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (piece.IsWhite == isWhite)
+                piece.SetPossibleEnPassant(false);
+        }
     }
 }
