@@ -87,6 +87,6 @@ public class BoardManager : MonoBehaviour
                 fen.Append("/");
         }
 
-        Debug.Log(fen.ToString());
+        UIManager.Instance.UpdateFENText(fen.ToString());
     }
 }

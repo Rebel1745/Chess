@@ -151,6 +151,20 @@ public class Piece : MonoBehaviour
         return false;
     }
 
+    public bool CheckIfValidMove(Square square)
+    {
+
+        foreach (MoveDetails move in _availableMoves)
+        {
+            if (move.MoveToSquare == square)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // if the piece can take the king, that means that the king would be in check
     public bool CheckIfPieceCanTakeKing()
     {

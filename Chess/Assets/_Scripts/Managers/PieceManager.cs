@@ -30,8 +30,8 @@ public class PieceManager : MonoBehaviour
 
     private List<Piece> _allPieces = new();
 
-    //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    private readonly string _defaultPosition = "r1bk3r/pP1p1pNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
+    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    //private readonly string _defaultPosition = "r1bk3r/pP1p1pNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
 
     private void Awake()
     {
@@ -48,6 +48,13 @@ public class PieceManager : MonoBehaviour
         GameObject newPieceGO;
         Piece newPiece;
         Square squareToSpawnPieceOn;
+
+        // remove all pieces
+        _allPieces.Clear();
+        for (int i = 0; i < _pieceHolder.childCount; i++)
+        {
+            Destroy(_pieceHolder.GetChild(i).gameObject);
+        }
 
         for (int i = rankStrings.Length - 1; i >= 0; i--)
         {

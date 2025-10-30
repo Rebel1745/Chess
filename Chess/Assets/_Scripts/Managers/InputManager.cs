@@ -194,6 +194,7 @@ public class InputManager : MonoBehaviour
 
     public void PieceMoved()
     {
+        BoardManager.Instance.GenerateBoardPositionFEN();
         // check for check
         if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
         {
@@ -201,7 +202,7 @@ public class InputManager : MonoBehaviour
             {
                 // check mate baby
                 Debug.Log("CheckMate");
-                GameManager.Instance.UpdateGameState(GameState.GameOver);
+                //GameManager.Instance.UpdateGameState(GameState.GameOver);
             }
             else
             {

@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
     private void SetupPieces()
     {
         PieceManager.Instance.LoadDefaultPosition();
+        _isCurrentPlayerWhite = true;
         UpdateGameState(GameState.WaitingForMove);
     }
 
