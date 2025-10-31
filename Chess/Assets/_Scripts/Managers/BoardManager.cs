@@ -9,7 +9,7 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private GameObject _boardBackgroundPrefab;
     [SerializeField] private GameObject _lightSquarePrefab;
     [SerializeField] private GameObject _darkSquarePrefab;
-    private readonly string[] _fileNames = { "A", "B", "C", "D", "E", "F", "G", "H" };
+    private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
 
     private void Awake()
@@ -23,6 +23,7 @@ public class BoardManager : MonoBehaviour
         GameObject newSquareGO;
         bool isLightSquare = true;
         Square currentSquare;
+        string code;
 
         // create board background
         Instantiate(_boardBackgroundPrefab, new Vector3(3.5f, 3.5f, 0f), Quaternion.identity, _boardHolder);
@@ -34,11 +35,12 @@ public class BoardManager : MonoBehaviour
 
             for (int x = 0; x < 8; x++)
             {
+                code = _fileNames[x] + (y + 1);
                 squarePrefab = isLightSquare ? _lightSquarePrefab : _darkSquarePrefab;
                 newSquareGO = Instantiate(squarePrefab, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
-                newSquareGO.name = "Square " + _fileNames[x] + (y + 1);
+                newSquareGO.name = "Square " + code;
                 currentSquare = newSquareGO.GetComponent<Square>();
-                currentSquare.SetupSquareDetails(x, y);
+                currentSquare.SetupSquareDetails(x, y, code);
                 _squares[x, y] = currentSquare;
                 isLightSquare = !isLightSquare;
             }
@@ -88,5 +90,16 @@ public class BoardManager : MonoBehaviour
         }
 
         UIManager.Instance.UpdateFENText(fen.ToString());
+    }
+
+    public Square GetSquareFromPGNCode(string code)
+    {
+        foreach (Square square in _squares)
+        {
+            if (square.SquarePGNCode.Equals(code))
+                return square;
+        }
+
+        return null;
     }
 }

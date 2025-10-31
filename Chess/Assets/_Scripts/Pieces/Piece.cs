@@ -18,6 +18,7 @@ public class Piece : MonoBehaviour
     public bool IsCanBeEnPassanted { get { return _canBeEnPassanted; } }
 
     protected List<MoveDetails> _availableMoves = new();
+    public List<MoveDetails> AvailableMoves { get { return _availableMoves; } }
     public int AvailableMoveCount { get { return _availableMoves.Count; } }
 
     public void SetupPiece(string pieceCode, Square square, bool isWhite)

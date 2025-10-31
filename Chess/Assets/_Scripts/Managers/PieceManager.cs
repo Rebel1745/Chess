@@ -280,4 +280,22 @@ public class PieceManager : MonoBehaviour
                 piece.SetPossibleEnPassant(false);
         }
     }
+
+    public Piece GetPieceByMove(Square square, bool isWhite, PIECE_TYPE pieceType)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.PieceType != pieceType) continue;
+
+            // the piece is the correct colour and type, check its moves
+            foreach (MoveDetails move in piece.AvailableMoves)
+            {
+                if (move.MoveToSquare == square)
+                    return move.PieceToMove;
+            }
+        }
+
+        return null;
+    }
 }
