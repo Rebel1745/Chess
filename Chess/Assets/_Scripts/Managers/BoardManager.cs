@@ -96,7 +96,7 @@ public class BoardManager : MonoBehaviour
     {
         foreach (Square square in _squares)
         {
-            if (square.SquarePGNCode.Equals(code))
+            if (square.SquarePGNCode.ToUpper().Equals(code.ToUpper()))
                 return square;
         }
 

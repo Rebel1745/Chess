@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 
 public class PieceManager : MonoBehaviour
 {
@@ -113,6 +110,35 @@ public class PieceManager : MonoBehaviour
     public void LoadDefaultPosition()
     {
         LoadPosition(_defaultPosition);
+    }
+
+    public PIECE_TYPE GetPieceTypeFromCharacter(string character)
+    {
+        PIECE_TYPE type = PIECE_TYPE.None;
+
+        switch (character.ToUpper())
+        {
+            case "P":
+                type = PIECE_TYPE.Pawn;
+                break;
+            case "N":
+                type = PIECE_TYPE.Knight;
+                break;
+            case "B":
+                type = PIECE_TYPE.Bishop;
+                break;
+            case "R":
+                type = PIECE_TYPE.Rook;
+                break;
+            case "Q":
+                type = PIECE_TYPE.Queen;
+                break;
+            case "K":
+                type = PIECE_TYPE.King;
+                break;
+        }
+
+        return type;
     }
 
     private GameObject GetPieceGOFromText(string character, out bool isWhite)
@@ -294,6 +320,36 @@ public class PieceManager : MonoBehaviour
                 if (move.MoveToSquare == square)
                     return move.PieceToMove;
             }
+        }
+
+        return null;
+    }
+
+    public Piece GetPieceByFile(string file, bool isWhite, PIECE_TYPE pieceType)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.PieceType != pieceType) continue;
+
+            if (piece.Square.SquarePGNCode[..1] == file)
+                return piece;
+        }
+
+        return null;
+    }
+
+    public Piece GetPieceFromCharacter(string character, bool isWhite)
+    {
+        PIECE_TYPE pieceType = GetPieceTypeFromCharacter(character);
+
+        foreach (Piece piece in _allPieces)
+        {
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.PieceType != pieceType) continue;
+
+            if (piece.PieceType == pieceType)
+                return piece;
         }
 
         return null;

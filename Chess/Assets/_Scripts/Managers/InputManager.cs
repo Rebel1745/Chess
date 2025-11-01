@@ -140,7 +140,7 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void MovePiece(MoveDetails move)
+    public void MovePiece(MoveDetails move)
     {
         // if there is a piece on the square, capture it
         if (move.MoveToSquare.PieceOnSquare != null)
