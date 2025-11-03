@@ -47,6 +47,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SetCurrentPlayerColour(bool isWhite)
+    {
+        _isCurrentPlayerWhite = isWhite;
+    }
+
     private void CreateBoard()
     {
         BoardManager.Instance.CreateBoard();

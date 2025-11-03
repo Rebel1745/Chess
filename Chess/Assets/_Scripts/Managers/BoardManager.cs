@@ -1,4 +1,5 @@
 using System.Text;
+using Unity.Collections;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
@@ -49,12 +50,34 @@ public class BoardManager : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.SetupPieces);
     }
 
+    public void ResetAllSquares()
+    {
+        for (int rank = 0; rank < 8; rank++)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                _squares[rank, file].SetPieceOnSquare(null);
+            }
+        }
+    }
+
     public Square GetSquare(int x, int y)
     {
         if (x > 7 || x < 0 || y > 7 || y < 0)
             return null;
 
         return _squares[x, y];
+    }
+
+    public Square GetSquareFromPGNCode(string code)
+    {
+        foreach (Square square in _squares)
+        {
+            if (square.SquarePGNCode.ToUpper().Equals(code.ToUpper()))
+                return square;
+        }
+
+        return null;
     }
 
     public void GenerateBoardPositionFEN()
@@ -90,16 +113,5 @@ public class BoardManager : MonoBehaviour
         }
 
         UIManager.Instance.UpdateFENText(fen.ToString());
-    }
-
-    public Square GetSquareFromPGNCode(string code)
-    {
-        foreach (Square square in _squares)
-        {
-            if (square.SquarePGNCode.ToUpper().Equals(code.ToUpper()))
-                return square;
-        }
-
-        return null;
     }
 }

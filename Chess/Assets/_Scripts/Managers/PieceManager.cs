@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,6 +102,7 @@ public class PieceManager : MonoBehaviour
 
         foreach (Piece p in _allPieces)
         {
+            if (!p.gameObject.activeInHierarchy) return;
             p.CalculateAvailableMoves(false);
         }
 
@@ -110,6 +112,37 @@ public class PieceManager : MonoBehaviour
     public void LoadDefaultPosition()
     {
         LoadPosition(_defaultPosition);
+    }
+
+    public void ResetBoardPosition()
+    {
+        Piece currentPiece;
+
+        BoardManager.Instance.ResetAllSquares();
+
+        for (int i = _allPieces.Count - 1; i >= 0; i--)
+        {
+            currentPiece = _allPieces[i];
+
+            // hide pieces created through promotion
+            if (currentPiece.IsPromotedPiece)
+            {
+                currentPiece.gameObject.SetActive(false);
+                continue;
+            }
+
+            // activate inactive (through capture) pieces
+            currentPiece.gameObject.SetActive(true);
+
+            // reset the pieces square to the initial square it was on
+            currentPiece.SetPieceSquare(currentPiece.InitialSquare);
+            currentPiece.transform.position = currentPiece.InitialSquare.transform.position;
+
+            // update the square with the current piece
+            currentPiece.InitialSquare.SetPieceOnSquare(currentPiece);
+
+            currentPiece.SetIsFirstMove(true);
+        }
     }
 
     public PIECE_TYPE GetPieceTypeFromCharacter(string character)
@@ -205,6 +238,7 @@ public class PieceManager : MonoBehaviour
     {
         foreach (Piece piece in _allPieces)
         {
+            if (!piece.gameObject.activeInHierarchy) continue;
             // piece to ignore allows us to simulate a capture without altering the pieces list
             if (pieceToIgnore != null && piece == pieceToIgnore) continue;
 
@@ -224,6 +258,7 @@ public class PieceManager : MonoBehaviour
         // if any piece has moves, its not mate
         foreach (Piece piece in _allPieces)
         {
+            if (!piece.gameObject.activeInHierarchy) continue;
             // we are checking the other colour, not the one making moves
             if (piece.IsWhite == GameManager.Instance.IsCurrentPlayerWhite) continue;
 
@@ -236,10 +271,18 @@ public class PieceManager : MonoBehaviour
         return true;
     }
 
+    public void UpdateAllPieceMoves()
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            piece.CalculateAvailableMoves(false);
+        }
+    }
+
     public void TakePiece(Piece piece)
     {
-        _allPieces.Remove(piece);
-        Destroy(piece.gameObject);
+        piece.gameObject.SetActive(false);
     }
 
     public void ShowPromotionPieces(MoveDetails move)
@@ -261,18 +304,25 @@ public class PieceManager : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.WaitingForPromotion);
     }
 
-    public void SelectPromotionPiece(PIECE_TYPE newPieceType)
+    public void SetAutomaticPromotion(MoveDetails move)
+    {
+        _pawnToPromote = move.PieceToMove;
+
+        SelectPromotionPiece(move);
+    }
+
+    public void SelectPromotionPiece(MoveDetails move)
     {
         if (GameManager.Instance.IsCurrentPlayerWhite) _promotionPiecesWhite.SetActive(false);
         else _promotionPiecesBlack.SetActive(false);
 
         Square promotionSquare = _pawnToPromote.Square;
-        _allPieces.Remove(_pawnToPromote);
-        Destroy(_pawnToPromote.gameObject);
+        GameObject newPieceGO;
+        TakePiece(_pawnToPromote);
         GameObject newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteQueen : _blackQueen;
         string newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "Q" : "q";
 
-        switch (newPieceType)
+        switch (move.PromotionPieceType)
         {
             case PIECE_TYPE.Knight:
                 newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteKnight : _blackKnight;
@@ -288,12 +338,24 @@ public class PieceManager : MonoBehaviour
                 break;
         }
 
-        GameObject newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
+        if (move.PromotedPiece == null)
+        {
+            newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
+            move.PromotedPiece = newPieceGO;
+        }
+        else
+        {
+            newPieceGO = move.PromotedPiece;
+            newPieceGO.SetActive(true);
+        }
+
         Piece newPiece = newPieceGO.GetComponent<Piece>();
-        newPiece.SetupPiece(newPieceCode, promotionSquare, GameManager.Instance.IsCurrentPlayerWhite);
+        newPiece.SetupPiece(newPieceCode, promotionSquare, GameManager.Instance.IsCurrentPlayerWhite, true);
         promotionSquare.SetPieceOnSquare(newPiece);
         _allPieces.Add(newPiece);
         newPiece.CalculateAvailableMoves(false);
+
+        InputManager.Instance.ResetCurrentPiece();
 
         InputManager.Instance.PieceMoved();
     }
@@ -302,6 +364,7 @@ public class PieceManager : MonoBehaviour
     {
         foreach (Piece piece in _allPieces)
         {
+            if (!piece.gameObject.activeInHierarchy) continue;
             if (piece.IsWhite == isWhite)
                 piece.SetPossibleEnPassant(false);
         }
@@ -311,6 +374,7 @@ public class PieceManager : MonoBehaviour
     {
         foreach (Piece piece in _allPieces)
         {
+            if (!piece.gameObject.activeInHierarchy) continue;
             if (piece.IsWhite != isWhite) continue;
             if (piece.PieceType != pieceType) continue;
 
@@ -329,10 +393,26 @@ public class PieceManager : MonoBehaviour
     {
         foreach (Piece piece in _allPieces)
         {
+            if (!piece.gameObject.activeInHierarchy) continue;
             if (piece.IsWhite != isWhite) continue;
             if (piece.PieceType != pieceType) continue;
 
             if (piece.Square.SquarePGNCode[..1] == file)
+                return piece;
+        }
+
+        return null;
+    }
+
+    public Piece GetPieceByRank(int rank, bool isWhite, PIECE_TYPE pieceType)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.PieceType != pieceType) continue;
+
+            if (int.Parse(piece.Square.SquarePGNCode.Substring(1, 1)) == rank)
                 return piece;
         }
 
@@ -345,6 +425,7 @@ public class PieceManager : MonoBehaviour
 
         foreach (Piece piece in _allPieces)
         {
+            if (!piece.gameObject.activeInHierarchy) continue;
             if (piece.IsWhite != isWhite) continue;
             if (piece.PieceType != pieceType) continue;
 
@@ -353,5 +434,13 @@ public class PieceManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void HideAllAvailablePieceMoves()
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            piece.ShowHideAvailableMoves(false);
+        }
     }
 }

@@ -9,8 +9,12 @@ public class Piece : MonoBehaviour
     private string _pieceCode;
     public string PieceCode { get { return _pieceCode; } }
     protected bool _isWhite;
+    private bool _isPromotedPiece;
+    public bool IsPromotedPiece { get { return _isPromotedPiece; } }
     protected Square _square;
     public Square Square { get { return _square; } }
+    private Square _initialSquare;
+    public Square InitialSquare { get { return _initialSquare; } }
     public bool IsWhite { get { return _isWhite; } }
     protected bool _isFirstMove = true;
     public bool IsFirstMove { get { return _isFirstMove; } }
@@ -21,11 +25,13 @@ public class Piece : MonoBehaviour
     public List<MoveDetails> AvailableMoves { get { return _availableMoves; } }
     public int AvailableMoveCount { get { return _availableMoves.Count; } }
 
-    public void SetupPiece(string pieceCode, Square square, bool isWhite)
+    public void SetupPiece(string pieceCode, Square square, bool isWhite, bool isPromotedPiece = false)
     {
         _pieceCode = pieceCode;
         _isWhite = isWhite;
         _square = square;
+        _initialSquare = square;
+        _isPromotedPiece = isPromotedPiece;
     }
 
     public void SetIsFirstMove(bool isFirstMove)

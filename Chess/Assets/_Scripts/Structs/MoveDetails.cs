@@ -1,3 +1,5 @@
+using UnityEngine;
+
 [System.Serializable]
 public struct MoveDetails
 {
@@ -8,4 +10,6 @@ public struct MoveDetails
     public bool IsPromotion;
     public bool ActivatesEnPassant;
     public Piece RemovePieceEnPassant;
+    public PIECE_TYPE PromotionPieceType;
+    public GameObject PromotedPiece;
 }

@@ -72,6 +72,12 @@ public class InputManager : MonoBehaviour
         else _currentPiece = null;
     }
 
+    public void ResetCurrentPiece()
+    {
+        _currentPiece = null;
+        _selectedPiece = null;
+    }
+
     private void CheckForMouseOverPromotionPiece()
     {
         Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _whatIsPromotionPiece);
@@ -98,7 +104,10 @@ public class InputManager : MonoBehaviour
         {
             if (_promotionPieceType == PIECE_TYPE.None) return;
 
-            PieceManager.Instance.SelectPromotionPiece(_promotionPieceType);
+            PieceManager.Instance.SelectPromotionPiece(new MoveDetails
+            {
+                PromotionPieceType = _promotionPieceType
+            });
         }
 
         if (GameManager.Instance.State != GameState.WaitingForMove) return;
@@ -180,6 +189,12 @@ public class InputManager : MonoBehaviour
             move.SecondPieceToMove.SetIsFirstMove(false);
         }
 
+        // this should only be used moving through the PGN moves
+        if (move.PromotionPieceType != PIECE_TYPE.None)
+        {
+            PieceManager.Instance.SetAutomaticPromotion(move);
+        }
+
         _currentSquare = null;
         _isMovingPiece = false;
 
@@ -189,7 +204,10 @@ public class InputManager : MonoBehaviour
         if (move.IsPromotion)
             PieceManager.Instance.ShowPromotionPieces(move);
         else
+        {
+            PieceManager.Instance.UpdateAllPieceMoves();
             PieceMoved();
+        }
     }
 
     public void PieceMoved()
@@ -202,11 +220,11 @@ public class InputManager : MonoBehaviour
             {
                 // check mate baby
                 Debug.Log("CheckMate");
-                //GameManager.Instance.UpdateGameState(GameState.GameOver);
+                GameManager.Instance.UpdateGameState(GameState.GameOver);
             }
             else
             {
-                Debug.Log("Check");
+                //Debug.Log("Check");
                 GameManager.Instance.UpdateGameState(GameState.NextTurn);
             }
         }
