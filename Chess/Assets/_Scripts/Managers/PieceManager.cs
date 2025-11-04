@@ -319,22 +319,22 @@ public class PieceManager : MonoBehaviour
         Square promotionSquare = _pawnToPromote.Square;
         GameObject newPieceGO;
         TakePiece(_pawnToPromote);
-        GameObject newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteQueen : _blackQueen;
-        string newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "Q" : "q";
+        GameObject newPiecePrefab = move.isWhite ? _whiteQueen : _blackQueen;
+        string newPieceCode = move.isWhite ? "Q" : "q";
 
         switch (move.PromotionPieceType)
         {
             case PIECE_TYPE.Knight:
-                newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteKnight : _blackKnight;
-                newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "N" : "n";
+                newPiecePrefab = move.isWhite ? _whiteKnight : _blackKnight;
+                newPieceCode = move.isWhite ? "N" : "n";
                 break;
             case PIECE_TYPE.Bishop:
-                newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteBishop : _blackBishop;
-                newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "B" : "b";
+                newPiecePrefab = move.isWhite ? _whiteBishop : _blackBishop;
+                newPieceCode = move.isWhite ? "B" : "b";
                 break;
             case PIECE_TYPE.Rook:
-                newPiecePrefab = GameManager.Instance.IsCurrentPlayerWhite ? _whiteRook : _blackRook;
-                newPieceCode = GameManager.Instance.IsCurrentPlayerWhite ? "R" : "r";
+                newPiecePrefab = move.isWhite ? _whiteRook : _blackRook;
+                newPieceCode = move.isWhite ? "R" : "r";
                 break;
         }
 
@@ -342,15 +342,18 @@ public class PieceManager : MonoBehaviour
         {
             newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
             move.PromotedPiece = newPieceGO;
+            if (move.MoveNumber != -1)
+                PGNManager.Instance.UpdatePromotedPieceGO(move.MoveNumber, newPieceGO);
         }
         else
         {
             newPieceGO = move.PromotedPiece;
             newPieceGO.SetActive(true);
+            newPieceGO.transform.position = promotionSquare.transform.position;
         }
 
         Piece newPiece = newPieceGO.GetComponent<Piece>();
-        newPiece.SetupPiece(newPieceCode, promotionSquare, GameManager.Instance.IsCurrentPlayerWhite, true);
+        newPiece.SetupPiece(newPieceCode, promotionSquare, move.isWhite, true);
         promotionSquare.SetPieceOnSquare(newPiece);
         _allPieces.Add(newPiece);
         newPiece.CalculateAvailableMoves(false);

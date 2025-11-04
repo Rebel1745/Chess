@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
 using UnityEngine;
 
 public class PGNManager : MonoBehaviour
@@ -17,23 +15,26 @@ public class PGNManager : MonoBehaviour
 
     public void ParsePGN(string pgn)
     {
+        _moveDetailsList = new List<MoveDetails>();
+
         string[] fieldStrings = pgn.Split(']');
         string moveList = fieldStrings[^1].Trim();
         string[] moves = moveList.Split(' ');
         bool isWhite = false;
-        Square moveSquare = null, secondMoveSquare = null;
-        PIECE_TYPE pieceType = PIECE_TYPE.None;
-        Piece movePiece = null, secondMovePiece = null;
+        Square moveSquare, secondMoveSquare;
+        PIECE_TYPE pieceType = PIECE_TYPE.None, promotionPieceType = PIECE_TYPE.None;
+        Piece movePiece, secondMovePiece;
         string pieceCode;
         string file;
         string squareCode;
         int rank;
         int moveNumber = 0;
         string pieceColour;
+        bool isEnPassantable;
 
         for (int i = 0; i < moves.Length; i++)
         {
-            moves[i] = moves[i].Replace('+', ' ').Trim();
+            moves[i] = moves[i].Replace('+', ' ').Replace('#', ' ').Trim();
         }
 
         _moveList = new string[moves.Length];
@@ -42,6 +43,14 @@ public class PGNManager : MonoBehaviour
         for (int i = 0; i < moves.Length; i++)
         {
             isWhite = !isWhite;
+            isEnPassantable = false;
+            pieceType = PIECE_TYPE.None;
+            promotionPieceType = PIECE_TYPE.None;
+            moveSquare = null;
+            secondMoveSquare = null;
+            movePiece = null;
+            secondMovePiece = null;
+
             if (isWhite) moveNumber++;
 
             pieceColour = isWhite ? "White" : "Black";
@@ -71,9 +80,12 @@ public class PGNManager : MonoBehaviour
 
                 if (movePiece == null) Debug.LogError($"{moves[i]} piece not found");
 
+                if (Mathf.Abs(int.Parse(moveSquare.SquarePGNCode.Substring(1, 1)) - int.Parse(movePiece.Square.SquarePGNCode.Substring(1, 1))) == 2)
+                    isEnPassantable = true;
+
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
-                AddMove(movePiece, moveSquare);
+                AddMove(isWhite, movePiece, moveSquare, null, null, PIECE_TYPE.None, isEnPassantable);
                 continue;
             }
 
@@ -105,7 +117,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} castle king side");
 
-                AddMove(movePiece, moveSquare, secondMovePiece, secondMoveSquare);
+                AddMove(isWhite, movePiece, moveSquare, secondMovePiece, secondMoveSquare);
                 continue;
             }
 
@@ -137,7 +149,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} castle queen side");
 
-                AddMove(movePiece, moveSquare, secondMovePiece, secondMoveSquare);
+                AddMove(isWhite, movePiece, moveSquare, secondMovePiece, secondMoveSquare);
                 continue;
             }
 
@@ -149,6 +161,19 @@ public class PGNManager : MonoBehaviour
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(2, 2));
 
                 if (moveSquare == null) Debug.LogError($"{moves[i].Substring(2, 2)} square not found");
+
+                // check to see if this capture is en passant
+                if (moveSquare.PieceOnSquare == null)
+                {
+                    // as this is a capture, there will always be a piece on the target square
+                    // that is, of course, unless we are en passant-ing
+                    rank = int.Parse(moves[i].Substring(3, 1));
+                    rank = isWhite ? rank - 1 : rank + 1;
+                    secondMoveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(2, 1) + rank.ToString());
+                    if (secondMoveSquare == null) Debug.LogError($"{moves[i].Substring(2, 1) + rank.ToString()} square not found");
+                    if (secondMoveSquare.PieceOnSquare == null) Debug.LogError($"Piece on {moves[i].Substring(2, 1) + rank.ToString()} not found");
+                    secondMovePiece = secondMoveSquare.PieceOnSquare;
+                }
 
                 if (pieceType == PIECE_TYPE.None)
                 {
@@ -169,9 +194,15 @@ public class PGNManager : MonoBehaviour
                     //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} take on {moveSquare.SquarePGNCode} ");
                 }
 
+                if (moves[i].IndexOf("=") != -1)
+                {
+                    // there is also a promotion
+                    promotionPieceType = PieceManager.Instance.GetPieceTypeFromCharacter(moves[i].Substring(moves[i].Length - 1, 1));
+                }
+
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} takes on {moveSquare.SquarePGNCode}");
 
-                AddMove(movePiece, moveSquare);
+                AddMove(isWhite, movePiece, moveSquare, null, null, promotionPieceType, false, secondMovePiece);
                 continue;
             }
 
@@ -187,7 +218,7 @@ public class PGNManager : MonoBehaviour
 
                 if (movePiece == null) Debug.LogError($"{pieceColour} Pawn to promote on {moveSquare} piece not found");
 
-                AddMove(movePiece, moveSquare, null, null, pieceType);
+                AddMove(isWhite, movePiece, moveSquare, null, null, pieceType);
                 continue;
             }
 
@@ -204,7 +235,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
-                AddMove(movePiece, moveSquare);
+                AddMove(isWhite, movePiece, moveSquare);
                 continue;
             }
 
@@ -225,13 +256,13 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
-                AddMove(movePiece, moveSquare);
+                AddMove(isWhite, movePiece, moveSquare);
                 continue;
             }
         }
     }
 
-    private void AddMove(Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None)
+    private void AddMove(bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
     {
         MoveDetails move;
 
@@ -239,17 +270,31 @@ public class PGNManager : MonoBehaviour
         {
             move = new MoveDetails
             {
+                MoveNumber = _moveDetailsList.Count,
+                isWhite = isWhite,
                 PieceToMove = pieceToMove,
                 MoveToSquare = squareToMoveTo,
                 SecondPieceToMove = secondPieceToMove,
                 SecondMoveToSquare = secondSquareToMoveTo,
-                PromotionPieceType = pieceToPromoteTo
+                PromotionPieceType = pieceToPromoteTo,
+                ActivatesEnPassant = isEnPassantable,
+                RemovePieceEnPassant = pieceToTakeEnPassant
             };
 
-            InputManager.Instance.MovePiece(move);
-
             _moveDetailsList.Add(move);
+
+            InputManager.Instance.MovePiece(move);
         }
+    }
+
+    public void UpdatePromotedPieceGO(int moveNumber, GameObject piece)
+    {
+        if (moveNumber == -1) return;
+
+        MoveDetails tmp = _moveDetailsList[moveNumber];
+        tmp.PromotedPiece = piece;
+
+        _moveDetailsList[moveNumber] = tmp;
     }
 
     public void FirstMove()
@@ -270,7 +315,7 @@ public class PGNManager : MonoBehaviour
 
     public void NextMove()
     {
-        if (_currentMove == _moveDetailsList.Count - 1) return;
+        if (_currentMove == _moveDetailsList.Count) return;
 
         MoveDetails move = _moveDetailsList[_currentMove];
         InputManager.Instance.MovePiece(move);

@@ -83,6 +83,8 @@ public class Piece : MonoBehaviour
             if (!ignoreCurrentDirection)
                 _availableMoves.Add(new MoveDetails
                 {
+                    MoveNumber = -1,
+                    isWhite = _isWhite,
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare
                 });

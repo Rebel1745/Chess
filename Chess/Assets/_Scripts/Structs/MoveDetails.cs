@@ -3,6 +3,8 @@ using UnityEngine;
 [System.Serializable]
 public struct MoveDetails
 {
+    public int MoveNumber;
+    public bool isWhite;
     public Piece PieceToMove;
     public Square MoveToSquare;
     public Piece SecondPieceToMove;

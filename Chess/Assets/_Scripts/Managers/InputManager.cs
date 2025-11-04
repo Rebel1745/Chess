@@ -155,7 +155,10 @@ public class InputManager : MonoBehaviour
         if (move.MoveToSquare.PieceOnSquare != null)
             PieceManager.Instance.TakePiece(move.MoveToSquare.PieceOnSquare);
         else if (move.RemovePieceEnPassant != null)
+        {
+            move.RemovePieceEnPassant.Square.SetPieceOnSquare(null);
             PieceManager.Instance.TakePiece(move.RemovePieceEnPassant);
+        }
 
         // remove the piece from the current square
         move.PieceToMove.Square.SetPieceOnSquare(null);

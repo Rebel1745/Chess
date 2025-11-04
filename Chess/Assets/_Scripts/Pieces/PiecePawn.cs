@@ -24,6 +24,8 @@ public class PiecePawn : Piece
         if (possibleMoveSquare.PieceOnSquare == null)
             _availableMoves.Add(new MoveDetails
             {
+                MoveNumber = -1,
+                isWhite = _isWhite,
                 PieceToMove = this,
                 MoveToSquare = possibleMoveSquare,
                 IsPromotion = isPromotion
@@ -39,6 +41,8 @@ public class PiecePawn : Piece
             if (possibleMoveSquare.PieceOnSquare == null)
                 _availableMoves.Add(new MoveDetails
                 {
+                    MoveNumber = -1,
+                    isWhite = _isWhite,
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,
@@ -62,6 +66,8 @@ public class PiecePawn : Piece
             if (captureAvailable)
                 _availableMoves.Add(new MoveDetails
                 {
+                    MoveNumber = -1,
+                    isWhite = _isWhite,
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion
@@ -93,6 +99,8 @@ public class PiecePawn : Piece
             if (captureAvailable)
                 _availableMoves.Add(new MoveDetails
                 {
+                    MoveNumber = -1,
+                    isWhite = _isWhite,
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,

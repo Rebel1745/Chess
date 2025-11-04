@@ -21,6 +21,8 @@ public class PieceKing : Piece
 
             _availableMoves.Add(new MoveDetails
             {
+                MoveNumber = -1,
+                isWhite = _isWhite,
                 PieceToMove = this,
                 MoveToSquare = possibleMoveSquare
             });
@@ -41,6 +43,8 @@ public class PieceKing : Piece
         if (_isFirstMove && CheckIfValidMove(possibleMoveSquare) && rookSquare.PieceOnSquare != null && rookSquare.PieceOnSquare.IsFirstMove && possibleMoveSquare.PieceOnSquare == null && possibleMoveSquare2.PieceOnSquare == null)
             _availableMoves.Add(new MoveDetails
             {
+                MoveNumber = -1,
+                isWhite = _isWhite,
                 PieceToMove = this,
                 MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX + 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
@@ -57,6 +61,8 @@ public class PieceKing : Piece
         if (_isFirstMove && CheckIfValidMove(possibleMoveSquare) && rookSquare.PieceOnSquare != null && rookSquare.PieceOnSquare.IsFirstMove && possibleMoveSquare.PieceOnSquare == null && possibleMoveSquare2.PieceOnSquare == null && possibleMoveSquare3.PieceOnSquare == null)
             _availableMoves.Add(new MoveDetails
             {
+                MoveNumber = -1,
+                isWhite = _isWhite,
                 PieceToMove = this,
                 MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX - 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
