@@ -24,7 +24,8 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
-                MoveToSquare = possibleMoveSquare
+                MoveToSquare = possibleMoveSquare,
+                PGNCode = "k" + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
             });
         }
 
@@ -48,7 +49,8 @@ public class PieceKing : Piece
                 PieceToMove = this,
                 MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX + 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
-                SecondMoveToSquare = possibleMoveSquare
+                SecondMoveToSquare = possibleMoveSquare,
+                PGNCode = "0-0"
             });
 
         // see if we can castle queen side
@@ -66,7 +68,8 @@ public class PieceKing : Piece
                 PieceToMove = this,
                 MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX - 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
-                SecondMoveToSquare = possibleMoveSquare
+                SecondMoveToSquare = possibleMoveSquare,
+                PGNCode = "0-0-0"
             });
 
         // this will remove the castling move if it is not valid

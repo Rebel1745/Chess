@@ -14,4 +14,5 @@ public struct MoveDetails
     public Piece RemovePieceEnPassant;
     public PIECE_TYPE PromotionPieceType;
     public GameObject PromotedPiece;
+    public string PGNCode;
 }

@@ -86,7 +86,8 @@ public class Piece : MonoBehaviour
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
-                    MoveToSquare = possibleMoveSquare
+                    MoveToSquare = possibleMoveSquare,
+                    PGNCode = _pieceCode + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
                 });
 
             // if we land on an oponent piece, we can't move past it

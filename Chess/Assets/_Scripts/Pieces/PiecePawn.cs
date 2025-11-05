@@ -28,7 +28,8 @@ public class PiecePawn : Piece
                 isWhite = _isWhite,
                 PieceToMove = this,
                 MoveToSquare = possibleMoveSquare,
-                IsPromotion = isPromotion
+                IsPromotion = isPromotion,
+                PGNCode = possibleMoveSquare.SquarePGNCode
             });
 
         // only check to see if we can move two squares if we can already move one
@@ -46,7 +47,8 @@ public class PiecePawn : Piece
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,
-                    ActivatesEnPassant = true
+                    ActivatesEnPassant = true,
+                    PGNCode = possibleMoveSquare.SquarePGNCode
                 });
         }
 
@@ -70,7 +72,8 @@ public class PiecePawn : Piece
                     isWhite = _isWhite,
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
-                    IsPromotion = isPromotion
+                    IsPromotion = isPromotion,
+                    PGNCode = _square.SquarePGNCode[..1] + "x" + possibleMoveSquare.SquarePGNCode
                 });
         }
 
@@ -104,7 +107,8 @@ public class PiecePawn : Piece
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,
-                    RemovePieceEnPassant = enPassantablePiece
+                    RemovePieceEnPassant = enPassantablePiece,
+                    PGNCode = _square.SquarePGNCode[..1] + "x" + possibleMoveSquare.SquarePGNCode
                 });
         }
 

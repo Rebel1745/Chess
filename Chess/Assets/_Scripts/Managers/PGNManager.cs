@@ -85,7 +85,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
-                AddMove(isWhite, movePiece, moveSquare, null, null, PIECE_TYPE.None, isEnPassantable);
+                AddMove(moves[i], isWhite, movePiece, moveSquare, null, null, PIECE_TYPE.None, isEnPassantable);
                 continue;
             }
 
@@ -117,7 +117,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} castle king side");
 
-                AddMove(isWhite, movePiece, moveSquare, secondMovePiece, secondMoveSquare);
+                AddMove(moves[i], isWhite, movePiece, moveSquare, secondMovePiece, secondMoveSquare);
                 continue;
             }
 
@@ -149,7 +149,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} castle queen side");
 
-                AddMove(isWhite, movePiece, moveSquare, secondMovePiece, secondMoveSquare);
+                AddMove(moves[i], isWhite, movePiece, moveSquare, secondMovePiece, secondMoveSquare);
                 continue;
             }
 
@@ -202,7 +202,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} takes on {moveSquare.SquarePGNCode}");
 
-                AddMove(isWhite, movePiece, moveSquare, null, null, promotionPieceType, false, secondMovePiece);
+                AddMove(moves[i], isWhite, movePiece, moveSquare, null, null, promotionPieceType, false, secondMovePiece);
                 continue;
             }
 
@@ -218,7 +218,7 @@ public class PGNManager : MonoBehaviour
 
                 if (movePiece == null) Debug.LogError($"{pieceColour} Pawn to promote on {moveSquare} piece not found");
 
-                AddMove(isWhite, movePiece, moveSquare, null, null, pieceType);
+                AddMove(moves[i], isWhite, movePiece, moveSquare, null, null, pieceType);
                 continue;
             }
 
@@ -235,7 +235,7 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
-                AddMove(isWhite, movePiece, moveSquare);
+                AddMove(moves[i], isWhite, movePiece, moveSquare);
                 continue;
             }
 
@@ -256,13 +256,13 @@ public class PGNManager : MonoBehaviour
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
-                AddMove(isWhite, movePiece, moveSquare);
+                AddMove(moves[i], isWhite, movePiece, moveSquare);
                 continue;
             }
         }
     }
 
-    private void AddMove(bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
+    private void AddMove(string pgnString, bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
     {
         MoveDetails move;
 
@@ -278,7 +278,8 @@ public class PGNManager : MonoBehaviour
                 SecondMoveToSquare = secondSquareToMoveTo,
                 PromotionPieceType = pieceToPromoteTo,
                 ActivatesEnPassant = isEnPassantable,
-                RemovePieceEnPassant = pieceToTakeEnPassant
+                RemovePieceEnPassant = pieceToTakeEnPassant,
+                PGNCode = pgnString
             };
 
             _moveDetailsList.Add(move);
