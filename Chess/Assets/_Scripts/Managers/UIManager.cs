@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button _previousMovePGNButton;
     [SerializeField] private Button _firstMovePGNButton;
     [SerializeField] private Button _lastMovePGNButton;
+    [SerializeField] private TabMenu _tabMenu;
 
     public static UIManager Instance { get; private set; }
 
@@ -71,5 +72,10 @@ public class UIManager : MonoBehaviour
     public void UpdateFENText(string text)
     {
         _fenInput.text = text;
+    }
+
+    public void SetTabMenuTab(int index)
+    {
+        _tabMenu.JumpToPage(index);
     }
 }

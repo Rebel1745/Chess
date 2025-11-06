@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class GameManager : MonoBehaviour
 
     public bool _isCurrentPlayerWhite = true;
     public bool IsCurrentPlayerWhite { get { return _isCurrentPlayerWhite; } }
+
+    public event EventHandler OnGameStarted;
 
     private void Awake()
     {
@@ -61,6 +64,7 @@ public class GameManager : MonoBehaviour
     {
         PieceManager.Instance.LoadDefaultPosition();
         _isCurrentPlayerWhite = true;
+        OnGameStarted?.Invoke(this, EventArgs.Empty);
         UpdateGameState(GameState.WaitingForMove);
     }
 

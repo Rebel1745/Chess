@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PGNManager : MonoBehaviour
@@ -8,9 +10,30 @@ public class PGNManager : MonoBehaviour
     public List<MoveDetails> _moveDetailsList = new();
     private int _currentMove = 0;
 
+    public event EventHandler<OnMoveDetailsChangedArgs> OnMoveDetailsChanged;
+    public class OnMoveDetailsChangedArgs : EventArgs
+    {
+        public List<MoveDetails> MoveDetailsList;
+    }
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
+    }
+
+    private void Start()
+    {
+        GameManager.Instance.OnGameStarted += GameManager_OnGameStarted;
+    }
+
+    private void GameManager_OnGameStarted(object sender, EventArgs e)
+    {
+        _moveDetailsList.Clear();
+        _currentMove = 0;
+        OnMoveDetailsChanged?.Invoke(this, new OnMoveDetailsChangedArgs
+        {
+            MoveDetailsList = _moveDetailsList
+        });
     }
 
     public void ParsePGN(string pgn)
@@ -260,6 +283,10 @@ public class PGNManager : MonoBehaviour
                 continue;
             }
         }
+
+        TriggerOnMoveListUpdatedEvent();
+        FirstMove();
+        UIManager.Instance.SetTabMenuTab(0);
     }
 
     private void AddMove(string pgnString, bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
@@ -282,10 +309,26 @@ public class PGNManager : MonoBehaviour
                 PGNCode = pgnString
             };
 
-            _moveDetailsList.Add(move);
+            AddMove(move, false);
 
             InputManager.Instance.MovePiece(move);
         }
+    }
+
+    public void AddMove(MoveDetails move, bool triggerListUpdatedEvent = true)
+    {
+        _moveDetailsList.Add(move);
+
+        if (triggerListUpdatedEvent)
+            TriggerOnMoveListUpdatedEvent();
+    }
+
+    private void TriggerOnMoveListUpdatedEvent()
+    {
+        OnMoveDetailsChanged?.Invoke(this, new OnMoveDetailsChangedArgs
+        {
+            MoveDetailsList = _moveDetailsList
+        });
     }
 
     public void UpdatePromotedPieceGO(int moveNumber, GameObject piece)

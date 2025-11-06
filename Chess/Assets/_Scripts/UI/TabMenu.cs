@@ -11,7 +11,9 @@ public class TabMenu : MonoBehaviour
 
     [Header("Components")]
     [SerializeField] private ToggleGroup _toggleGroup;
+    [SerializeField] private Transform _tabsHolder;
     [SerializeField] private List<Toggle> _tabs = new();
+    [SerializeField] private Transform _pagesHolder;
     [SerializeField] private List<CanvasGroup> _pages = new();
 
     public event EventHandler<OnPageIndexChangedArgs> OnPageIndexChanged;
@@ -27,8 +29,14 @@ public class TabMenu : MonoBehaviour
         _tabs.Clear();
         _pages.Clear();
 
-        _tabs.AddRange(GetComponentsInChildren<Toggle>());
-        _pages.AddRange(GetComponentsInChildren<CanvasGroup>());
+        for (int i = 0; i < _tabsHolder.childCount; i++)
+        {
+            _tabs.Add(_tabsHolder.GetChild(i).GetComponent<Toggle>());
+        }
+        for (int i = 0; i < _pagesHolder.childCount; i++)
+        {
+            _pages.Add(_pagesHolder.GetChild(i).GetComponent<CanvasGroup>());
+        }
     }
 
     private void Reset()
@@ -36,7 +44,7 @@ public class TabMenu : MonoBehaviour
         Initialise();
     }
 
-    private void Oalidate()
+    private void OnValidate()
     {
         Initialise();
         OpenPage(_pageIndex);
