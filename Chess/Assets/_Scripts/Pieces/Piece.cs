@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
-    [SerializeField] private PIECE_TYPE _pieceType;
+    [SerializeField] protected PIECE_TYPE _pieceType;
     public PIECE_TYPE PieceType { get { return _pieceType; } }
     [SerializeField] protected Vector2Int[] _basicMoves;
-    private string _pieceCode;
+    protected string _pieceCode;
     public string PieceCode { get { return _pieceCode; } }
     protected bool _isWhite;
     private bool _isPromotedPiece;
@@ -20,6 +20,8 @@ public class Piece : MonoBehaviour
     public bool IsFirstMove { get { return _isFirstMove; } }
     private bool _canBeEnPassanted = false;
     public bool IsCanBeEnPassanted { get { return _canBeEnPassanted; } }
+    protected Piece[] _piecesWithTheSameMove;
+    protected string _detailedPieceCode; // used when multiple pieces can move to the same square
 
     protected List<MoveDetails> _availableMoves = new();
     public List<MoveDetails> AvailableMoves { get { return _availableMoves; } }
@@ -81,14 +83,23 @@ public class Piece : MonoBehaviour
             }
 
             if (!ignoreCurrentDirection)
+            {
+                _piecesWithTheSameMove = PieceManager.Instance.GetPiecesByMove(possibleMoveSquare, _isWhite, _pieceType);
+
+                if (_piecesWithTheSameMove.Length >= 1)
+                    _detailedPieceCode = GetDetailedPieceCode();
+                else
+                    _detailedPieceCode = _pieceCode.ToUpper();
+
                 _availableMoves.Add(new MoveDetails
                 {
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
                     MoveToSquare = possibleMoveSquare,
-                    PGNCode = _pieceCode + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
+                    PGNCode = _detailedPieceCode + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
                 });
+            }
 
             // if we land on an oponent piece, we can't move past it
             if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
@@ -185,6 +196,41 @@ public class Piece : MonoBehaviour
         }
 
         return false;
+    }
+
+    protected string GetDetailedPieceCode()
+    {
+        List<Piece> sameRankPieces = new();
+        List<Piece> sameFilePieces = new();
+
+        // first check to see if they are on different files
+        foreach (Piece piece in _piecesWithTheSameMove)
+        {
+            // ignore our piece
+            if (piece.Square.SquarePGNCode == _square.SquarePGNCode) continue;
+
+            if (piece.Square.SquarePGNCode[..1] == _square.SquarePGNCode[..1]) sameRankPieces.Add(piece);
+        }
+
+        // if there are no pieces on the same rank as our piece, return the piece code and the rank
+        if (sameRankPieces.Count == 0)
+            return _pieceCode.ToUpper() + _square.SquarePGNCode[..1];
+
+        // check to see if there are on different ranks
+        foreach (Piece piece in _piecesWithTheSameMove)
+        {
+            // ignore our piece
+            if (piece.Square.SquarePGNCode == _square.SquarePGNCode) continue;
+
+            if (piece.Square.SquarePGNCode.Substring(1, 1) == _square.SquarePGNCode.Substring(1, 1)) sameFilePieces.Add(piece);
+        }
+
+        // if there are no pieces on the same file as our piece, return the piece code and the file
+        if (sameFilePieces.Count == 0)
+            return _pieceCode.ToUpper() + _square.SquarePGNCode.Substring(1, 1);
+        else
+            // otherwise return the piece code and the full code of the square it is on
+            return _pieceCode.ToUpper() + _square.SquarePGNCode;
     }
 }
 

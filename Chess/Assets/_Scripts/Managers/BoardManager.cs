@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using Unity.Collections;
 using UnityEngine;
@@ -16,6 +17,16 @@ public class BoardManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
+    }
+
+    private void Start()
+    {
+        PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
+    }
+
+    private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
+    {
+        GenerateBoardPositionFEN();
     }
 
     public void CreateBoard()

@@ -25,7 +25,7 @@ public class PieceKing : Piece
                 isWhite = _isWhite,
                 PieceToMove = this,
                 MoveToSquare = possibleMoveSquare,
-                PGNCode = "k" + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
+                PGNCode = "K" + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
             });
         }
 

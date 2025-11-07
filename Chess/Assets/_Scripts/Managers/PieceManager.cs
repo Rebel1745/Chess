@@ -26,16 +26,93 @@ public class PieceManager : MonoBehaviour
     private GameObject _promotionPiecesBlack;
     private Piece _pawnToPromote;
 
+    private Piece _selectedPiece;
+    //private Square _currentSquare;
+    private bool _isMovingPiece;
+
     private List<Piece> _allPieces = new();
 
     private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     //private readonly string _defaultPosition = "r1bk3r/pP1p1pNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
+
+    public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
+    public class OnMoveCompletedArgs : EventArgs
+    {
+        public MoveDetails Move;
+    }
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
     }
 
+    private void Start()
+    {
+        InputManager.Instance.OnClickStarted += InputManager_OnClickStarted;
+        InputManager.Instance.OnClickFinished += InputManager_OnClickFinished;
+    }
+
+    private void Update()
+    {
+        if (!_isMovingPiece) return;
+
+        UpdateMovePiece();
+    }
+
+    private void InputManager_OnClickStarted(object sender, InputManager.OnClickArgs e)
+    {
+
+        if (GameManager.Instance.State == GameState.WaitingForPromotion)
+        {
+            if (e.PromotionPieceType == PIECE_TYPE.None) return;
+
+            SelectPromotionPiece(new MoveDetails
+            {
+                PromotionPieceType = e.PromotionPieceType
+            });
+        }
+
+        if (GameManager.Instance.State != GameState.WaitingForMove) return;
+
+        if (e.CurrentPiece)
+        {
+            if (e.CurrentPiece.IsWhite != GameManager.Instance.IsCurrentPlayerWhite) return;
+
+            // if there is already a piece seleced, hide their available moves
+            if (_selectedPiece) _selectedPiece.ShowHideAvailableMoves(false);
+
+            _selectedPiece = e.CurrentPiece;
+            _selectedPiece.CalculateAvailableMoves(true);
+            _selectedPiece.ShowHideAvailableMoves(true);
+            _isMovingPiece = true;
+            //_currentSquare = e.CurrentSquare;
+        }
+    }
+
+    private void InputManager_OnClickFinished(object sender, InputManager.OnClickArgs e)
+    {
+        if (!_selectedPiece) return;
+
+        if (_selectedPiece.Square == e.CurrentSquare)
+        {
+            _isMovingPiece = false;
+            _selectedPiece.transform.position = e.CurrentSquare.transform.position;
+            return;
+        }
+
+        if (e.CurrentSquare)
+        {
+            // check if the current square is part of the available move set of the piece
+            if (_selectedPiece.CheckIfValidMove(e.CurrentSquare, out MoveDetails move))
+                MovePiece(move);
+            else
+            {
+                ResetPiecePosition(_selectedPiece, _selectedPiece.Square);
+            }
+        }
+    }
+
+    #region Position Functions
     public void LoadPosition(string position)
     {
         string[] rankStrings = position.Split('/');
@@ -144,95 +221,7 @@ public class PieceManager : MonoBehaviour
             currentPiece.SetIsFirstMove(true);
         }
     }
-
-    public PIECE_TYPE GetPieceTypeFromCharacter(string character)
-    {
-        PIECE_TYPE type = PIECE_TYPE.None;
-
-        switch (character.ToUpper())
-        {
-            case "P":
-                type = PIECE_TYPE.Pawn;
-                break;
-            case "N":
-                type = PIECE_TYPE.Knight;
-                break;
-            case "B":
-                type = PIECE_TYPE.Bishop;
-                break;
-            case "R":
-                type = PIECE_TYPE.Rook;
-                break;
-            case "Q":
-                type = PIECE_TYPE.Queen;
-                break;
-            case "K":
-                type = PIECE_TYPE.King;
-                break;
-        }
-
-        return type;
-    }
-
-    private GameObject GetPieceGOFromText(string character, out bool isWhite)
-    {
-        GameObject piece = _whiteKing;
-        isWhite = true;
-
-        switch (character)
-        {
-            case "K":
-                piece = _whiteKing;
-                isWhite = true;
-                break;
-            case "Q":
-                piece = _whiteQueen;
-                isWhite = true;
-                break;
-            case "R":
-                piece = _whiteRook;
-                isWhite = true;
-                break;
-            case "B":
-                piece = _whiteBishop;
-                isWhite = true;
-                break;
-            case "N":
-                piece = _whiteKnight;
-                isWhite = true;
-                break;
-            case "P":
-                piece = _whitePawn;
-                isWhite = true;
-                break;
-            case "k":
-                piece = _blackKing;
-                isWhite = false;
-                break;
-            case "q":
-                piece = _blackQueen;
-                isWhite = false;
-                break;
-            case "r":
-                piece = _blackRook;
-                isWhite = false;
-                break;
-            case "b":
-                piece = _blackBishop;
-                isWhite = false;
-                break;
-            case "n":
-                piece = _blackKnight;
-                isWhite = false;
-                break;
-            case "p":
-                piece = _blackPawn;
-                isWhite = false;
-                break;
-        }
-
-        return piece;
-    }
+    #endregion
 
     public bool CheckIfAnyPieceCanTakeKing(bool isWhite, Piece pieceToIgnore = null)
     {
@@ -358,9 +347,9 @@ public class PieceManager : MonoBehaviour
         _allPieces.Add(newPiece);
         newPiece.CalculateAvailableMoves(false);
 
-        InputManager.Instance.ResetCurrentPiece();
+        ResetCurrentPiece();
 
-        InputManager.Instance.PieceMoved();
+        PieceMoved(move);
     }
 
     public void SetPiecesAsNotEnPassantable(bool isWhite)
@@ -371,6 +360,96 @@ public class PieceManager : MonoBehaviour
             if (piece.IsWhite == isWhite)
                 piece.SetPossibleEnPassant(false);
         }
+    }
+
+    #region Get Piece Functions
+    public PIECE_TYPE GetPieceTypeFromCharacter(string character)
+    {
+        PIECE_TYPE type = PIECE_TYPE.None;
+
+        switch (character.ToUpper())
+        {
+            case "P":
+                type = PIECE_TYPE.Pawn;
+                break;
+            case "N":
+                type = PIECE_TYPE.Knight;
+                break;
+            case "B":
+                type = PIECE_TYPE.Bishop;
+                break;
+            case "R":
+                type = PIECE_TYPE.Rook;
+                break;
+            case "Q":
+                type = PIECE_TYPE.Queen;
+                break;
+            case "K":
+                type = PIECE_TYPE.King;
+                break;
+        }
+
+        return type;
+    }
+
+    private GameObject GetPieceGOFromText(string character, out bool isWhite)
+    {
+        GameObject piece = _whiteKing;
+        isWhite = true;
+
+        switch (character)
+        {
+            case "K":
+                piece = _whiteKing;
+                isWhite = true;
+                break;
+            case "Q":
+                piece = _whiteQueen;
+                isWhite = true;
+                break;
+            case "R":
+                piece = _whiteRook;
+                isWhite = true;
+                break;
+            case "B":
+                piece = _whiteBishop;
+                isWhite = true;
+                break;
+            case "N":
+                piece = _whiteKnight;
+                isWhite = true;
+                break;
+            case "P":
+                piece = _whitePawn;
+                isWhite = true;
+                break;
+            case "k":
+                piece = _blackKing;
+                isWhite = false;
+                break;
+            case "q":
+                piece = _blackQueen;
+                isWhite = false;
+                break;
+            case "r":
+                piece = _blackRook;
+                isWhite = false;
+                break;
+            case "b":
+                piece = _blackBishop;
+                isWhite = false;
+                break;
+            case "n":
+                piece = _blackKnight;
+                isWhite = false;
+                break;
+            case "p":
+                piece = _blackPawn;
+                isWhite = false;
+                break;
+        }
+
+        return piece;
     }
 
     public Piece GetPieceByMove(Square square, bool isWhite, PIECE_TYPE pieceType)
@@ -390,6 +469,30 @@ public class PieceManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public Piece[] GetPiecesByMove(Square square, bool isWhite, PIECE_TYPE pieceType)
+    {
+        List<Piece> pieceList = new();
+
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.PieceType != pieceType) continue;
+
+            // the piece is the correct colour and type, check its moves
+            foreach (MoveDetails move in piece.AvailableMoves)
+            {
+                if (move.MoveToSquare == square)
+                {
+                    pieceList.Add(move.PieceToMove);
+                    break;
+                }
+            }
+        }
+
+        return pieceList.ToArray();
     }
 
     public Piece GetPieceByFile(string file, bool isWhite, PIECE_TYPE pieceType)
@@ -438,12 +541,116 @@ public class PieceManager : MonoBehaviour
 
         return null;
     }
+    #endregion
 
-    public void HideAllAvailablePieceMoves()
+    #region Piece Movement
+    public void MovePiece(MoveDetails move)
     {
-        foreach (Piece piece in _allPieces)
+        // if there is a piece on the square, capture it
+        if (move.MoveToSquare.PieceOnSquare != null)
+            TakePiece(move.MoveToSquare.PieceOnSquare);
+        else if (move.RemovePieceEnPassant != null)
         {
-            piece.ShowHideAvailableMoves(false);
+            move.RemovePieceEnPassant.Square.SetPieceOnSquare(null);
+            TakePiece(move.RemovePieceEnPassant);
+        }
+
+        // remove the piece from the current square
+        move.PieceToMove.Square.SetPieceOnSquare(null);
+        // set the pieces position to the new squares position
+        move.PieceToMove.transform.position = move.MoveToSquare.transform.position;
+        move.PieceToMove.ShowHideAvailableMoves(false);
+        // set the new square of the piece
+        move.PieceToMove.SetPieceSquare(move.MoveToSquare);
+        _selectedPiece = null;
+        // set the piece as the new piece on the square
+        move.MoveToSquare.SetPieceOnSquare(move.PieceToMove);
+
+        if (move.ActivatesEnPassant)
+            move.PieceToMove.SetPossibleEnPassant(true);
+
+        move.PieceToMove.SetIsFirstMove(false);
+
+        // if we are castling, we need to move the rook as well
+        if (move.SecondPieceToMove != null && move.SecondMoveToSquare != null)
+        {
+            // remove the piece from the current square
+            move.SecondPieceToMove.Square.SetPieceOnSquare(null);
+            // set the pieces position to the new squares position
+            move.SecondPieceToMove.transform.position = move.SecondMoveToSquare.transform.position;
+            move.SecondPieceToMove.ShowHideAvailableMoves(false);
+            // set the new square of the piece
+            move.SecondPieceToMove.SetPieceSquare(move.SecondMoveToSquare);
+            // set the piece as the new piece on the square
+            move.SecondMoveToSquare.SetPieceOnSquare(move.SecondPieceToMove);
+
+            move.SecondPieceToMove.SetIsFirstMove(false);
+        }
+
+        // this should only be used moving through the PGN moves
+        if (move.PromotionPieceType != PIECE_TYPE.None)
+        {
+            SetAutomaticPromotion(move);
+        }
+
+        //_currentSquare = null;
+        _isMovingPiece = false;
+
+        // if we didn't en passant this move, set any available en passantable pieces back to not en passantable
+        SetPiecesAsNotEnPassantable(!GameManager.Instance.IsCurrentPlayerWhite);
+
+        if (move.IsPromotion)
+            ShowPromotionPieces(move);
+        else
+        {
+            UpdateAllPieceMoves();
+            PieceMoved(move);
         }
     }
+
+    public void PieceMoved(MoveDetails move)
+    {
+        OnMoveCompleted?.Invoke(this, new()
+        {
+            Move = move
+        });
+
+        // check for check
+        if (CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
+        {
+            if (CheckForMate())
+            {
+                // check mate baby
+                Debug.Log("CheckMate");
+                GameManager.Instance.UpdateGameState(GameState.GameOver);
+            }
+            else
+            {
+                //Debug.Log("Check");
+                GameManager.Instance.UpdateGameState(GameState.NextTurn);
+            }
+        }
+        else
+            GameManager.Instance.UpdateGameState(GameState.NextTurn);
+    }
+
+    private void ResetPiecePosition(Piece piece, Square square)
+    {
+        piece.transform.position = square.transform.position;
+        piece.ShowHideAvailableMoves(false);
+        _selectedPiece = null;
+        // _currentSquare = null;
+        _isMovingPiece = false;
+    }
+
+    private void UpdateMovePiece()
+    {
+        _selectedPiece.transform.position = InputManager.Instance.MousePostion;
+    }
+
+    public void ResetCurrentPiece()
+    {
+        _selectedPiece = null;
+    }
+    #endregion
 }

@@ -24,6 +24,7 @@ public class PGNManager : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OnGameStarted += GameManager_OnGameStarted;
+        PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
     }
 
     private void GameManager_OnGameStarted(object sender, EventArgs e)
@@ -34,6 +35,11 @@ public class PGNManager : MonoBehaviour
         {
             MoveDetailsList = _moveDetailsList
         });
+    }
+
+    private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
+    {
+        AddMove(e.Move);
     }
 
     public void ParsePGN(string pgn)
@@ -311,12 +317,14 @@ public class PGNManager : MonoBehaviour
 
             AddMove(move, false);
 
-            InputManager.Instance.MovePiece(move);
+            PieceManager.Instance.MovePiece(move);
         }
     }
 
     public void AddMove(MoveDetails move, bool triggerListUpdatedEvent = true)
     {
+        move.MoveNumber = _currentMove;
+        _currentMove++;
         _moveDetailsList.Add(move);
 
         if (triggerListUpdatedEvent)
@@ -362,7 +370,7 @@ public class PGNManager : MonoBehaviour
         if (_currentMove == _moveDetailsList.Count) return;
 
         MoveDetails move = _moveDetailsList[_currentMove];
-        InputManager.Instance.MovePiece(move);
+        PieceManager.Instance.MovePiece(move);
         _currentMove++;
     }
 
