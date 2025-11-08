@@ -9,6 +9,7 @@ public class PGNManager : MonoBehaviour
     public string[] _moveList;
     public List<MoveDetails> _moveDetailsList = new();
     private int _currentMove = 0;
+    [SerializeField] private MoveList _moveListDisplay;
 
     public event EventHandler<OnMoveDetailsChangedArgs> OnMoveDetailsChanged;
     public class OnMoveDetailsChangedArgs : EventArgs
@@ -25,6 +26,7 @@ public class PGNManager : MonoBehaviour
     {
         GameManager.Instance.OnGameStarted += GameManager_OnGameStarted;
         PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
+        _moveListDisplay.OnMoveListClicked += MoveList_OnMoveListClicked;
     }
 
     private void GameManager_OnGameStarted(object sender, EventArgs e)
@@ -40,6 +42,11 @@ public class PGNManager : MonoBehaviour
     private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
     {
         AddMove(e.Move);
+    }
+
+    private void MoveList_OnMoveListClicked(object sender, MoveList.OnMoveListClickedArgs e)
+    {
+        GoToMove(e.Move.MoveNumber);
     }
 
     public void ParsePGN(string pgn)
@@ -317,7 +324,7 @@ public class PGNManager : MonoBehaviour
 
             AddMove(move, false);
 
-            PieceManager.Instance.MovePiece(move);
+            PieceManager.Instance.MovePiece(move, false);
         }
     }
 
@@ -370,7 +377,7 @@ public class PGNManager : MonoBehaviour
         if (_currentMove == _moveDetailsList.Count) return;
 
         MoveDetails move = _moveDetailsList[_currentMove];
-        PieceManager.Instance.MovePiece(move);
+        PieceManager.Instance.MovePiece(move, false);
         _currentMove++;
     }
 
@@ -383,6 +390,15 @@ public class PGNManager : MonoBehaviour
         FirstMove();
 
         for (int i = 0; i < moveTo; i++)
+        {
+            NextMove();
+        }
+    }
+
+    private void GoToMove(int moveNumber)
+    {
+        FirstMove();
+        for (int i = 0; i <= moveNumber; i++)
         {
             NextMove();
         }

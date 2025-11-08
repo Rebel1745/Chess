@@ -1,11 +1,23 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(ToggleGroup))]
 public class MoveList : MonoBehaviour
 {
     [SerializeField] private Transform _moveListContainer;
     [SerializeField] private GameObject _moveDetailsPrefab;
+
+    // move click toggle stuff
+    [SerializeField] private ToggleGroup _toggleGroup;
+    [SerializeField] private List<Toggle> _moveListToggles = new();
+
+    public event EventHandler<OnMoveListClickedArgs> OnMoveListClicked;
+    public class OnMoveListClickedArgs : EventArgs
+    {
+        public MoveDetails Move;
+    }
 
     private void Start()
     {
@@ -38,7 +50,7 @@ public class MoveList : MonoBehaviour
             whiteMove = moveDetailsList[i];
             blackMove = moveDetailsList.Count > iPlusOne ? moveDetailsList[iPlusOne] : emptyMove;
 
-            moveListElement.SetMoveDetails(whiteMove, blackMove);
+            moveListElement.SetMoveDetails(this, whiteMove, blackMove);
 
             // increment again
             i++;
@@ -51,5 +63,13 @@ public class MoveList : MonoBehaviour
         {
             Destroy(_moveListContainer.GetChild(i).gameObject);
         }
+    }
+
+    public void TriggerMoveClicked(MoveDetails move)
+    {
+        OnMoveListClicked?.Invoke(this, new OnMoveListClickedArgs()
+        {
+            Move = move
+        });
     }
 }

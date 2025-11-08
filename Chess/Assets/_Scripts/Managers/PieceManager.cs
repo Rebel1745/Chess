@@ -544,7 +544,7 @@ public class PieceManager : MonoBehaviour
     #endregion
 
     #region Piece Movement
-    public void MovePiece(MoveDetails move)
+    public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
         // if there is a piece on the square, capture it
         if (move.MoveToSquare.PieceOnSquare != null)
@@ -604,16 +604,17 @@ public class PieceManager : MonoBehaviour
         else
         {
             UpdateAllPieceMoves();
-            PieceMoved(move);
+            PieceMoved(move, triggerMoveCompletedEvent);
         }
     }
 
-    public void PieceMoved(MoveDetails move)
+    public void PieceMoved(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
-        OnMoveCompleted?.Invoke(this, new()
-        {
-            Move = move
-        });
+        if (triggerMoveCompletedEvent)
+            OnMoveCompleted?.Invoke(this, new()
+            {
+                Move = move
+            });
 
         // check for check
         if (CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
