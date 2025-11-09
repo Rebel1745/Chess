@@ -610,6 +610,11 @@ public class PieceManager : MonoBehaviour
 
     public void PieceMoved(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
+        // reset the highlighted moves on the board
+        BoardManager.Instance.ResetSquareColours();
+        // highlight the current move
+        BoardManager.Instance.HighlightCurrentMove(move);
+
         if (triggerMoveCompletedEvent)
             OnMoveCompleted?.Invoke(this, new()
             {
@@ -654,4 +659,12 @@ public class PieceManager : MonoBehaviour
         _selectedPiece = null;
     }
     #endregion
+
+    public void FlipPieces()
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            piece.transform.Rotate(0, 0, 180f);
+        }
+    }
 }

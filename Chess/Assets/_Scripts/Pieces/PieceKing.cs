@@ -24,6 +24,7 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
+                StartingSquare = _square,
                 MoveToSquare = possibleMoveSquare,
                 PGNCode = "K" + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
             });
@@ -47,6 +48,7 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
+                StartingSquare = _square,
                 MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX + 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
                 SecondMoveToSquare = possibleMoveSquare,
@@ -66,6 +68,7 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
+                StartingSquare = _square,
                 MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX - 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
                 SecondMoveToSquare = possibleMoveSquare,

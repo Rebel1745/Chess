@@ -27,6 +27,7 @@ public class PiecePawn : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
+                StartingSquare = _square,
                 MoveToSquare = possibleMoveSquare,
                 IsPromotion = isPromotion,
                 PGNCode = possibleMoveSquare.SquarePGNCode
@@ -45,6 +46,7 @@ public class PiecePawn : Piece
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
+                    StartingSquare = _square,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,
                     ActivatesEnPassant = true,
@@ -71,6 +73,7 @@ public class PiecePawn : Piece
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
+                    StartingSquare = _square,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,
                     PGNCode = _square.SquarePGNCode[..1] + "x" + possibleMoveSquare.SquarePGNCode
@@ -105,6 +108,7 @@ public class PiecePawn : Piece
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
+                    StartingSquare = _square,
                     MoveToSquare = possibleMoveSquare,
                     IsPromotion = isPromotion,
                     RemovePieceEnPassant = enPassantablePiece,

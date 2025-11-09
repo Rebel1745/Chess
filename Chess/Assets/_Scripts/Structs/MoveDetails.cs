@@ -6,6 +6,7 @@ public struct MoveDetails
     public int MoveNumber;
     public bool isWhite;
     public Piece PieceToMove;
+    public Square StartingSquare;
     public Square MoveToSquare;
     public Piece SecondPieceToMove;
     public Square SecondMoveToSquare;

@@ -96,6 +96,7 @@ public class Piece : MonoBehaviour
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
+                    StartingSquare = _square,
                     MoveToSquare = possibleMoveSquare,
                     PGNCode = _detailedPieceCode + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
                 });

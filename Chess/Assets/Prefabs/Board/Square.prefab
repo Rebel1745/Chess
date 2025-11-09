@@ -43,9 +43,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8416432248365392536}
   - component: {fileID: 8790506990091349706}
-  - component: {fileID: 3244863658571345024}
+  - component: {fileID: -8503833721498021914}
   m_Layer: 6
-  m_Name: SquareLight
+  m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,7 +113,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &3244863658571345024
+--- !u!114 &-8503833721498021914
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,6 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62c9254d2cccf6741b9d577f26186057, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Square
+  _spriteRenderer: {fileID: 3835697046805104806}
   _possibleMoveIndicator: {fileID: 6258042957928252548}
 --- !u!1 &4689217004895290326
 GameObject:
@@ -206,7 +207,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.80937874, g: 0.8349056, b: 0.4844028, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

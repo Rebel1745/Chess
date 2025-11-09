@@ -9,8 +9,10 @@ public class BoardManager : MonoBehaviour
 
     [SerializeField] private Transform _boardHolder;
     [SerializeField] private GameObject _boardBackgroundPrefab;
-    [SerializeField] private GameObject _lightSquarePrefab;
-    [SerializeField] private GameObject _darkSquarePrefab;
+    [SerializeField] private GameObject _squarePrefab;
+    [SerializeField] private Color _lightSquareColour;
+    [SerializeField] private Color _darkSquareColour;
+    [SerializeField] private Color _moveHighlightColour;
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
 
@@ -31,7 +33,7 @@ public class BoardManager : MonoBehaviour
 
     public void CreateBoard()
     {
-        GameObject squarePrefab;
+        Color squareColor;
         GameObject newSquareGO;
         bool isLightSquare = true;
         Square currentSquare;
@@ -48,11 +50,11 @@ public class BoardManager : MonoBehaviour
             for (int x = 0; x < 8; x++)
             {
                 code = _fileNames[x] + (y + 1);
-                squarePrefab = isLightSquare ? _lightSquarePrefab : _darkSquarePrefab;
-                newSquareGO = Instantiate(squarePrefab, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
+                squareColor = isLightSquare ? _lightSquareColour : _darkSquareColour;
+                newSquareGO = Instantiate(_squarePrefab, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
                 newSquareGO.name = "Square " + code;
                 currentSquare = newSquareGO.GetComponent<Square>();
-                currentSquare.SetupSquareDetails(x, y, code);
+                currentSquare.SetupSquareDetails(x, y, code, squareColor);
                 _squares[x, y] = currentSquare;
                 isLightSquare = !isLightSquare;
             }
@@ -124,5 +126,28 @@ public class BoardManager : MonoBehaviour
         }
 
         UIManager.Instance.UpdateFENText(fen.ToString());
+    }
+
+    public void ResetSquareColours()
+    {
+        for (int rank = 7; rank >= 0; rank--)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                _squares[rank, file].ResetSquareColour();
+            }
+        }
+    }
+
+    public void HighlightCurrentMove(MoveDetails move)
+    {
+        move.StartingSquare.SetSquareColour(_moveHighlightColour);
+        move.MoveToSquare.SetSquareColour(_moveHighlightColour);
+    }
+
+    public void FlipBoard()
+    {
+        PieceManager.Instance.FlipPieces();
+        CameraManager.Instance.FlipCamera();
     }
 }

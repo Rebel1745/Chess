@@ -313,6 +313,7 @@ public class PGNManager : MonoBehaviour
                 MoveNumber = _moveDetailsList.Count,
                 isWhite = isWhite,
                 PieceToMove = pieceToMove,
+                StartingSquare = pieceToMove.Square,
                 MoveToSquare = squareToMoveTo,
                 SecondPieceToMove = secondPieceToMove,
                 SecondMoveToSquare = secondSquareToMoveTo,
@@ -361,6 +362,7 @@ public class PGNManager : MonoBehaviour
         GameManager.Instance.SetCurrentPlayerColour(true);
         _currentMove = 0;
         PieceManager.Instance.ResetBoardPosition();
+        BoardManager.Instance.ResetSquareColours();
     }
 
     public void LastMove()
