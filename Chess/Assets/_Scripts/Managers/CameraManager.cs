@@ -7,6 +7,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private Camera _camera;
     [SerializeField] private Vector3 _cameraFlippedPosition;
     private Vector3 _cameraStartPosition;
+    [SerializeField] private bool _flipCameraAfterEachMove = false;
     private bool _isFlipped = false;
 
     private void Awake()
@@ -23,7 +24,7 @@ public class CameraManager : MonoBehaviour
 
     private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
     {
-        if (GameManager.Instance.IsCurrentPlayerWhite != _isFlipped)
+        if (_flipCameraAfterEachMove && GameManager.Instance.IsCurrentPlayerWhite != _isFlipped)
             BoardManager.Instance.FlipBoard();
     }
 

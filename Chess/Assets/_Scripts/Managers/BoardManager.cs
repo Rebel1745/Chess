@@ -1,6 +1,4 @@
-using System;
 using System.Text;
-using Unity.Collections;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
@@ -15,6 +13,7 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Color _moveHighlightColour;
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
+    public Square[,] AllSquares { get { return _squares; } }
 
     private void Awake()
     {
