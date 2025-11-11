@@ -28,6 +28,11 @@ public class CameraManager : MonoBehaviour
             BoardManager.Instance.FlipBoard();
     }
 
+    public void SetFlipBoard(bool flipBoard)
+    {
+        _flipCameraAfterEachMove = flipBoard;
+    }
+
     public void FlipCamera()
     {
         if (_isFlipped) _camera.transform.position = _cameraStartPosition;

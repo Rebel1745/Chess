@@ -26,6 +26,7 @@ public class PieceManager : MonoBehaviour
     private GameObject _promotionPiecesBlack;
     private Piece _pawnToPromote;
 
+    private MoveDetails _currentMove;
     private Piece _selectedPiece;
     //private Square _currentSquare;
     private bool _isMovingPiece;
@@ -62,15 +63,13 @@ public class PieceManager : MonoBehaviour
 
     private void InputManager_OnClickStarted(object sender, InputManager.OnClickArgs e)
     {
-
         if (GameManager.Instance.State == GameState.WaitingForPromotion)
         {
             if (e.PromotionPieceType == PIECE_TYPE.None) return;
 
-            SelectPromotionPiece(new MoveDetails
-            {
-                PromotionPieceType = e.PromotionPieceType
-            });
+            _currentMove.PromotionPieceType = e.PromotionPieceType;
+
+            SelectPromotionPiece(_currentMove);
         }
 
         if (GameManager.Instance.State != GameState.WaitingForMove) return;
@@ -332,8 +331,7 @@ public class PieceManager : MonoBehaviour
         {
             newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
             move.PromotedPiece = newPieceGO;
-            if (move.MoveNumber != -1)
-                PGNManager.Instance.UpdatePromotedPieceGO(move.MoveNumber, newPieceGO);
+            move.PGNCode += "=" + newPieceCode;
         }
         else
         {
@@ -547,6 +545,9 @@ public class PieceManager : MonoBehaviour
     #region Piece Movement
     public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
+        move.MoveNumber = PGNManager.Instance.GetNextMoveNumber();
+        _currentMove = move;
+
         // if there is a piece on the square, capture it
         if (move.MoveToSquare.PieceOnSquare != null)
             TakePiece(move.MoveToSquare.PieceOnSquare);
@@ -622,6 +623,13 @@ public class PieceManager : MonoBehaviour
                 Move = move
             });
 
+        if (move.MoveNumber != -1 && move.PromotedPiece != null)
+        {
+            PGNManager.Instance.UpdatePromotedPieceGO(move.MoveNumber, move.PromotedPiece);
+            PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode);
+        }
+
+
         // check for check
         if (CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
         {
@@ -629,11 +637,13 @@ public class PieceManager : MonoBehaviour
             {
                 // check mate baby
                 Debug.Log("CheckMate");
+                PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode + "#");
                 GameManager.Instance.UpdateGameState(GameState.GameOver);
             }
             else
             {
                 //Debug.Log("Check");
+                PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode + "+");
                 GameManager.Instance.UpdateGameState(GameState.NextTurn);
             }
         }
@@ -667,5 +677,26 @@ public class PieceManager : MonoBehaviour
         {
             piece.transform.Rotate(0, 0, 180f);
         }
+    }
+
+    public void PrintMove(MoveDetails move)
+    {
+        Debug.Log($"Move Number: {move.MoveNumber}");
+        Debug.Log($"Is White: {move.isWhite}");
+        Debug.Log($"Piece To Move: {move.PieceToMove.name}");
+        Debug.Log($"Starting Square: {move.StartingSquare.name}");
+        Debug.Log($"Move To Square: {move.MoveToSquare.name}");
+        if (move.SecondPieceToMove != null)
+            Debug.Log($"Second Piece To Move: {move.SecondPieceToMove.name}");
+        if (move.SecondMoveToSquare != null)
+            Debug.Log($"Second Move To Square: {move.SecondMoveToSquare.name}");
+        Debug.Log($"Is Promotion: {move.IsPromotion}");
+        Debug.Log($"Activates En Passant: {move.ActivatesEnPassant}");
+        if (move.RemovePieceEnPassant != null)
+            Debug.Log($"Remove Piece En Passant: {move.RemovePieceEnPassant.name}");
+        Debug.Log($"Promotion Piece Type: {move.PromotionPieceType}");
+        if (move.PromotedPiece != null)
+            Debug.Log($"Promoted Piece: {move.PromotedPiece.name}");
+        Debug.Log($"PGN Code: {move.PGNCode}");
     }
 }

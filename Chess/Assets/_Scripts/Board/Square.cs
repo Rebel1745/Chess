@@ -12,17 +12,18 @@ public class Square : MonoBehaviour
     public Piece PieceOnSquare { get { return _pieceOnSquare; } }
     private Color _defaultSquareColour;
 
-    [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private SpriteRenderer _squareSprite;
+    [SerializeField] private SpriteRenderer _squareOutlineSprite;
     [SerializeField] private GameObject _possibleMoveIndicator;
 
-    public void SetupSquareDetails(int x, int y, string code, Color color)
+    public void SetupSquareDetails(int x, int y, string code, Color colour)
     {
         _squareX = x;
         _squareY = y;
         _squarePGNCode = code;
-        _defaultSquareColour = color;
+        _defaultSquareColour = colour;
 
-        SetSquareColour(color);
+        SetSquareColour(colour, colour);
     }
 
     public void SetPieceOnSquare(Piece piece)
@@ -35,13 +36,25 @@ public class Square : MonoBehaviour
         _possibleMoveIndicator.SetActive(show);
     }
 
+    public void SetSquareColour(Color squareColour, Color outlineColour)
+    {
+        _squareSprite.color = squareColour;
+        _squareOutlineSprite.color = outlineColour;
+    }
+
     public void SetSquareColour(Color color)
     {
-        _spriteRenderer.color = color;
+        _squareSprite.color = color;
+    }
+
+    public void SetSquareOutlineColour(Color color)
+    {
+        _squareOutlineSprite.color = color;
     }
 
     public void ResetSquareColour()
     {
-        _spriteRenderer.color = _defaultSquareColour;
+        _squareSprite.color = _defaultSquareColour;
+        _squareOutlineSprite.color = _defaultSquareColour;
     }
 }

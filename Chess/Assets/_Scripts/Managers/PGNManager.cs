@@ -357,6 +357,18 @@ public class PGNManager : MonoBehaviour
         _moveDetailsList[moveNumber] = tmp;
     }
 
+    public void UpdatePGNString(int moveNumber, string pgnString)
+    {
+        if (moveNumber == -1) return;
+
+        MoveDetails tmp = _moveDetailsList[moveNumber];
+        tmp.PGNCode = pgnString;
+
+        _moveDetailsList[moveNumber] = tmp;
+
+        TriggerOnMoveListUpdatedEvent();
+    }
+
     public void FirstMove()
     {
         GameManager.Instance.SetCurrentPlayerColour(true);
@@ -404,5 +416,10 @@ public class PGNManager : MonoBehaviour
         {
             NextMove();
         }
+    }
+
+    public int GetNextMoveNumber()
+    {
+        return _moveDetailsList.Count;
     }
 }

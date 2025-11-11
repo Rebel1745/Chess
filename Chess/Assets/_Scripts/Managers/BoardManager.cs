@@ -11,6 +11,7 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Color _lightSquareColour;
     [SerializeField] private Color _darkSquareColour;
     [SerializeField] private Color _moveHighlightColour;
+    [SerializeField] private Color _moveHighlightOutlineColour;
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
     public Square[,] AllSquares { get { return _squares; } }
@@ -140,8 +141,9 @@ public class BoardManager : MonoBehaviour
 
     public void HighlightCurrentMove(MoveDetails move)
     {
-        move.StartingSquare.SetSquareColour(_moveHighlightColour);
-        move.MoveToSquare.SetSquareColour(_moveHighlightColour);
+        //PieceManager.Instance.PrintMove(move);
+        move.StartingSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
+        move.MoveToSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
     }
 
     public void FlipBoard()
