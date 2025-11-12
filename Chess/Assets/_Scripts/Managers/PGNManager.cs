@@ -70,7 +70,7 @@ public class PGNManager : MonoBehaviour
 
         for (int i = 0; i < moves.Length; i++)
         {
-            moves[i] = moves[i].Replace('+', ' ').Replace('#', ' ').Trim();
+            moves[i] = moves[i].Replace('+', ' ').Replace('#', ' ').Replace("  ", " ").Trim();
         }
 
         _moveList = new string[moves.Length];
@@ -95,8 +95,9 @@ public class PGNManager : MonoBehaviour
             if (moves[i].IndexOf('.') != -1)
                 moves[i] = moves[i].Substring(moves[i].IndexOf('.') + 1, moves[i].Length - moves[i].IndexOf('.') - 1);
 
-            pieceCode = moves[i][..1];
+            pieceCode = moves[i][..1].Trim();
 
+            if (moves[i].Length == 0 || moves[i] == "") continue;
             if (moves[i].Length == 1)
             {
                 // maybe a checkmate symbol, or a * showing the game is not over
@@ -299,7 +300,7 @@ public class PGNManager : MonoBehaviour
 
         TriggerOnMoveListUpdatedEvent();
         FirstMove();
-        UIManager.Instance.SetTabMenuTab(0);
+        UIManager.Instance.SetTabMenuTab(1);
     }
 
     private void AddMove(string pgnString, bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)

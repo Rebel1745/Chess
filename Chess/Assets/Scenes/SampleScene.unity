@@ -1068,6 +1068,8 @@ MonoBehaviour:
   _darkSquareColour: {r: 0.5943396, g: 0.07008721, b: 0.48727313, a: 1}
   _moveHighlightColour: {r: 0.8773585, g: 0.796949, b: 0.39315593, a: 1}
   _moveHighlightOutlineColour: {r: 1, g: 0.7334804, b: 0, a: 1}
+  _squareHighlightColour: {r: 0, g: 0.5019608, b: 0, a: 1}
+  _squareHighlightOutlineColour: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &313680091
 GameObject:
   m_ObjectHideFlags: 0
@@ -2668,6 +2670,8 @@ MonoBehaviour:
   _blackPawn: {fileID: 7559596393190870394, guid: 17dba58263e2c8d4e96c3aa04ad2d665, type: 3}
   _promtionPiecesWhitePrefab: {fileID: 4573902114905135514, guid: e74651dcd7941634bac8687d0add0262, type: 3}
   _promtionPiecesBlackPrefab: {fileID: 8881507680313807570, guid: d73b6091e604e8644a17c567d13a6a95, type: 3}
+  _checkmateSquareColour: {r: 0.9056604, g: 0.37166253, b: 0.37166253, a: 1}
+  _checkmateOutlineColour: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &775386469
 GameObject:
   m_ObjectHideFlags: 0
@@ -2974,45 +2978,79 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: '[Event "Live Chess"]
+  m_Text: '[Event "Play vs Bot"]
 
     [Site "Chess.com"]
 
-    [Date "2015.03.31"]
+    [Date "2025.11.12"]
 
     [Round
-    "?"]
+    "-"]
 
-    [White "JackOfAllHobbies"]
+    [White "R00k_n_R0ll"]
 
-    [Black "johnpanageas"]
+    [Black "Bob-The-Cat-BOT"]
 
     [Result
     "1-0"]
 
-    [TimeControl "300"]
+    [CurrentPosition "6R1/6Qk/8/8/1p5p/7P/PP3PP1/6K1 b - - 2 44"]
 
-    [WhiteElo "837"]
+    [Timezone
+    "UTC"]
 
-    [BlackElo "794"]
+    [ECO "B10"]
 
-    [Termination
-    "JackOfAllHobbies won by checkmate"]
+    [ECOUrl "https://www.chess.com/openings/Caro-Kann-Defense-2.Nf3-d5"]
 
-    [ECO "B02"]
+    [UTCDate
+    "2025.11.12"]
 
-    [EndTime "13:09:57
-    GMT+0000"]
+    [UTCTime "22:43:03"]
 
-    [Link "https://www.chess.com/game/live/1106010987"]
+    [WhiteElo "1208"]
 
+    [BlackElo
+    "1350"]
 
+    [TimeControl "-"]
 
-    1.e4
-    Nf6 2.e5 Ne4 3.d3 Nc5 4.d4 Ne4 5.Qd3 d5 6.exd6 Nxd6 7.Nf3 b5 8.Bf4 e5 9.Bxe5
-    Bf5 10.Qb3 Nc6 11.Bxb5 Qd7 12.O-O Ne4 13.Nc3 a6 14.Ba4 Be6 15.d5 Bf5 16.Bxc6
-    Qxc6 17.dxc6 Bc5 18.Bxg7 Rg8 19.Ne5 Rxg7 20.Nxe4 Bxe4 21.g3 f5 22.Rad1 Bf3 23.Rd7
-    Rd8 24.Rxg7 Rd4 25.Qf7+ Kd8 26.Qg8+ Bf8 27.Qxf8#'
+    [Termination "R00k_n_R0ll won by checkmate"]
+
+    [StartTime
+    "22:43:03"]
+
+    [EndDate "2025.11.12"]
+
+    [EndTime "22:52:43"]
+
+    [Link
+    "https://www.chess.com/analysis/game/computer/459487495/analysis?move=82"]
+
+    [WhiteUrl
+    "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+
+    [WhiteCountry
+    "79"]
+
+    [WhiteTitle ""]
+
+    [BlackUrl "https://images.chesscomfiles.com/uploads/v1/user/486263657.e0b29e6c.50x50o.7374b6c2faeb.png"]
+
+    [BlackCountry
+    "164"]
+
+    [BlackTitle ""]
+
+    
+
+    1.e4 c6 2.Nf3 d5 3.e5 a6 4.d4 Bf5 5.Bf4
+    Nd7 6.c4 dxc4 7.Bxc4 b5 8.Bb3 e6 9.Nc3 b4 10.Na4 Ra7 11.O-O f6 12.exf6 Ngxf6
+    13.Bg5 Qb8 14.Ne5 Nxe5 15.dxe5 Qxe5 16.Re1 Qd6 17.Qf3 Bg4 18.Qe3 Re7 19.Nb6 Nd5
+    20.Nxd5 exd5 21.Bxe7 Bxe7 22.h3 Bd7 23.Re2 Kf7 24.Rae1 Bf6 25.Qd3 Qf4 26.Qxa6
+    Kg8 27.Re4 Qb8 28.Qd3 Qf8 29.Bxd5+ cxd5 30.Qxd5+ Be6 31.Qxe6+ Qf7 32.Qc8+ Bd8
+    33.Qxd8+ Qf8 34.Re8 Kf7 35.Rxf8+ Rxf8 36.Re7+ Kg8 37.Re8 h5 38.Rxf8+ Kh7 39.Qd3+
+    g6 40.Qd7+ Kh6 41.Qe7 g5 42.Rg8 h4 43.Qxg5+ Kh7 44.Qg7#'
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -3646,14 +3684,23 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "[Event \"Live Chess\"]\n[Site \"Chess.com\"]\n[Date \"2015.03.31\"]\n[Round
-    \"?\"]\n[White \"JackOfAllHobbies\"]\n[Black \"johnpanageas\"]\n[Result \"1-0\"]\n[TimeControl
-    \"300\"]\n[WhiteElo \"837\"]\n[BlackElo \"794\"]\n[Termination \"JackOfAllHobbies
-    won by checkmate\"]\n[ECO \"B02\"]\n[EndTime \"13:09:57 GMT+0000\"]\n[Link \"https://www.chess.com/game/live/1106010987\"]\n\n\n1.e4
-    Nf6 2.e5 Ne4 3.d3 Nc5 4.d4 Ne4 5.Qd3 d5 6.exd6 Nxd6 7.Nf3 b5 8.Bf4 e5 9.Bxe5
-    Bf5 10.Qb3 Nc6 11.Bxb5 Qd7 12.O-O Ne4 13.Nc3 a6 14.Ba4 Be6 15.d5 Bf5 16.Bxc6
-    Qxc6 17.dxc6 Bc5 18.Bxg7 Rg8 19.Ne5 Rxg7 20.Nxe4 Bxe4 21.g3 f5 22.Rad1 Bf3 23.Rd7
-    Rd8 24.Rxg7 Rd4 25.Qf7+ Kd8 26.Qg8+ Bf8 27.Qxf8#\u200B"
+  m_text: "[Event \"Play vs Bot\"]\r\n[Site \"Chess.com\"]\r\n[Date \"2025.11.12\"]\r\n[Round
+    \"-\"]\r\n[White \"R00k_n_R0ll\"]\r\n[Black \"Bob-The-Cat-BOT\"]\r\n[Result \"1-0\"]\r\n[CurrentPosition
+    \"6R1/6Qk/8/8/1p5p/7P/PP3PP1/6K1 b - - 2 44\"]\r\n[Timezone \"UTC\"]\r\n[ECO
+    \"B10\"]\r\n[ECOUrl \"https://www.chess.com/openings/Caro-Kann-Defense-2.Nf3-d5\"]\r\n[UTCDate
+    \"2025.11.12\"]\r\n[UTCTime \"22:43:03\"]\r\n[WhiteElo \"1208\"]\r\n[BlackElo
+    \"1350\"]\r\n[TimeControl \"-\"]\r\n[Termination \"R00k_n_R0ll won by checkmate\"]\r\n[StartTime
+    \"22:43:03\"]\r\n[EndDate \"2025.11.12\"]\r\n[EndTime \"22:52:43\"]\r\n[Link
+    \"https://www.chess.com/analysis/game/computer/459487495/analysis?move=82\"]\r\n[WhiteUrl
+    \"https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif\"]\r\n[WhiteCountry
+    \"79\"]\r\n[WhiteTitle \"\"]\r\n[BlackUrl \"https://images.chesscomfiles.com/uploads/v1/user/486263657.e0b29e6c.50x50o.7374b6c2faeb.png\"]\r\n[BlackCountry
+    \"164\"]\r\n[BlackTitle \"\"]\r\n\r\n1.e4 c6 2.Nf3 d5 3.e5 a6 4.d4 Bf5 5.Bf4
+    Nd7 6.c4 dxc4 7.Bxc4 b5 8.Bb3 e6 9.Nc3 b4 10.Na4 Ra7 11.O-O f6 12.exf6 Ngxf6
+    13.Bg5 Qb8 14.Ne5 Nxe5 15.dxe5 Qxe5 16.Re1 Qd6 17.Qf3 Bg4 18.Qe3 Re7 19.Nb6 Nd5
+    20.Nxd5 exd5 21.Bxe7 Bxe7 22.h3 Bd7 23.Re2 Kf7 24.Rae1 Bf6 25.Qd3 Qf4 26.Qxa6
+    Kg8 27.Re4 Qb8 28.Qd3 Qf8 29.Bxd5+ cxd5 30.Qxd5+ Be6 31.Qxe6+ Qf7 32.Qc8+ Bd8
+    33.Qxd8+ Qf8 34.Re8 Kf7 35.Rxf8+ Rxf8 36.Re7+ Kg8 37.Re8 h5 38.Rxf8+ Kh7 39.Qd3+
+    g6 40.Qd7+ Kh6 41.Qe7 g5 42.Rg8 h4 43.Qxg5+ Kh7 44.Qg7#\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

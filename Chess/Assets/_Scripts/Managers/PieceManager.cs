@@ -31,6 +31,9 @@ public class PieceManager : MonoBehaviour
     //private Square _currentSquare;
     private bool _isMovingPiece;
 
+    [SerializeField] private Color _checkmateSquareColour;
+    [SerializeField] private Color _checkmateOutlineColour;
+
     private List<Piece> _allPieces = new();
     public List<Piece> AllPieces { get { return _allPieces; } }
 
@@ -293,14 +296,14 @@ public class PieceManager : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.WaitingForPromotion);
     }
 
-    public void SetAutomaticPromotion(MoveDetails move)
+    public void SetAutomaticPromotion(MoveDetails move, bool triggerMoveCompletedEvent)
     {
         _pawnToPromote = move.PieceToMove;
 
-        SelectPromotionPiece(move);
+        SelectPromotionPiece(move, triggerMoveCompletedEvent);
     }
 
-    public void SelectPromotionPiece(MoveDetails move)
+    public void SelectPromotionPiece(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
         if (GameManager.Instance.IsCurrentPlayerWhite) _promotionPiecesWhite.SetActive(false);
         else _promotionPiecesBlack.SetActive(false);
@@ -310,6 +313,7 @@ public class PieceManager : MonoBehaviour
         TakePiece(_pawnToPromote);
         GameObject newPiecePrefab = move.isWhite ? _whiteQueen : _blackQueen;
         string newPieceCode = move.isWhite ? "Q" : "q";
+        string newPGNCode;
 
         switch (move.PromotionPieceType)
         {
@@ -331,7 +335,8 @@ public class PieceManager : MonoBehaviour
         {
             newPieceGO = Instantiate(newPiecePrefab, promotionSquare.transform.position, Quaternion.identity, _pieceHolder);
             move.PromotedPiece = newPieceGO;
-            move.PGNCode += "=" + newPieceCode;
+            newPGNCode = "=" + newPieceCode;
+            move.PGNCode = move.PGNCode.Replace(newPGNCode, " ").Trim() + "=" + newPieceCode;
         }
         else
         {
@@ -348,7 +353,7 @@ public class PieceManager : MonoBehaviour
 
         ResetCurrentPiece();
 
-        PieceMoved(move);
+        PieceMoved(move, triggerMoveCompletedEvent);
     }
 
     public void SetPiecesAsNotEnPassantable(bool isWhite)
@@ -545,7 +550,9 @@ public class PieceManager : MonoBehaviour
     #region Piece Movement
     public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
-        move.MoveNumber = PGNManager.Instance.GetNextMoveNumber();
+        if (move.MoveNumber == -1)
+            move.MoveNumber = PGNManager.Instance.GetNextMoveNumber();
+
         _currentMove = move;
 
         // if there is a piece on the square, capture it
@@ -589,11 +596,6 @@ public class PieceManager : MonoBehaviour
             move.SecondPieceToMove.SetIsFirstMove(false);
         }
 
-        // this should only be used moving through the PGN moves
-        if (move.PromotionPieceType != PIECE_TYPE.None)
-        {
-            SetAutomaticPromotion(move);
-        }
 
         //_currentSquare = null;
         _isMovingPiece = false;
@@ -601,7 +603,12 @@ public class PieceManager : MonoBehaviour
         // if we didn't en passant this move, set any available en passantable pieces back to not en passantable
         SetPiecesAsNotEnPassantable(!GameManager.Instance.IsCurrentPlayerWhite);
 
-        if (move.IsPromotion)
+        // this should only be used moving through the PGN moves
+        if (move.PromotionPieceType != PIECE_TYPE.None)
+        {
+            SetAutomaticPromotion(move, false);
+        }
+        else if (move.IsPromotion && move.PromotionPieceType == PIECE_TYPE.None)
             ShowPromotionPieces(move);
         else
         {
@@ -612,6 +619,8 @@ public class PieceManager : MonoBehaviour
 
     public void PieceMoved(MoveDetails move, bool triggerMoveCompletedEvent = true)
     {
+        Piece attackedKing;
+
         // reset the highlighted moves on the board
         BoardManager.Instance.ResetSquareColours();
         // highlight the current move
@@ -633,17 +642,21 @@ public class PieceManager : MonoBehaviour
         // check for check
         if (CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
         {
+            attackedKing = GetPieceFromCharacter("K", !GameManager.Instance.IsCurrentPlayerWhite);
+
             if (CheckForMate())
             {
                 // check mate baby
                 Debug.Log("CheckMate");
-                PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode + "#");
+                PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode.Replace('#', ' ').Trim() + "#");
+                attackedKing.Square.SetSquareColour(_checkmateSquareColour, _checkmateOutlineColour);
                 GameManager.Instance.UpdateGameState(GameState.GameOver);
             }
             else
             {
                 //Debug.Log("Check");
-                PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode + "+");
+                PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode.Replace('+', ' ').Trim() + "+");
+                attackedKing.Square.SetSquareOutlineColour(_checkmateOutlineColour);
                 GameManager.Instance.UpdateGameState(GameState.NextTurn);
             }
         }

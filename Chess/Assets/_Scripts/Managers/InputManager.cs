@@ -27,6 +27,13 @@ public class InputManager : MonoBehaviour
     public event EventHandler<OnClickArgs> OnClickStarted;
     public event EventHandler<OnClickArgs> OnClickFinished;
 
+    public class OnRightClickArgs : EventArgs
+    {
+        public Square CurrentSquare;
+    }
+    public event EventHandler<OnRightClickArgs> OnRightClickStarted;
+    public event EventHandler<OnRightClickArgs> OnRightClickFinished;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -39,6 +46,9 @@ public class InputManager : MonoBehaviour
 
         _inputActions.Game.Click.started += OnClick;
         _inputActions.Game.Click.canceled += OnClickCanceled;
+
+        _inputActions.Game.RightClick.started += OnRightClick;
+        _inputActions.Game.RightClick.canceled += OnRightClickCanceled;
     }
 
     private void Update()
@@ -109,6 +119,18 @@ public class InputManager : MonoBehaviour
             CurrentPiece = _currentPiece,
             CurrentSquare = _currentSquare,
             PromotionPieceType = _promotionPieceType
+        });
+    }
+
+    private void OnRightClick(InputAction.CallbackContext context)
+    {
+    }
+
+    private void OnRightClickCanceled(InputAction.CallbackContext context)
+    {
+        OnRightClickFinished.Invoke(this, new OnRightClickArgs()
+        {
+            CurrentSquare = _currentSquare
         });
     }
     #endregion

@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Color _darkSquareColour;
     [SerializeField] private Color _moveHighlightColour;
     [SerializeField] private Color _moveHighlightOutlineColour;
+    [SerializeField] private Color _squareHighlightColour;
+    [SerializeField] private Color _squareHighlightOutlineColour;
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
     public Square[,] AllSquares { get { return _squares; } }
@@ -24,11 +27,17 @@ public class BoardManager : MonoBehaviour
     private void Start()
     {
         PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
+        InputManager.Instance.OnRightClickFinished += InputManager_OnRightClickFinished;
     }
 
     private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
     {
         GenerateBoardPositionFEN();
+    }
+
+    private void InputManager_OnRightClickFinished(object sender, InputManager.OnRightClickArgs e)
+    {
+        HighlightSquare(e.CurrentSquare);
     }
 
     public void CreateBoard()
@@ -141,7 +150,6 @@ public class BoardManager : MonoBehaviour
 
     public void HighlightCurrentMove(MoveDetails move)
     {
-        //PieceManager.Instance.PrintMove(move);
         move.StartingSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
         move.MoveToSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
     }
@@ -150,5 +158,11 @@ public class BoardManager : MonoBehaviour
     {
         PieceManager.Instance.FlipPieces();
         CameraManager.Instance.FlipCamera();
+    }
+
+    private void HighlightSquare(Square square)
+    {
+        ResetSquareColours();
+        square.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour);
     }
 }
