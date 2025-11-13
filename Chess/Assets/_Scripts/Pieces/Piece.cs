@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -26,6 +27,17 @@ public class Piece : MonoBehaviour
     protected List<MoveDetails> _availableMoves = new();
     public List<MoveDetails> AvailableMoves { get { return _availableMoves; } }
     public int AvailableMoveCount { get { return _availableMoves.Count; } }
+
+    // animation stuff
+    private bool _isPieceMoving = false;
+    private Vector3 _moveToPosition;
+    private float _moveSpeed = 20f;
+
+    private void Update()
+    {
+        if (_isPieceMoving)
+            MovePieceToPosition();
+    }
 
     public void SetupPiece(string pieceCode, Square square, bool isWhite, bool isPromotedPiece = false)
     {
@@ -232,6 +244,23 @@ public class Piece : MonoBehaviour
         else
             // otherwise return the piece code and the full code of the square it is on
             return _pieceCode.ToUpper() + _square.SquarePGNCode;
+    }
+
+    public void AnimateToPosition(Vector3 position)
+    {
+        _moveToPosition = position;
+        _isPieceMoving = true;
+    }
+
+    private void MovePieceToPosition()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, _moveToPosition, _moveSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(_moveToPosition, transform.position) < 0.01)
+        {
+            transform.position = _moveToPosition;
+            _isPieceMoving = false;
+        }
     }
 }
 

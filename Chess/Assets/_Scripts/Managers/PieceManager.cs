@@ -204,15 +204,15 @@ public class PieceManager : MonoBehaviour
         {
             currentPiece = _allPieces[i];
 
+            // activate inactive (through capture) pieces
+            currentPiece.gameObject.SetActive(true);
+
             // hide pieces created through promotion
             if (currentPiece.IsPromotedPiece)
             {
                 currentPiece.gameObject.SetActive(false);
                 continue;
             }
-
-            // activate inactive (through capture) pieces
-            currentPiece.gameObject.SetActive(true);
 
             // reset the pieces square to the initial square it was on
             currentPiece.SetPieceSquare(currentPiece.InitialSquare);
@@ -529,6 +529,21 @@ public class PieceManager : MonoBehaviour
         return null;
     }
 
+    public Piece GetPieceByRankAndFile(int rank, string file, bool isWhite, PIECE_TYPE pieceType)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.PieceType != pieceType) continue;
+
+            if (int.Parse(piece.Square.SquarePGNCode.Substring(1, 1)) == rank && piece.Square.SquarePGNCode[..1] == file)
+                return piece;
+        }
+
+        return null;
+    }
+
     public Piece GetPieceFromCharacter(string character, bool isWhite)
     {
         PIECE_TYPE pieceType = GetPieceTypeFromCharacter(character);
@@ -548,7 +563,7 @@ public class PieceManager : MonoBehaviour
     #endregion
 
     #region Piece Movement
-    public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true)
+    public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true, bool animate = true)
     {
         if (move.MoveNumber == -1)
             move.MoveNumber = PGNManager.Instance.GetNextMoveNumber();
@@ -557,7 +572,9 @@ public class PieceManager : MonoBehaviour
 
         // if there is a piece on the square, capture it
         if (move.MoveToSquare.PieceOnSquare != null)
+        {
             TakePiece(move.MoveToSquare.PieceOnSquare);
+        }
         else if (move.RemovePieceEnPassant != null)
         {
             move.RemovePieceEnPassant.Square.SetPieceOnSquare(null);
@@ -567,7 +584,11 @@ public class PieceManager : MonoBehaviour
         // remove the piece from the current square
         move.PieceToMove.Square.SetPieceOnSquare(null);
         // set the pieces position to the new squares position
-        move.PieceToMove.transform.position = move.MoveToSquare.transform.position;
+        if (animate)
+            move.PieceToMove.AnimateToPosition(move.MoveToSquare.transform.position);
+        else
+            move.PieceToMove.transform.position = move.MoveToSquare.transform.position;
+
         move.PieceToMove.ShowHideAvailableMoves(false);
         // set the new square of the piece
         move.PieceToMove.SetPieceSquare(move.MoveToSquare);

@@ -195,7 +195,7 @@ public class PGNManager : MonoBehaviour
             {
                 // there is a capture here
                 pieceType = PieceManager.Instance.GetPieceTypeFromCharacter(pieceCode);
-                moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(2, 2));
+                moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(moves[i].Length - 2, 2));
 
                 if (moveSquare == null) Debug.LogError($"{moves[i].Substring(2, 2)} square not found");
 
@@ -214,7 +214,6 @@ public class PGNManager : MonoBehaviour
 
                 if (pieceType == PIECE_TYPE.None)
                 {
-
                     pieceType = PIECE_TYPE.Pawn;
                     rank = int.Parse(moves[i].Substring(3, 1));
                     rank = isWhite ? rank - 1 : rank + 1;
@@ -226,7 +225,28 @@ public class PGNManager : MonoBehaviour
                 }
                 else
                 {
-                    movePiece = PieceManager.Instance.GetPieceByMove(moveSquare, isWhite, pieceType);
+                    // check to see if there is a character to clarify the piece taking
+                    string[] pieceAndSquareStrings = moves[i].ToUpper().Split("X");
+                    string rankOrFile = moves[i].Substring(1, 1);
+
+                    // if there is only one character to identify the piece, we can find it by using the piece typ
+                    if (pieceAndSquareStrings[0].Length == 1)
+                        movePiece = PieceManager.Instance.GetPieceByMove(moveSquare, isWhite, pieceType);
+                    else if (pieceAndSquareStrings[0].Length == 2)
+                    {
+                        // if there are two characters to identify the piece it could be either the rank or the file
+                        // if it is a letter it is the file, if it is a number, it is the rank
+                        if (int.TryParse(rankOrFile, out rank))
+                            movePiece = PieceManager.Instance.GetPieceByRank(rank, isWhite, pieceType);
+                        else
+                            movePiece = PieceManager.Instance.GetPieceByFile(rankOrFile, isWhite, pieceType);
+                    }
+                    else if (pieceAndSquareStrings[0].Length == 3)
+                    {
+                        // if we are here then it is both the rank and the file that denotes which piece is doing the capture
+                        movePiece = PieceManager.Instance.GetPieceByRankAndFile(int.Parse(moves[i].Substring(1, 1)), moves[i].Substring(2, 1), isWhite, pieceType);
+                    }
+
                     if (movePiece == null) Debug.LogError($"{pieceColour} {pieceType} that takes on {moveSquare.SquarePGNCode} not found");
                     //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} take on {moveSquare.SquarePGNCode} ");
                 }
@@ -299,8 +319,8 @@ public class PGNManager : MonoBehaviour
         }
 
         TriggerOnMoveListUpdatedEvent();
-        FirstMove();
         UIManager.Instance.SetTabMenuTab(1);
+        // FirstMove();
     }
 
     private void AddMove(string pgnString, bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
@@ -326,7 +346,7 @@ public class PGNManager : MonoBehaviour
 
             AddMove(move, false);
 
-            PieceManager.Instance.MovePiece(move, false);
+            PieceManager.Instance.MovePiece(move, false, false);
         }
     }
 
@@ -383,16 +403,16 @@ public class PGNManager : MonoBehaviour
         FirstMove();
         for (int i = 0; i < _moveDetailsList.Count; i++)
         {
-            NextMove();
+            NextMove(false);
         }
     }
 
-    public void NextMove()
+    public void NextMove(bool animate = true)
     {
         if (_currentMove == _moveDetailsList.Count) return;
 
         MoveDetails move = _moveDetailsList[_currentMove];
-        PieceManager.Instance.MovePiece(move, false);
+        PieceManager.Instance.MovePiece(move, false, animate);
         _currentMove++;
     }
 
@@ -406,7 +426,7 @@ public class PGNManager : MonoBehaviour
 
         for (int i = 0; i < moveTo; i++)
         {
-            NextMove();
+            NextMove(false);
         }
     }
 
@@ -415,7 +435,7 @@ public class PGNManager : MonoBehaviour
         FirstMove();
         for (int i = 0; i <= moveNumber; i++)
         {
-            NextMove();
+            NextMove(false);
         }
     }
 
