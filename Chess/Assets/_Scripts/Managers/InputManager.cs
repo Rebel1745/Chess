@@ -124,14 +124,20 @@ public class InputManager : MonoBehaviour
 
     private void OnRightClick(InputAction.CallbackContext context)
     {
+        if (_currentSquare != null)
+            OnRightClickStarted.Invoke(this, new OnRightClickArgs()
+            {
+                CurrentSquare = _currentSquare
+            });
     }
 
     private void OnRightClickCanceled(InputAction.CallbackContext context)
     {
-        OnRightClickFinished.Invoke(this, new OnRightClickArgs()
-        {
-            CurrentSquare = _currentSquare
-        });
+        if (_currentSquare != null)
+            OnRightClickFinished.Invoke(this, new OnRightClickArgs()
+            {
+                CurrentSquare = _currentSquare
+            });
     }
     #endregion
 }

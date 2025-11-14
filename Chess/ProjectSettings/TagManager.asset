@@ -47,5 +47,8 @@ TagManager:
   - name: Pieces
     uniqueID: 956605661
     locked: 0
+  - name: Arrows
+    uniqueID: 4145664905
+    locked: 0
   m_RenderingLayers:
   - Default

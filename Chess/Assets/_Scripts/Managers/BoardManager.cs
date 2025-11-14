@@ -19,6 +19,10 @@ public class BoardManager : MonoBehaviour
     private Square[,] _squares = new Square[8, 8];
     public Square[,] AllSquares { get { return _squares; } }
 
+    // arrows
+    private Square _startSquare;
+    private bool _isDragging = false;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -27,6 +31,7 @@ public class BoardManager : MonoBehaviour
     private void Start()
     {
         PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
+        InputManager.Instance.OnRightClickStarted += InputManager_OnRightClickStarted;
         InputManager.Instance.OnRightClickFinished += InputManager_OnRightClickFinished;
     }
 
@@ -35,9 +40,29 @@ public class BoardManager : MonoBehaviour
         GenerateBoardPositionFEN();
     }
 
+    private void InputManager_OnRightClickStarted(object sender, InputManager.OnRightClickArgs e)
+    {
+        // arrow stuff
+        if (e.CurrentSquare)
+        {
+            // we are right clicking on a square
+            _startSquare = e.CurrentSquare;
+            _isDragging = true;
+        }
+    }
+
     private void InputManager_OnRightClickFinished(object sender, InputManager.OnRightClickArgs e)
     {
-        HighlightSquare(e.CurrentSquare);
+        // if we have started on one square and moved to another square, draw a line between the two
+        if (e.CurrentSquare && _isDragging && _startSquare != null && e.CurrentSquare != _startSquare)
+        {
+            ArrowManager.Instance.DrawArrow(_startSquare, e.CurrentSquare);
+            _startSquare = null;
+            _isDragging = false;
+        }
+
+        if (e.CurrentSquare == _startSquare)
+            HighlightSquare(e.CurrentSquare);
     }
 
     public void CreateBoard()

@@ -218,12 +218,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 51261202}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.34693, y: 0.484, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.00144, y: -3.24512, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 606709569}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &51455293
 GameObject:
@@ -900,6 +900,53 @@ MonoBehaviour:
   _firstMovePGNButton: {fileID: 1385621013}
   _lastMovePGNButton: {fileID: 600773475}
   _tabMenu: {fileID: 258015690}
+--- !u!1 &246662419
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 246662420}
+  - component: {fileID: 246662421}
+  m_Layer: 0
+  m_Name: ArrowManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &246662420
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246662419}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 293129195}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &246662421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246662419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0989c3d4e6bf80e4a9b3a41542848ec0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArrowManager
+  _arrowHolder: {fileID: 2055373500}
+  _arrowShaftPrefab: {fileID: 5918758495190768316, guid: 22983ea49cc72c9499c354b67fbf8bf9, type: 3}
+  _arrowHeadPrefab: {fileID: 4305607301575044333, guid: 26a137063d9fe1f40bc19acd05002386, type: 3}
 --- !u!1 &258015686
 GameObject:
   m_ObjectHideFlags: 0
@@ -1047,6 +1094,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1381944969}
+  - {fileID: 246662420}
   m_Father: {fileID: 1847338074}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &293129196
@@ -2248,6 +2296,40 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 600773473}
   m_CullTransparentMesh: 1
+--- !u!1 &606709568
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 606709569}
+  m_Layer: 0
+  m_Name: GameElements
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &606709569
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606709568}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 750120864}
+  - {fileID: 51261203}
+  - {fileID: 2055373500}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2285,7 +2367,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 0000000001ebcda9dda40439
+  m_ApplyToSortingLayers: 0000000001ebcda9dda4043989d319f7
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -2609,7 +2691,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 606709569}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &762238920
 GameObject:
@@ -2991,15 +3073,15 @@ MonoBehaviour:
 
     [Black "Bob-The-Cat-BOT"]
 
-    [Result
-    "1-0"]
+    [Result "1-0"]
 
-    [CurrentPosition "6R1/6Qk/8/8/1p5p/7P/PP3PP1/6K1 b - - 2 44"]
+    [CurrentPosition
+    "6R1/6Qk/8/8/1p5p/7P/PP3PP1/6K1 b - - 2 44"]
 
-    [Timezone
-    "UTC"]
+    [Timezone "UTC"]
 
-    [ECO "B10"]
+    [ECO
+    "B10"]
 
     [ECOUrl "https://www.chess.com/openings/Caro-Kann-Defense-2.Nf3-d5"]
 
@@ -3042,15 +3124,15 @@ MonoBehaviour:
 
     [BlackTitle ""]
 
-    
 
-    1.e4 c6 2.Nf3 d5 3.e5 a6 4.d4 Bf5 5.Bf4
-    Nd7 6.c4 dxc4 7.Bxc4 b5 8.Bb3 e6 9.Nc3 b4 10.Na4 Ra7 11.O-O f6 12.exf6 Ngxf6
-    13.Bg5 Qb8 14.Ne5 Nxe5 15.dxe5 Qxe5 16.Re1 Qd6 17.Qf3 Bg4 18.Qe3 Re7 19.Nb6 Nd5
-    20.Nxd5 exd5 21.Bxe7 Bxe7 22.h3 Bd7 23.Re2 Kf7 24.Rae1 Bf6 25.Qd3 Qf4 26.Qxa6
-    Kg8 27.Re4 Qb8 28.Qd3 Qf8 29.Bxd5+ cxd5 30.Qxd5+ Be6 31.Qxe6+ Qf7 32.Qc8+ Bd8
-    33.Qxd8+ Qf8 34.Re8 Kf7 35.Rxf8+ Rxf8 36.Re7+ Kg8 37.Re8 h5 38.Rxf8+ Kh7 39.Qd3+
-    g6 40.Qd7+ Kh6 41.Qe7 g5 42.Rg8 h4 43.Qxg5+ Kh7 44.Qg7#'
+
+    1.e4 c6 2.Nf3 d5 3.e5 a6 4.d4 Bf5 5.Bf4 Nd7
+    6.c4 dxc4 7.Bxc4 b5 8.Bb3 e6 9.Nc3 b4 10.Na4 Ra7 11.O-O f6 12.exf6 Ngxf6 13.Bg5
+    Qb8 14.Ne5 Nxe5 15.dxe5 Qxe5 16.Re1 Qd6 17.Qf3 Bg4 18.Qe3 Re7 19.Nb6 Nd5 20.Nxd5
+    exd5 21.Bxe7 Bxe7 22.h3 Bd7 23.Re2 Kf7 24.Rae1 Bf6 25.Qd3 Qf4 26.Qxa6 Kg8 27.Re4
+    Qb8 28.Qd3 Qf8 29.Bxd5+ cxd5 30.Qxd5+ Be6 31.Qxe6+ Qf7 32.Qc8+ Bd8 33.Qxd8+ Qf8
+    34.Re8 Kf7 35.Rxf8+ Rxf8 36.Re7+ Kg8 37.Re8 h5 38.Rxf8+ Kh7 39.Qd3+ g6 40.Qd7+
+    Kh6 41.Qe7 g5 42.Rg8 h4 43.Qxg5+ Kh7 44.Qg7#'
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -3684,23 +3766,22 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "[Event \"Play vs Bot\"]\r\n[Site \"Chess.com\"]\r\n[Date \"2025.11.12\"]\r\n[Round
-    \"-\"]\r\n[White \"R00k_n_R0ll\"]\r\n[Black \"Bob-The-Cat-BOT\"]\r\n[Result \"1-0\"]\r\n[CurrentPosition
-    \"6R1/6Qk/8/8/1p5p/7P/PP3PP1/6K1 b - - 2 44\"]\r\n[Timezone \"UTC\"]\r\n[ECO
-    \"B10\"]\r\n[ECOUrl \"https://www.chess.com/openings/Caro-Kann-Defense-2.Nf3-d5\"]\r\n[UTCDate
-    \"2025.11.12\"]\r\n[UTCTime \"22:43:03\"]\r\n[WhiteElo \"1208\"]\r\n[BlackElo
-    \"1350\"]\r\n[TimeControl \"-\"]\r\n[Termination \"R00k_n_R0ll won by checkmate\"]\r\n[StartTime
-    \"22:43:03\"]\r\n[EndDate \"2025.11.12\"]\r\n[EndTime \"22:52:43\"]\r\n[Link
-    \"https://www.chess.com/analysis/game/computer/459487495/analysis?move=82\"]\r\n[WhiteUrl
-    \"https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif\"]\r\n[WhiteCountry
-    \"79\"]\r\n[WhiteTitle \"\"]\r\n[BlackUrl \"https://images.chesscomfiles.com/uploads/v1/user/486263657.e0b29e6c.50x50o.7374b6c2faeb.png\"]\r\n[BlackCountry
-    \"164\"]\r\n[BlackTitle \"\"]\r\n\r\n1.e4 c6 2.Nf3 d5 3.e5 a6 4.d4 Bf5 5.Bf4
-    Nd7 6.c4 dxc4 7.Bxc4 b5 8.Bb3 e6 9.Nc3 b4 10.Na4 Ra7 11.O-O f6 12.exf6 Ngxf6
-    13.Bg5 Qb8 14.Ne5 Nxe5 15.dxe5 Qxe5 16.Re1 Qd6 17.Qf3 Bg4 18.Qe3 Re7 19.Nb6 Nd5
-    20.Nxd5 exd5 21.Bxe7 Bxe7 22.h3 Bd7 23.Re2 Kf7 24.Rae1 Bf6 25.Qd3 Qf4 26.Qxa6
-    Kg8 27.Re4 Qb8 28.Qd3 Qf8 29.Bxd5+ cxd5 30.Qxd5+ Be6 31.Qxe6+ Qf7 32.Qc8+ Bd8
-    33.Qxd8+ Qf8 34.Re8 Kf7 35.Rxf8+ Rxf8 36.Re7+ Kg8 37.Re8 h5 38.Rxf8+ Kh7 39.Qd3+
-    g6 40.Qd7+ Kh6 41.Qe7 g5 42.Rg8 h4 43.Qxg5+ Kh7 44.Qg7#\u200B"
+  m_text: "[Event \"Play vs Bot\"]\n[Site \"Chess.com\"]\n[Date \"2025.11.12\"]\n[Round
+    \"-\"]\n[White \"R00k_n_R0ll\"]\n[Black \"Bob-The-Cat-BOT\"]\n[Result \"1-0\"]\n[CurrentPosition
+    \"6R1/6Qk/8/8/1p5p/7P/PP3PP1/6K1 b - - 2 44\"]\n[Timezone \"UTC\"]\n[ECO \"B10\"]\n[ECOUrl
+    \"https://www.chess.com/openings/Caro-Kann-Defense-2.Nf3-d5\"]\n[UTCDate \"2025.11.12\"]\n[UTCTime
+    \"22:43:03\"]\n[WhiteElo \"1208\"]\n[BlackElo \"1350\"]\n[TimeControl \"-\"]\n[Termination
+    \"R00k_n_R0ll won by checkmate\"]\n[StartTime \"22:43:03\"]\n[EndDate \"2025.11.12\"]\n[EndTime
+    \"22:52:43\"]\n[Link \"https://www.chess.com/analysis/game/computer/459487495/analysis?move=82\"]\n[WhiteUrl
+    \"https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif\"]\n[WhiteCountry
+    \"79\"]\n[WhiteTitle \"\"]\n[BlackUrl \"https://images.chesscomfiles.com/uploads/v1/user/486263657.e0b29e6c.50x50o.7374b6c2faeb.png\"]\n[BlackCountry
+    \"164\"]\n[BlackTitle \"\"]\n\n\n1.e4 c6 2.Nf3 d5 3.e5 a6 4.d4 Bf5 5.Bf4 Nd7
+    6.c4 dxc4 7.Bxc4 b5 8.Bb3 e6 9.Nc3 b4 10.Na4 Ra7 11.O-O f6 12.exf6 Ngxf6 13.Bg5
+    Qb8 14.Ne5 Nxe5 15.dxe5 Qxe5 16.Re1 Qd6 17.Qf3 Bg4 18.Qe3 Re7 19.Nb6 Nd5 20.Nxd5
+    exd5 21.Bxe7 Bxe7 22.h3 Bd7 23.Re2 Kf7 24.Rae1 Bf6 25.Qd3 Qf4 26.Qxa6 Kg8 27.Re4
+    Qb8 28.Qd3 Qf8 29.Bxd5+ cxd5 30.Qxd5+ Be6 31.Qxe6+ Qf7 32.Qc8+ Bd8 33.Qxd8+ Qf8
+    34.Re8 Kf7 35.Rxf8+ Rxf8 36.Re7+ Kg8 37.Re8 h5 38.Rxf8+ Kh7 39.Qd3+ g6 40.Qd7+
+    Kh6 41.Qe7 g5 42.Rg8 h4 43.Qxg5+ Kh7 44.Qg7#\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6957,6 +7038,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ToggleHighlightStaysActiveAfterLosingFocus
   toggle: {fileID: 2008703132}
   imageToKeepFocusActive: {fileID: 1359223052}
+--- !u!1 &2055373499
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2055373500}
+  m_Layer: 0
+  m_Name: Arrows
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2055373500
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055373499}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 606709569}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2060976219
 GameObject:
   m_ObjectHideFlags: 0
@@ -7206,7 +7318,6 @@ SceneRoots:
   - {fileID: 1847338074}
   - {fileID: 56381197}
   - {fileID: 361044736}
-  - {fileID: 750120864}
-  - {fileID: 51261203}
+  - {fileID: 606709569}
   - {fileID: 849413014}
   - {fileID: 775386472}
