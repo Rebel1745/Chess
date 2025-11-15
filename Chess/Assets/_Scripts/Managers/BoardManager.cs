@@ -31,6 +31,7 @@ public class BoardManager : MonoBehaviour
     private void Start()
     {
         PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
+        InputManager.Instance.OnClickFinished += InputManager_OnClickFinished;
         InputManager.Instance.OnRightClickStarted += InputManager_OnRightClickStarted;
         InputManager.Instance.OnRightClickFinished += InputManager_OnRightClickFinished;
     }
@@ -38,6 +39,13 @@ public class BoardManager : MonoBehaviour
     private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
     {
         GenerateBoardPositionFEN();
+    }
+
+    private void InputManager_OnClickFinished(object sender, InputManager.OnClickArgs e)
+    {
+        // we have clicked leftily, we can get rid of all arrows and square highlighting
+        ArrowManager.Instance.DestroyAllArrows();
+        RemoveAllHighlightingFromSquares();
     }
 
     private void InputManager_OnRightClickStarted(object sender, InputManager.OnRightClickArgs e)
@@ -67,7 +75,7 @@ public class BoardManager : MonoBehaviour
 
     public void CreateBoard()
     {
-        Color squareColor;
+        Color squareColour, otherColour;
         GameObject newSquareGO;
         bool isLightSquare = true;
         Square currentSquare;
@@ -84,11 +92,12 @@ public class BoardManager : MonoBehaviour
             for (int x = 0; x < 8; x++)
             {
                 code = _fileNames[x] + (y + 1);
-                squareColor = isLightSquare ? _lightSquareColour : _darkSquareColour;
+                squareColour = isLightSquare ? _lightSquareColour : _darkSquareColour;
+                otherColour = isLightSquare ? _darkSquareColour : _lightSquareColour;
                 newSquareGO = Instantiate(_squarePrefab, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
                 newSquareGO.name = "Square " + code;
                 currentSquare = newSquareGO.GetComponent<Square>();
-                currentSquare.SetupSquareDetails(x, y, code, squareColor);
+                currentSquare.SetupSquareDetails(x, y, code, squareColour, otherColour);
                 _squares[x, y] = currentSquare;
                 isLightSquare = !isLightSquare;
             }
@@ -187,7 +196,15 @@ public class BoardManager : MonoBehaviour
 
     private void HighlightSquare(Square square)
     {
-        ResetSquareColours();
-        square.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour);
+        square.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour, true);
+    }
+
+    private void RemoveAllHighlightingFromSquares()
+    {
+        foreach (Square square in _squares)
+        {
+            if (square.IsHighlighted)
+                HighlightSquare(square);
+        }
     }
 }
