@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -15,6 +16,8 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Color _moveHighlightOutlineColour;
     [SerializeField] private Color _squareHighlightColour;
     [SerializeField] private Color _squareHighlightOutlineColour;
+    [SerializeField] private Color _currentHighlightedSquareColour;
+    private List<Square> _highlightedSquaresList = new();
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
     public Square[,] AllSquares { get { return _squares; } }
@@ -196,7 +199,46 @@ public class BoardManager : MonoBehaviour
 
     private void HighlightSquare(Square square)
     {
-        square.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour, true);
+        // if the square has been highlighted already, remove it from the list and call setsquarecolour again to reset the colours
+        if (_highlightedSquaresList.Contains(square))
+        {
+            // if the square we are removing is the last in the list (i.e. the currently active highlighed square)
+            // set the second to last square as being the active square
+            int squareIndex = _highlightedSquaresList.IndexOf(square);
+            if (squareIndex == _highlightedSquaresList.Count - 1)
+            {
+                if (_highlightedSquaresList.Count > 1)
+                {
+                    _highlightedSquaresList[_highlightedSquaresList.Count - 2].SetSquareColour(_squareHighlightColour, _currentHighlightedSquareColour, true);
+                    _highlightedSquaresList[_highlightedSquaresList.Count - 2].SetSquareColour(_squareHighlightColour, _currentHighlightedSquareColour, true);
+                    UIManager.Instance.ShowActiveSquare(_highlightedSquaresList[_highlightedSquaresList.Count - 2]);
+
+                    UIManager.Instance.ShowActiveSquare(_highlightedSquaresList[_highlightedSquaresList.Count - 2]);
+                }
+                else UIManager.Instance.HideActiveSquare();
+            }
+
+            square.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour, true);
+            _highlightedSquaresList.Remove(square);
+        }
+        // if not, set all of the other squares in the list to the inactive highlight colours and highlight the latest clicked on square
+        else
+        {
+            if (_highlightedSquaresList.Count > 0)
+            {
+                foreach (Square s in _highlightedSquaresList)
+                {
+                    // calling it twice first removes all highlighting then re-adds it with the inactive highlight outline
+                    s.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour, true);
+                    s.SetSquareColour(_squareHighlightColour, _squareHighlightOutlineColour, true);
+                }
+            }
+
+            square.SetSquareColour(_squareHighlightColour, _currentHighlightedSquareColour, true);
+            _highlightedSquaresList.Add(square);
+
+            UIManager.Instance.ShowActiveSquare(square);
+        }
     }
 
     private void RemoveAllHighlightingFromSquares()

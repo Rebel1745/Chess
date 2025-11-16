@@ -936,6 +936,7 @@ MonoBehaviour:
   _firstMovePGNButton: {fileID: 1385621013}
   _lastMovePGNButton: {fileID: 600773475}
   _tabMenu: {fileID: 258015690}
+  _togglesTab: {fileID: 2077814985}
 --- !u!1 &246662419
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,6 +1155,7 @@ MonoBehaviour:
   _moveHighlightOutlineColour: {r: 1, g: 0.7334804, b: 0, a: 1}
   _squareHighlightColour: {r: 0, g: 0.5019608, b: 0, a: 1}
   _squareHighlightOutlineColour: {r: 0, g: 1, b: 0, a: 1}
+  _currentHighlightedSquareColour: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &313680091
 GameObject:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ public class MoveHighlightingToggles : MonoBehaviour
 
     private void Start()
     {
-        InputManager.Instance.OnRightClickStarted += InputManager_OnRightClickStarted;
+        //InputManager.Instance.OnRightClickFinished += InputManager_OnRightClickFinished;
 
         _squareDetails = _squareDetailsPanel.GetComponent<SquareDetails>();
     }
@@ -39,7 +39,7 @@ public class MoveHighlightingToggles : MonoBehaviour
         CameraManager.Instance.SetFlipBoard(selected);
     }
 
-    private void InputManager_OnRightClickStarted(object sender, InputManager.OnRightClickArgs e)
+    private void InputManager_OnRightClickFinished(object sender, InputManager.OnRightClickArgs e)
     {
         if (e.CurrentSquare.IsHighlighted)
             RemoveSquareDetails();
@@ -47,13 +47,13 @@ public class MoveHighlightingToggles : MonoBehaviour
             ShowSquareDetails(e.CurrentSquare);
     }
 
-    private void ShowSquareDetails(Square selectedSquare)
+    public void ShowSquareDetails(Square selectedSquare)
     {
         _squareDetailsPanel.SetActive(true);
         _squareDetails.SetSquareDetails(selectedSquare);
     }
 
-    private void RemoveSquareDetails()
+    public void RemoveSquareDetails()
     {
         _squareDetailsPanel.SetActive(false);
     }
