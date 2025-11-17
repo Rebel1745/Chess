@@ -6,6 +6,10 @@ public class PieceKing : Piece
     public override void CalculateAvailableMoves(bool checkForChecks)
     {
         _availableMoves.Clear();
+
+        if (ToggleManager.Instance.IsAnalysisModeActivated)
+            CalculateAnalysisMoves(checkForChecks);
+
         Square possibleMoveSquare, possibleMoveSquare2, possibleMoveSquare3, rookSquare;
 
         foreach (Vector2Int move in _basicMoves)
@@ -24,8 +28,8 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
-                StartingSquare = _square,
-                MoveToSquare = possibleMoveSquare,
+                StartSquare = _square,
+                EndSquare = possibleMoveSquare,
                 PGNCode = "K" + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
             });
         }
@@ -48,10 +52,10 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
-                StartingSquare = _square,
-                MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX + 2, _square.SquareY),
+                StartSquare = _square,
+                EndSquare = BoardManager.Instance.GetSquare(_square.SquareX + 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
-                SecondMoveToSquare = possibleMoveSquare,
+                SecondEndSquare = possibleMoveSquare,
                 PGNCode = "0-0"
             });
 
@@ -68,10 +72,10 @@ public class PieceKing : Piece
                 MoveNumber = -1,
                 isWhite = _isWhite,
                 PieceToMove = this,
-                StartingSquare = _square,
-                MoveToSquare = BoardManager.Instance.GetSquare(_square.SquareX - 2, _square.SquareY),
+                StartSquare = _square,
+                EndSquare = BoardManager.Instance.GetSquare(_square.SquareX - 2, _square.SquareY),
                 SecondPieceToMove = rookSquare.PieceOnSquare,
-                SecondMoveToSquare = possibleMoveSquare,
+                SecondEndSquare = possibleMoveSquare,
                 PGNCode = "0-0-0"
             });
 

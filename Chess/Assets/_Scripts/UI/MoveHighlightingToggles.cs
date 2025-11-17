@@ -6,32 +6,23 @@ public class MoveHighlightingToggles : MonoBehaviour
 {
     [SerializeField] private GameObject _squareDetailsPanel;
     private SquareDetails _squareDetails;
-    [SerializeField] private Toggle _showSafeSquaresToggle;
-    [SerializeField] private Toggle _showDangerousSquaresToggle;
+    [SerializeField] private Toggle _activateAnalysisModeToggle;
     [SerializeField] private Toggle _flipBoardToggle;
 
     private void Awake()
     {
-        _showSafeSquaresToggle.onValueChanged.AddListener(OnShowSafeSquaresClicked);
-        _showDangerousSquaresToggle.onValueChanged.AddListener(OnShowDangerousSquaresClicked);
+        _activateAnalysisModeToggle.onValueChanged.AddListener(OnAnalysisModeChanged);
         _flipBoardToggle.onValueChanged.AddListener(OnFlipBoardClicked);
     }
 
     private void Start()
     {
-        //InputManager.Instance.OnRightClickFinished += InputManager_OnRightClickFinished;
-
         _squareDetails = _squareDetailsPanel.GetComponent<SquareDetails>();
     }
 
-    private void OnShowSafeSquaresClicked(bool selected)
+    private void OnAnalysisModeChanged(bool selected)
     {
-        ToggleManager.Instance.ShowHideSafeSquares(selected);
-    }
-
-    private void OnShowDangerousSquaresClicked(bool selected)
-    {
-        ToggleManager.Instance.ShowHideDangerousSquares(selected);
+        ToggleManager.Instance.SetAnalysisModeActivated(selected);
     }
 
     private void OnFlipBoardClicked(bool selected)

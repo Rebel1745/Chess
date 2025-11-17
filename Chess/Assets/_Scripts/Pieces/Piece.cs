@@ -28,6 +28,8 @@ public class Piece : MonoBehaviour
     public List<MoveDetails> AvailableMoves { get { return _availableMoves; } }
     public int AvailableMoveCount { get { return _availableMoves.Count; } }
 
+    protected List<AnalysisMoveDetails> _analysisMoves = new();
+
     // animation stuff
     private bool _isPieceMoving = false;
     private Vector3 _moveToPosition;
@@ -66,6 +68,9 @@ public class Piece : MonoBehaviour
     public virtual void CalculateAvailableMoves(bool checkForChecks)
     {
         _availableMoves.Clear();
+
+        if (ToggleManager.Instance.IsAnalysisModeActivated)
+            CalculateAnalysisMoves(checkForChecks);
 
         int startX = _square.SquareX;
         int startY = _square.SquareY;
@@ -108,8 +113,8 @@ public class Piece : MonoBehaviour
                     MoveNumber = -1,
                     isWhite = _isWhite,
                     PieceToMove = this,
-                    StartingSquare = _square,
-                    MoveToSquare = possibleMoveSquare,
+                    StartSquare = _square,
+                    EndSquare = possibleMoveSquare,
                     PGNCode = _detailedPieceCode + (possibleMoveSquare.PieceOnSquare == null ? "" : "x") + possibleMoveSquare.SquarePGNCode
                 });
             }
@@ -136,13 +141,13 @@ public class Piece : MonoBehaviour
             remove = false;
             currentSquare = _square;
 
-            if (_availableMoves[i].MoveToSquare.PieceOnSquare != null)
-                capturedPiece = _availableMoves[i].MoveToSquare.PieceOnSquare;
+            if (_availableMoves[i].EndSquare.PieceOnSquare != null)
+                capturedPiece = _availableMoves[i].EndSquare.PieceOnSquare;
             else capturedPiece = null;
 
             // move to valid square
-            SetPieceSquare(_availableMoves[i].MoveToSquare);
-            _availableMoves[i].MoveToSquare.SetPieceOnSquare(this);
+            SetPieceSquare(_availableMoves[i].EndSquare);
+            _availableMoves[i].EndSquare.SetPieceOnSquare(this);
             currentSquare.SetPieceOnSquare(null);
 
             // check to see if on this new square the player would be in check
@@ -152,11 +157,70 @@ public class Piece : MonoBehaviour
 
             // reset pieces and squares
             SetPieceSquare(currentSquare);
-            _availableMoves[i].MoveToSquare.SetPieceOnSquare(capturedPiece);
+            _availableMoves[i].EndSquare.SetPieceOnSquare(capturedPiece);
             currentSquare.SetPieceOnSquare(this);
 
             if (remove) _availableMoves.RemoveAt(i);
         }
+    }
+
+    public void RemovePinnedPieceMovesFromAnalysisMoves()
+    {
+        Square currentSquare;
+        bool remove;
+        Piece capturedPiece;
+
+        // loop backwards through the list so elements can be removed as we go
+        for (int i = _analysisMoves.Count - 1; i >= 0; i--)
+        {
+            remove = false;
+            currentSquare = _square;
+
+            if (_analysisMoves[i].EndSquare.PieceOnSquare != null)
+                capturedPiece = _analysisMoves[i].EndSquare.PieceOnSquare;
+            else capturedPiece = null;
+
+            // move to valid square
+            SetPieceSquare(_analysisMoves[i].EndSquare);
+            _analysisMoves[i].EndSquare.SetPieceOnSquare(this);
+            currentSquare.SetPieceOnSquare(null);
+
+            // check to see if on this new square the player would be in check
+            // if they are that means that the piece was pinned and shouldn't be able to move
+            if (PieceManager.Instance.CheckIfAnyPieceCanTakeKing(!_isWhite, capturedPiece))
+                remove = true;
+
+            // reset pieces and squares
+            SetPieceSquare(currentSquare);
+            _analysisMoves[i].EndSquare.SetPieceOnSquare(capturedPiece);
+            currentSquare.SetPieceOnSquare(this);
+
+            if (remove) _analysisMoves.RemoveAt(i);
+        }
+    }
+
+    public virtual void CalculateAnalysisMoves(bool checkForChecks)
+    {
+        _analysisMoves.Clear();
+
+        Square possibleMoveSquare;
+
+        foreach (Vector2Int move in _basicMoves)
+        {
+            possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
+
+            // if there is no square, move on
+            if (possibleMoveSquare == null) continue;
+
+            _analysisMoves.Add(new AnalysisMoveDetails
+            {
+                StartSquare = _square,
+                EndSquare = possibleMoveSquare
+            });
+        }
+
+        if (checkForChecks)
+            RemovePinnedPieceMovesFromAnalysisMoves();
     }
 
     public void ShowHideAvailableMoves(bool show)
@@ -165,7 +229,7 @@ public class Piece : MonoBehaviour
 
         foreach (MoveDetails move in _availableMoves)
         {
-            move.MoveToSquare.ShowHidePossibleMoveIndicator(show);
+            move.EndSquare.ShowHidePossibleMoveIndicator(show);
         }
     }
 
@@ -175,7 +239,7 @@ public class Piece : MonoBehaviour
 
         foreach (MoveDetails move in _availableMoves)
         {
-            if (move.MoveToSquare == square)
+            if (move.EndSquare == square)
             {
                 moveDetails = move;
                 return true;
@@ -190,7 +254,7 @@ public class Piece : MonoBehaviour
 
         foreach (MoveDetails move in _availableMoves)
         {
-            if (move.MoveToSquare == square)
+            if (move.EndSquare == square)
             {
                 return true;
             }
@@ -204,7 +268,7 @@ public class Piece : MonoBehaviour
     {
         foreach (MoveDetails move in _availableMoves)
         {
-            if (move.MoveToSquare.PieceOnSquare != null && move.MoveToSquare.PieceOnSquare.PieceType == PIECE_TYPE.King)
+            if (move.EndSquare.PieceOnSquare != null && move.EndSquare.PieceOnSquare.PieceType == PIECE_TYPE.King)
                 return true;
         }
 
@@ -260,6 +324,22 @@ public class Piece : MonoBehaviour
         {
             transform.position = _moveToPosition;
             _isPieceMoving = false;
+        }
+    }
+
+    public void ShowAnalysisArrows()
+    {
+        foreach (AnalysisMoveDetails move in _analysisMoves)
+        {
+            ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare);
+        }
+    }
+
+    public void RemoveAnalysisArrows()
+    {
+        foreach (AnalysisMoveDetails move in _analysisMoves)
+        {
+            ArrowManager.Instance.RemoveArrow(move.StartSquare, move.EndSquare);
         }
     }
 }

@@ -187,8 +187,8 @@ public class BoardManager : MonoBehaviour
 
     public void HighlightCurrentMove(MoveDetails move)
     {
-        move.StartingSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
-        move.MoveToSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
+        move.StartSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
+        move.EndSquare.SetSquareColour(_moveHighlightColour, _moveHighlightOutlineColour);
     }
 
     public void FlipBoard()
@@ -207,6 +207,8 @@ public class BoardManager : MonoBehaviour
             int squareIndex = _highlightedSquaresList.IndexOf(square);
             if (squareIndex == _highlightedSquaresList.Count - 1)
             {
+                // if we are clicking on a square for the second time, hide the arrows
+                RemoveArrowsForSquare(square);
                 if (_highlightedSquaresList.Count > 1)
                 {
                     _highlightedSquaresList[_highlightedSquaresList.Count - 2].SetSquareColour(_squareHighlightColour, _currentHighlightedSquareColour, true);
@@ -214,6 +216,8 @@ public class BoardManager : MonoBehaviour
                     UIManager.Instance.ShowActiveSquare(_highlightedSquaresList[_highlightedSquaresList.Count - 2]);
 
                     UIManager.Instance.ShowActiveSquare(_highlightedSquaresList[_highlightedSquaresList.Count - 2]);
+
+                    //ShowArrowsForSquare(_highlightedSquaresList[_highlightedSquaresList.Count - 2]);
                 }
                 else UIManager.Instance.HideActiveSquare();
             }
@@ -238,6 +242,7 @@ public class BoardManager : MonoBehaviour
             _highlightedSquaresList.Add(square);
 
             UIManager.Instance.ShowActiveSquare(square);
+            ShowArrowsForSquare(square);
         }
     }
 
@@ -247,6 +252,25 @@ public class BoardManager : MonoBehaviour
         {
             if (square.IsHighlighted)
                 HighlightSquare(square);
+        }
+    }
+
+    private void ShowArrowsForSquare(Square square)
+    {
+        if (!ToggleManager.Instance.IsAnalysisModeActivated) return;
+
+        // if there is a piece on the square, show all of the arrows for the analysis moves
+        if (square.PieceOnSquare != null)
+        {
+            square.PieceOnSquare.ShowAnalysisArrows();
+        }
+    }
+
+    private void RemoveArrowsForSquare(Square square)
+    {
+        if (square.PieceOnSquare != null)
+        {
+            square.PieceOnSquare.RemoveAnalysisArrows();
         }
     }
 }

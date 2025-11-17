@@ -272,6 +272,15 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+    public void UpdateAllPieceAnalysisMoves()
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            piece.CalculateAnalysisMoves(false);
+        }
+    }
+
     public void TakePiece(Piece piece)
     {
         piece.gameObject.SetActive(false);
@@ -279,7 +288,7 @@ public class PieceManager : MonoBehaviour
 
     public void ShowPromotionPieces(MoveDetails move)
     {
-        Square promotionSquare = move.MoveToSquare;
+        Square promotionSquare = move.EndSquare;
         _pawnToPromote = move.PieceToMove;
 
         if (GameManager.Instance.IsCurrentPlayerWhite)
@@ -467,7 +476,7 @@ public class PieceManager : MonoBehaviour
             // the piece is the correct colour and type, check its moves
             foreach (MoveDetails move in piece.AvailableMoves)
             {
-                if (move.MoveToSquare == square)
+                if (move.EndSquare == square)
                     return move.PieceToMove;
             }
         }
@@ -488,7 +497,7 @@ public class PieceManager : MonoBehaviour
             // the piece is the correct colour and type, check its moves
             foreach (MoveDetails move in piece.AvailableMoves)
             {
-                if (move.MoveToSquare == square)
+                if (move.EndSquare == square)
                 {
                     pieceList.Add(move.PieceToMove);
                     break;
@@ -571,9 +580,9 @@ public class PieceManager : MonoBehaviour
         _currentMove = move;
 
         // if there is a piece on the square, capture it
-        if (move.MoveToSquare.PieceOnSquare != null)
+        if (move.EndSquare.PieceOnSquare != null)
         {
-            TakePiece(move.MoveToSquare.PieceOnSquare);
+            TakePiece(move.EndSquare.PieceOnSquare);
         }
         else if (move.RemovePieceEnPassant != null)
         {
@@ -585,16 +594,16 @@ public class PieceManager : MonoBehaviour
         move.PieceToMove.Square.SetPieceOnSquare(null);
         // set the pieces position to the new squares position
         if (animate)
-            move.PieceToMove.AnimateToPosition(move.MoveToSquare.transform.position);
+            move.PieceToMove.AnimateToPosition(move.EndSquare.transform.position);
         else
-            move.PieceToMove.transform.position = move.MoveToSquare.transform.position;
+            move.PieceToMove.transform.position = move.EndSquare.transform.position;
 
         move.PieceToMove.ShowHideAvailableMoves(false);
         // set the new square of the piece
-        move.PieceToMove.SetPieceSquare(move.MoveToSquare);
+        move.PieceToMove.SetPieceSquare(move.EndSquare);
         _selectedPiece = null;
         // set the piece as the new piece on the square
-        move.MoveToSquare.SetPieceOnSquare(move.PieceToMove);
+        move.EndSquare.SetPieceOnSquare(move.PieceToMove);
 
         if (move.ActivatesEnPassant)
             move.PieceToMove.SetPossibleEnPassant(true);
@@ -602,17 +611,17 @@ public class PieceManager : MonoBehaviour
         move.PieceToMove.SetIsFirstMove(false);
 
         // if we are castling, we need to move the rook as well
-        if (move.SecondPieceToMove != null && move.SecondMoveToSquare != null)
+        if (move.SecondPieceToMove != null && move.SecondEndSquare != null)
         {
             // remove the piece from the current square
             move.SecondPieceToMove.Square.SetPieceOnSquare(null);
             // set the pieces position to the new squares position
-            move.SecondPieceToMove.transform.position = move.SecondMoveToSquare.transform.position;
+            move.SecondPieceToMove.transform.position = move.SecondEndSquare.transform.position;
             move.SecondPieceToMove.ShowHideAvailableMoves(false);
             // set the new square of the piece
-            move.SecondPieceToMove.SetPieceSquare(move.SecondMoveToSquare);
+            move.SecondPieceToMove.SetPieceSquare(move.SecondEndSquare);
             // set the piece as the new piece on the square
-            move.SecondMoveToSquare.SetPieceOnSquare(move.SecondPieceToMove);
+            move.SecondEndSquare.SetPieceOnSquare(move.SecondPieceToMove);
 
             move.SecondPieceToMove.SetIsFirstMove(false);
         }
@@ -718,12 +727,12 @@ public class PieceManager : MonoBehaviour
         Debug.Log($"Move Number: {move.MoveNumber}");
         Debug.Log($"Is White: {move.isWhite}");
         Debug.Log($"Piece To Move: {move.PieceToMove.name}");
-        Debug.Log($"Starting Square: {move.StartingSquare.name}");
-        Debug.Log($"Move To Square: {move.MoveToSquare.name}");
+        Debug.Log($"Starting Square: {move.StartSquare.name}");
+        Debug.Log($"Move To Square: {move.EndSquare.name}");
         if (move.SecondPieceToMove != null)
             Debug.Log($"Second Piece To Move: {move.SecondPieceToMove.name}");
-        if (move.SecondMoveToSquare != null)
-            Debug.Log($"Second Move To Square: {move.SecondMoveToSquare.name}");
+        if (move.SecondEndSquare != null)
+            Debug.Log($"Second Move To Square: {move.SecondEndSquare.name}");
         Debug.Log($"Is Promotion: {move.IsPromotion}");
         Debug.Log($"Activates En Passant: {move.ActivatesEnPassant}");
         if (move.RemovePieceEnPassant != null)

@@ -21,10 +21,7 @@ public class ArrowManager : MonoBehaviour
 
         if (_arrowSquareCodesToArrowGameObjectDictionary.ContainsKey(squareCodesString))
         {
-            // destroy the arrow
-            Destroy(_arrowSquareCodesToArrowGameObjectDictionary[squareCodesString]);
-            // remove from dictionary
-            _arrowSquareCodesToArrowGameObjectDictionary.Remove(squareCodesString);
+            RemoveArrow(startSquare, endSquare);
         }
         else
         {
@@ -55,6 +52,18 @@ public class ArrowManager : MonoBehaviour
 
             _arrowSquareCodesToArrowGameObjectDictionary.Add(squareCodesString, newArrow);
         }
+    }
+
+    public void RemoveArrow(Square startSquare, Square endSquare)
+    {
+        string squareCodesString = startSquare.SquarePGNCode + endSquare.SquarePGNCode;
+
+        if (!_arrowSquareCodesToArrowGameObjectDictionary.ContainsKey(squareCodesString)) return;
+
+        // destroy the arrow
+        Destroy(_arrowSquareCodesToArrowGameObjectDictionary[squareCodesString]);
+        // remove from dictionary
+        _arrowSquareCodesToArrowGameObjectDictionary.Remove(squareCodesString);
     }
 
     public void DestroyAllArrows()
