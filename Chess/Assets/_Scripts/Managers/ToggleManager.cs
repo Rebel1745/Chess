@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ToggleManager : MonoBehaviour
 {
     public static ToggleManager Instance { get; private set; }
 
-    [SerializeField] private bool _isAnalysisModeActivated = false;
+    private bool _isAnalysisModeActivated = false;
     public bool IsAnalysisModeActivated { get { return _isAnalysisModeActivated; } }
+    private bool _showXRayMoves = false;
+    public bool ShowXRayMoves { get { return _showXRayMoves; } }
 
     private void Awake()
     {
@@ -22,5 +22,10 @@ public class ToggleManager : MonoBehaviour
         {
             PieceManager.Instance.UpdateAllPieceAnalysisMoves();
         }
+    }
+
+    public void SetXRayMoves(bool active)
+    {
+        _showXRayMoves = active;
     }
 }

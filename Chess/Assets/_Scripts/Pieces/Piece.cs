@@ -29,6 +29,7 @@ public class Piece : MonoBehaviour
     public int AvailableMoveCount { get { return _availableMoves.Count; } }
 
     protected List<AnalysisMoveDetails> _analysisMoves = new();
+    public List<AnalysisMoveDetails> AnalysisMoves { get { return _analysisMoves; } }
 
     // animation stuff
     private bool _isPieceMoving = false;
@@ -215,7 +216,8 @@ public class Piece : MonoBehaviour
             _analysisMoves.Add(new AnalysisMoveDetails
             {
                 StartSquare = _square,
-                EndSquare = possibleMoveSquare
+                EndSquare = possibleMoveSquare,
+                AnalysisMoveType = ANALYSIS_MOVE_TYPE.Capture
             });
         }
 
@@ -331,6 +333,8 @@ public class Piece : MonoBehaviour
     {
         foreach (AnalysisMoveDetails move in _analysisMoves)
         {
+            if (!ToggleManager.Instance.ShowXRayMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.XRay) continue;
+
             ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare);
         }
     }

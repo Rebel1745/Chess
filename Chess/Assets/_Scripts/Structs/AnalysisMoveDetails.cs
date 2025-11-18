@@ -12,5 +12,6 @@ public enum ANALYSIS_MOVE_TYPE
 {
     Standard,
     Capture,
-    XRay
+    XRay,
+    Protection
 }

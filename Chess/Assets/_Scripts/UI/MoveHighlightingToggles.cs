@@ -7,11 +7,13 @@ public class MoveHighlightingToggles : MonoBehaviour
     [SerializeField] private GameObject _squareDetailsPanel;
     private SquareDetails _squareDetails;
     [SerializeField] private Toggle _activateAnalysisModeToggle;
+    [SerializeField] private Toggle _showXRayMovesToggle;
     [SerializeField] private Toggle _flipBoardToggle;
 
     private void Awake()
     {
         _activateAnalysisModeToggle.onValueChanged.AddListener(OnAnalysisModeChanged);
+        _showXRayMovesToggle.onValueChanged.AddListener(OnShowXRayMovesChanged);
         _flipBoardToggle.onValueChanged.AddListener(OnFlipBoardClicked);
     }
 
@@ -23,6 +25,11 @@ public class MoveHighlightingToggles : MonoBehaviour
     private void OnAnalysisModeChanged(bool selected)
     {
         ToggleManager.Instance.SetAnalysisModeActivated(selected);
+    }
+
+    private void OnShowXRayMovesChanged(bool selected)
+    {
+        ToggleManager.Instance.SetXRayMoves(selected);
     }
 
     private void OnFlipBoardClicked(bool selected)

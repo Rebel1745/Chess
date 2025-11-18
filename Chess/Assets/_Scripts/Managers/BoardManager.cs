@@ -264,6 +264,8 @@ public class BoardManager : MonoBehaviour
         {
             square.PieceOnSquare.ShowAnalysisArrows();
         }
+
+        PieceManager.Instance.DrawArrowsToSquareFromAnalysisMoves(square);
     }
 
     private void RemoveArrowsForSquare(Square square)
@@ -272,5 +274,7 @@ public class BoardManager : MonoBehaviour
         {
             square.PieceOnSquare.RemoveAnalysisArrows();
         }
+
+        ArrowManager.Instance.RemoveArrowsFromSquare(square);
     }
 }

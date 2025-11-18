@@ -722,6 +722,20 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+    public void DrawArrowsToSquareFromAnalysisMoves(Square square)
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
+            {
+                if (!ToggleManager.Instance.ShowXRayMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.XRay) continue;
+
+                if (move.EndSquare == square)
+                    ArrowManager.Instance.DrawArrow(piece.Square, square);
+            }
+        }
+    }
+
     public void PrintMove(MoveDetails move)
     {
         Debug.Log($"Move Number: {move.MoveNumber}");

@@ -139,7 +139,8 @@ public class PiecePawn : Piece
             _analysisMoves.Add(new AnalysisMoveDetails
             {
                 StartSquare = _square,
-                EndSquare = possibleMoveSquare
+                EndSquare = possibleMoveSquare,
+                AnalysisMoveType = ANALYSIS_MOVE_TYPE.Standard
             });
 
         // only check to see if we can move two squares if we can already move one
@@ -151,7 +152,8 @@ public class PiecePawn : Piece
                 _analysisMoves.Add(new AnalysisMoveDetails
                 {
                     StartSquare = _square,
-                    EndSquare = possibleMoveSquare
+                    EndSquare = possibleMoveSquare,
+                    AnalysisMoveType = ANALYSIS_MOVE_TYPE.Standard
                 });
         }
 
@@ -170,7 +172,8 @@ public class PiecePawn : Piece
                 _analysisMoves.Add(new AnalysisMoveDetails
                 {
                     StartSquare = _square,
-                    EndSquare = possibleMoveSquare
+                    EndSquare = possibleMoveSquare,
+                    AnalysisMoveType = captureAvailable ? ANALYSIS_MOVE_TYPE.Capture : ANALYSIS_MOVE_TYPE.Protection
                 });
         }
 
@@ -193,11 +196,12 @@ public class PiecePawn : Piece
             }
 
             //if (captureAvailable) change the move type to capture
-            if (possibleMoveSquare != null && possibleMoveSquare2 != null)
+            if (possibleMoveSquare != null && possibleMoveSquare2 != null && captureAvailable)
                 _analysisMoves.Add(new AnalysisMoveDetails
                 {
                     StartSquare = _square,
-                    EndSquare = possibleMoveSquare
+                    EndSquare = possibleMoveSquare,
+                    AnalysisMoveType = ANALYSIS_MOVE_TYPE.Capture
                 });
         }
 

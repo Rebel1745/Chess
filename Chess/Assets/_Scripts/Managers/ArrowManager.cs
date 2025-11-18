@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class ArrowManager : MonoBehaviour
 {
@@ -66,6 +67,16 @@ public class ArrowManager : MonoBehaviour
         _arrowSquareCodesToArrowGameObjectDictionary.Remove(squareCodesString);
     }
 
+    public void RemoveArrow(string arrowCode)
+    {
+        Square startSquare, endSquare;
+
+        startSquare = BoardManager.Instance.GetSquareFromPGNCode(arrowCode.Substring(0, 2));
+        endSquare = BoardManager.Instance.GetSquareFromPGNCode(arrowCode.Substring(2, 2));
+
+        RemoveArrow(startSquare, endSquare);
+    }
+
     public void DestroyAllArrows()
     {
         foreach (KeyValuePair<string, GameObject> arrows in _arrowSquareCodesToArrowGameObjectDictionary)
@@ -74,5 +85,14 @@ public class ArrowManager : MonoBehaviour
         }
 
         _arrowSquareCodesToArrowGameObjectDictionary.Clear();
+    }
+
+    public void RemoveArrowsFromSquare(Square square)
+    {
+        for (int i = _arrowSquareCodesToArrowGameObjectDictionary.Count - 1; i >= 0; i--)
+        {
+            if (_arrowSquareCodesToArrowGameObjectDictionary.ElementAt(i).Key.Substring(2, 2) == square.SquarePGNCode)
+                RemoveArrow(_arrowSquareCodesToArrowGameObjectDictionary.ElementAt(i).Key);
+        }
     }
 }
