@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,14 +6,23 @@ public class MoveHighlightingToggles : MonoBehaviour
     [SerializeField] private GameObject _squareDetailsPanel;
     private SquareDetails _squareDetails;
     [SerializeField] private Toggle _activateAnalysisModeToggle;
+    [SerializeField] private Toggle _showCaptureMovesToggle;
+    [SerializeField] private Toggle _showProtectionMovesToggle;
     [SerializeField] private Toggle _showXRayMovesToggle;
     [SerializeField] private Toggle _flipBoardToggle;
 
     private void Awake()
     {
         _activateAnalysisModeToggle.onValueChanged.AddListener(OnAnalysisModeChanged);
+        _showCaptureMovesToggle.onValueChanged.AddListener(OnShowCaptureMovesChanged);
+        _showProtectionMovesToggle.onValueChanged.AddListener(OnShowProtectionMovesChanged);
         _showXRayMovesToggle.onValueChanged.AddListener(OnShowXRayMovesChanged);
         _flipBoardToggle.onValueChanged.AddListener(OnFlipBoardClicked);
+
+        _activateAnalysisModeToggle.isOn = PlayerPrefs.GetInt("AnalysisModeActivated", 0) != 0;
+        _showCaptureMovesToggle.isOn = PlayerPrefs.GetInt("ShowCaptureMoves", 0) != 0;
+        _showProtectionMovesToggle.isOn = PlayerPrefs.GetInt("ShowProtectionMoves", 0) != 0;
+        _showXRayMovesToggle.isOn = PlayerPrefs.GetInt("ShowXRayMoves", 0) != 0;
     }
 
     private void Start()
@@ -25,6 +33,16 @@ public class MoveHighlightingToggles : MonoBehaviour
     private void OnAnalysisModeChanged(bool selected)
     {
         ToggleManager.Instance.SetAnalysisModeActivated(selected);
+    }
+
+    private void OnShowCaptureMovesChanged(bool selected)
+    {
+        ToggleManager.Instance.SetCaptureMoves(selected);
+    }
+
+    private void OnShowProtectionMovesChanged(bool selected)
+    {
+        ToggleManager.Instance.SetProtectionMoves(selected);
     }
 
     private void OnShowXRayMovesChanged(bool selected)

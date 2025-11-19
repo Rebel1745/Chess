@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Piece : MonoBehaviour
 {
@@ -165,6 +165,70 @@ public class Piece : MonoBehaviour
         }
     }
 
+    public virtual void CalculateAnalysisMoves(bool checkForChecks)
+    {
+        _analysisMoves.Clear();
+
+        Square possibleMoveSquare;
+        float lastXSign = Mathf.Sign(_basicMoves[0].x);
+        float lastYSign = Mathf.Sign(_basicMoves[0].y);
+        bool isCurrentDirectionXRay = false;
+        ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Capture;
+        bool addMove;
+
+        foreach (Vector2Int move in _basicMoves)
+        {
+            addMove = true;
+            // if the signs don't match, we are checking in a different direction, reset the ignore variable
+            if (Mathf.Sign(move.x) != lastXSign || Mathf.Sign(move.y) != lastYSign)
+                isCurrentDirectionXRay = false;
+
+            moveType = isCurrentDirectionXRay ? ANALYSIS_MOVE_TYPE.XRay : ANALYSIS_MOVE_TYPE.Capture;
+
+            possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
+
+            // if there is no square, move on
+            if (possibleMoveSquare == null) continue;
+
+            // if we are to ignore x-ray moves and this is an x-ray, bail
+            if (!ToggleManager.Instance.ShowXRayMoves && isCurrentDirectionXRay) continue;
+
+            // if the piece is landing on a piece of the same colour, it is a protection move
+            // following moves will be XRay moves
+            if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite == _isWhite)
+            {
+                moveType = ANALYSIS_MOVE_TYPE.Protection;
+                isCurrentDirectionXRay = true;
+                lastXSign = Mathf.Sign(move.x);
+                lastYSign = Mathf.Sign(move.y);
+            }
+            // if we land on an oponent piece, we can't move past it
+            else if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
+            {
+                moveType = ANALYSIS_MOVE_TYPE.Capture;
+                isCurrentDirectionXRay = true;
+                lastXSign = Mathf.Sign(move.x);
+                lastYSign = Mathf.Sign(move.y);
+            }
+
+            // if we are to ignore capture moves and this is an capture, bail
+            if (!ToggleManager.Instance.ShowCaptureMoves && moveType == ANALYSIS_MOVE_TYPE.Capture) addMove = false;
+            // if we are to ignore protection moves and this is an protection, bail
+            if (!ToggleManager.Instance.ShowProtectionMoves && moveType == ANALYSIS_MOVE_TYPE.Protection) addMove = false;
+
+            if (addMove)
+                _analysisMoves.Add(new AnalysisMoveDetails
+                {
+                    StartSquare = _square,
+                    EndSquare = possibleMoveSquare,
+                    AnalysisMoveType = moveType
+                });
+        }
+
+        if (checkForChecks)
+            RemovePinnedPieceMovesFromAnalysisMoves();
+    }
+
     public void RemovePinnedPieceMovesFromAnalysisMoves()
     {
         Square currentSquare;
@@ -198,31 +262,6 @@ public class Piece : MonoBehaviour
 
             if (remove) _analysisMoves.RemoveAt(i);
         }
-    }
-
-    public virtual void CalculateAnalysisMoves(bool checkForChecks)
-    {
-        _analysisMoves.Clear();
-
-        Square possibleMoveSquare;
-
-        foreach (Vector2Int move in _basicMoves)
-        {
-            possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
-
-            // if there is no square, move on
-            if (possibleMoveSquare == null) continue;
-
-            _analysisMoves.Add(new AnalysisMoveDetails
-            {
-                StartSquare = _square,
-                EndSquare = possibleMoveSquare,
-                AnalysisMoveType = ANALYSIS_MOVE_TYPE.Capture
-            });
-        }
-
-        if (checkForChecks)
-            RemovePinnedPieceMovesFromAnalysisMoves();
     }
 
     public void ShowHideAvailableMoves(bool show)
@@ -335,7 +374,7 @@ public class Piece : MonoBehaviour
         {
             if (!ToggleManager.Instance.ShowXRayMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.XRay) continue;
 
-            ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare);
+            ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, move.AnalysisMoveType);
         }
     }
 

@@ -9,6 +9,10 @@ public class ArrowManager : MonoBehaviour
     [SerializeField] private Transform _arrowHolder;
     [SerializeField] private GameObject _arrowShaftPrefab;
     [SerializeField] private GameObject _arrowHeadPrefab;
+    [SerializeField] private Color _standardMoveColour;
+    [SerializeField] private Color _captureMoveColour;
+    [SerializeField] private Color _protectionMoveColour;
+    [SerializeField] private Color _xRayMoveColour;
     private Dictionary<string, GameObject> _arrowSquareCodesToArrowGameObjectDictionary = new();
 
     private void Awake()
@@ -16,7 +20,7 @@ public class ArrowManager : MonoBehaviour
         if (Instance == null) Instance = this;
     }
 
-    public void DrawArrow(Square startSquare, Square endSquare)
+    public void DrawArrow(Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Standard)
     {
         string squareCodesString = startSquare.SquarePGNCode + endSquare.SquarePGNCode;
 
@@ -47,9 +51,12 @@ public class ArrowManager : MonoBehaviour
             // instantiate the shaft and then scale it
             GameObject newShaft = Instantiate(_arrowShaftPrefab, midpoint, Quaternion.Euler(0, 0, angle), newArrow.transform);
             newShaft.transform.localScale = new Vector3(newArrow.transform.localScale.x, distance, newArrow.transform.localScale.z);
+            Color arrowColour = GetColourFromMoveType(moveType);
+            newShaft.GetComponentInChildren<SpriteRenderer>().color = arrowColour;
 
             // instantiate the arrow head and place it at the center of the end square and angle it
             GameObject newHead = Instantiate(_arrowHeadPrefab, endSquare.transform.position, Quaternion.Euler(0, 0, angle), newArrow.transform);
+            newHead.GetComponentInChildren<SpriteRenderer>().color = arrowColour;
 
             _arrowSquareCodesToArrowGameObjectDictionary.Add(squareCodesString, newArrow);
         }
@@ -94,5 +101,24 @@ public class ArrowManager : MonoBehaviour
             if (_arrowSquareCodesToArrowGameObjectDictionary.ElementAt(i).Key.Substring(2, 2) == square.SquarePGNCode)
                 RemoveArrow(_arrowSquareCodesToArrowGameObjectDictionary.ElementAt(i).Key);
         }
+    }
+
+    private Color GetColourFromMoveType(ANALYSIS_MOVE_TYPE moveType)
+    {
+        Color moveColour = _standardMoveColour;
+        switch (moveType)
+        {
+            case ANALYSIS_MOVE_TYPE.Capture:
+                moveColour = _captureMoveColour;
+                break;
+            case ANALYSIS_MOVE_TYPE.Protection:
+                moveColour = _protectionMoveColour;
+                break;
+            case ANALYSIS_MOVE_TYPE.XRay:
+                moveColour = _xRayMoveColour;
+                break;
+        }
+
+        return moveColour;
     }
 }

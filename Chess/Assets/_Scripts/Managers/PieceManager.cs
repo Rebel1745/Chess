@@ -728,10 +728,13 @@ public class PieceManager : MonoBehaviour
         {
             foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
             {
+                // don't show if we don't want x-ray moves
                 if (!ToggleManager.Instance.ShowXRayMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.XRay) continue;
+                // don't show standard moves as they can't control the square
+                if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Standard) continue;
 
                 if (move.EndSquare == square)
-                    ArrowManager.Instance.DrawArrow(piece.Square, square);
+                    ArrowManager.Instance.DrawArrow(piece.Square, square, move.AnalysisMoveType);
             }
         }
     }
