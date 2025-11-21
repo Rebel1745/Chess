@@ -23,6 +23,7 @@ public class ArrowManager : MonoBehaviour
     public void DrawArrow(Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Standard)
     {
         string squareCodesString = startSquare.SquarePGNCode + endSquare.SquarePGNCode;
+        SpriteRenderer sr;
 
         if (_arrowSquareCodesToArrowGameObjectDictionary.ContainsKey(squareCodesString))
         {
@@ -52,11 +53,15 @@ public class ArrowManager : MonoBehaviour
             GameObject newShaft = Instantiate(_arrowShaftPrefab, midpoint, Quaternion.Euler(0, 0, angle), newArrow.transform);
             newShaft.transform.localScale = new Vector3(newArrow.transform.localScale.x, distance, newArrow.transform.localScale.z);
             Color arrowColour = GetColourFromMoveType(moveType);
-            newShaft.GetComponentInChildren<SpriteRenderer>().color = arrowColour;
+            sr = newShaft.GetComponentInChildren<SpriteRenderer>();
+            sr.color = arrowColour;
+            sr.sortingOrder = 999 - (_arrowSquareCodesToArrowGameObjectDictionary.Count * 2);
 
             // instantiate the arrow head and place it at the center of the end square and angle it
             GameObject newHead = Instantiate(_arrowHeadPrefab, endSquare.transform.position, Quaternion.Euler(0, 0, angle), newArrow.transform);
-            newHead.GetComponentInChildren<SpriteRenderer>().color = arrowColour;
+            sr = newHead.GetComponentInChildren<SpriteRenderer>();
+            sr.color = arrowColour;
+            sr.sortingOrder = 1000 - (_arrowSquareCodesToArrowGameObjectDictionary.Count * 2);
 
             _arrowSquareCodesToArrowGameObjectDictionary.Add(squareCodesString, newArrow);
         }
@@ -113,9 +118,6 @@ public class ArrowManager : MonoBehaviour
                 break;
             case ANALYSIS_MOVE_TYPE.Protection:
                 moveColour = _protectionMoveColour;
-                break;
-            case ANALYSIS_MOVE_TYPE.XRay:
-                moveColour = _xRayMoveColour;
                 break;
         }
 

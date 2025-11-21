@@ -246,7 +246,7 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private void RemoveAllHighlightingFromSquares()
+    public void RemoveAllHighlightingFromSquares()
     {
         foreach (Square square in _squares)
         {

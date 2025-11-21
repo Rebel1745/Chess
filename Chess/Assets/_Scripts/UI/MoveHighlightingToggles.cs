@@ -1,3 +1,5 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +12,10 @@ public class MoveHighlightingToggles : MonoBehaviour
     [SerializeField] private Toggle _showProtectionMovesToggle;
     [SerializeField] private Toggle _showXRayMovesToggle;
     [SerializeField] private Toggle _flipBoardToggle;
+    [SerializeField] private Button _checkForChecksButton;
+    [SerializeField] private TMP_Text _checksCountText;
+    [SerializeField] private Button _checkForCapturesButton;
+    [SerializeField] private TMP_Text _capturesCountText;
 
     private void Awake()
     {
@@ -18,6 +24,9 @@ public class MoveHighlightingToggles : MonoBehaviour
         _showProtectionMovesToggle.onValueChanged.AddListener(OnShowProtectionMovesChanged);
         _showXRayMovesToggle.onValueChanged.AddListener(OnShowXRayMovesChanged);
         _flipBoardToggle.onValueChanged.AddListener(OnFlipBoardClicked);
+
+        _checkForChecksButton.onClick.AddListener(OnCheckForChecksClicked);
+        _checkForCapturesButton.onClick.AddListener(OnCheckForCapturesClicked);
 
         _activateAnalysisModeToggle.isOn = PlayerPrefs.GetInt("AnalysisModeActivated", 0) != 0;
         _showCaptureMovesToggle.isOn = PlayerPrefs.GetInt("ShowCaptureMoves", 0) != 0;
@@ -72,5 +81,23 @@ public class MoveHighlightingToggles : MonoBehaviour
     public void RemoveSquareDetails()
     {
         _squareDetailsPanel.SetActive(false);
+    }
+
+    private void OnCheckForChecksClicked()
+    {
+        ArrowManager.Instance.DestroyAllArrows();
+        BoardManager.Instance.RemoveAllHighlightingFromSquares();
+
+        int checkCount = PieceManager.Instance.DrawArrowsForAllPossibleChecks(GameManager.Instance.IsCurrentPlayerWhite);
+        _checksCountText.text = "        " + checkCount + " checks";
+    }
+
+    private void OnCheckForCapturesClicked()
+    {
+        ArrowManager.Instance.DestroyAllArrows();
+        BoardManager.Instance.RemoveAllHighlightingFromSquares();
+
+        int captureCount = PieceManager.Instance.DrawArrowsForAllPossibleCaptures(GameManager.Instance.IsCurrentPlayerWhite);
+        _capturesCountText.text = "        " + captureCount + " captures";
     }
 }

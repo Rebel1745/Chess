@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
@@ -37,8 +38,8 @@ public class PieceManager : MonoBehaviour
     private List<Piece> _allPieces = new();
     public List<Piece> AllPieces { get { return _allPieces; } }
 
-    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    //private readonly string _defaultPosition = "r1bk3r/pP1p1pNp/n4n2/1pN1P2P/6P1/3P4/PpP1K3/q5b1";
+    private readonly string _defaultPosition = "5qkr/3b2pp/2p2b2/3p4/1p2R3/1B1Q3P/PP3PP1/4R1K1";
+    //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
     public class OnMoveCompletedArgs : EventArgs
@@ -729,7 +730,7 @@ public class PieceManager : MonoBehaviour
             foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
             {
                 // don't show if we don't want x-ray moves
-                if (!ToggleManager.Instance.ShowXRayMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.XRay) continue;
+                if (!ToggleManager.Instance.ShowXRayMoves && move.IsXRayMove) continue;
                 // don't show standard moves as they can't control the square
                 if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Standard) continue;
 
@@ -737,6 +738,112 @@ public class PieceManager : MonoBehaviour
                     ArrowManager.Instance.DrawArrow(piece.Square, square, move.AnalysisMoveType);
             }
         }
+    }
+
+    public int DrawArrowsForAllPossibleChecks(bool isWhite)
+    {
+        int possibleCheckCount = 0;
+        ANALYSIS_MOVE_TYPE moveType;
+
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.AvailableMoves.Count == 0) continue;
+
+            // Create a copy of the moves to avoid modification during enumeration
+            List<MoveDetails> movesToCheck = piece.AvailableMoves.ToList();
+
+            foreach (MoveDetails move in movesToCheck)
+            {
+                Piece capturedPiece = move.EndSquare.PieceOnSquare;
+                Square startSquare = move.StartSquare;
+                Square endSquare = move.EndSquare;
+                moveType = move.EndSquare.PieceOnSquare == null ? ANALYSIS_MOVE_TYPE.Standard : ANALYSIS_MOVE_TYPE.Capture;
+                Piece pieceToMove = piece;
+
+                // check if castling
+                if (move.SecondPieceToMove != null)
+                {
+                    // if we are castling, for this function, we only need to move the rook and then recalculate
+                    pieceToMove = move.SecondPieceToMove;
+                    endSquare = move.SecondEndSquare;
+                }
+                else if (move.RemovePieceEnPassant != null)
+                {
+                    // en passant can also check
+                    capturedPiece = move.RemovePieceEnPassant;
+                }
+
+                if (move.IsPromotion)
+                {
+                    // if we can promote, we have to check all the possible pieces we can promote to, and see if any of them can check the king
+                }
+                else
+                {
+                    // Simulate move
+                    SimulateMove(startSquare, endSquare, pieceToMove);
+
+                    // Check for possible check
+                    if (CheckForPossibleCheck(pieceToMove, startSquare, endSquare, moveType))
+                        possibleCheckCount++;
+
+                    // Restore state
+                    RestoreMove(startSquare, endSquare, pieceToMove, capturedPiece);
+                }
+            }
+        }
+
+        return possibleCheckCount;
+    }
+
+    private void SimulateMove(Square startSquare, Square endSquare, Piece pieceToMove)
+    {
+        pieceToMove.SetPieceSquare(endSquare);
+        endSquare.SetPieceOnSquare(pieceToMove);
+        startSquare.SetPieceOnSquare(null);
+        pieceToMove.CalculateAvailableMoves(false);
+    }
+
+    private void RestoreMove(Square startSquare, Square endSquare, Piece pieceToMove, Piece capturedPiece)
+    {
+        pieceToMove.SetPieceSquare(startSquare);
+        endSquare.SetPieceOnSquare(capturedPiece);
+        startSquare.SetPieceOnSquare(pieceToMove);
+        pieceToMove.CalculateAvailableMoves(false);
+    }
+
+    private bool CheckForPossibleCheck(Piece piece, Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType, bool drawArrow = true)
+    {
+        bool check = piece.CheckIfPieceCanTakeKing();
+
+        if (check && drawArrow)
+            ArrowManager.Instance.DrawArrow(startSquare, endSquare, moveType);
+
+        return check;
+    }
+
+    public int DrawArrowsForAllPossibleCaptures(bool isWhite)
+    {
+        int possibleCaptureCount = 0;
+
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.IsWhite != isWhite) continue;
+            if (piece.AvailableMoves.Count == 0) continue;
+
+            foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
+            {
+                if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Capture)
+                {
+                    ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, ANALYSIS_MOVE_TYPE.Capture);
+                    possibleCaptureCount++;
+                }
+            }
+        }
+
+        return possibleCaptureCount;
     }
 
     public void PrintMove(MoveDetails move)
