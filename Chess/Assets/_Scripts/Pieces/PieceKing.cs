@@ -46,7 +46,14 @@ public class PieceKing : Piece
         rookSquare = BoardManager.Instance.GetSquare(7, _square.SquareY);
 
         // if the king is yet to move, and there is a rook that hasnt moved on its square and both squares in between don't have a piece on them
-        if (_isFirstMove && CheckIfValidMove(possibleMoveSquare) && rookSquare.PieceOnSquare != null && rookSquare.PieceOnSquare.IsFirstMove && possibleMoveSquare.PieceOnSquare == null && possibleMoveSquare2.PieceOnSquare == null)
+        if (_isFirstMove &&
+        CheckIfValidMove(possibleMoveSquare) &&
+        rookSquare.PieceOnSquare != null &&
+        rookSquare.PieceOnSquare.IsWhite == _isWhite &&
+        rookSquare.PieceOnSquare.PieceType == PIECE_TYPE.Rook &&
+        rookSquare.PieceOnSquare.IsFirstMove &&
+        possibleMoveSquare.PieceOnSquare == null &&
+        possibleMoveSquare2.PieceOnSquare == null)
             _availableMoves.Add(new MoveDetails
             {
                 MoveNumber = -1,
@@ -66,7 +73,15 @@ public class PieceKing : Piece
         rookSquare = BoardManager.Instance.GetSquare(0, _square.SquareY);
 
         // if the king is yet to move, and there is a rook that hasnt moved on its square and both squares in between don't have a piece on them
-        if (_isFirstMove && CheckIfValidMove(possibleMoveSquare) && rookSquare.PieceOnSquare != null && rookSquare.PieceOnSquare.IsFirstMove && possibleMoveSquare.PieceOnSquare == null && possibleMoveSquare2.PieceOnSquare == null && possibleMoveSquare3.PieceOnSquare == null)
+        if (_isFirstMove &&
+        CheckIfValidMove(possibleMoveSquare) &&
+        rookSquare.PieceOnSquare != null &&
+        rookSquare.PieceOnSquare.IsWhite == _isWhite &&
+        rookSquare.PieceOnSquare.PieceType == PIECE_TYPE.Rook &&
+        rookSquare.PieceOnSquare.IsFirstMove &&
+        possibleMoveSquare.PieceOnSquare == null &&
+        possibleMoveSquare2.PieceOnSquare == null &&
+        possibleMoveSquare3.PieceOnSquare == null)
             _availableMoves.Add(new MoveDetails
             {
                 MoveNumber = -1,

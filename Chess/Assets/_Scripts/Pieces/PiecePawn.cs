@@ -131,6 +131,7 @@ public class PiecePawn : Piece
 
         Square possibleMoveSquare, possibleMoveSquare2;
         bool captureAvailable;
+        bool enPassantAvailable;
 
         // check the base move
         possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + _basicMoves[0].x, _square.SquareY + _basicMoves[0].y);
@@ -157,31 +158,12 @@ public class PiecePawn : Piece
                 });
         }
 
-        foreach (Vector2Int move in _captureMoves)
-        {
-            captureAvailable = false;
-            possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
-
-            if (possibleMoveSquare == null) continue;
-
-            if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
-                captureAvailable = true;
-
-            //if (captureAvailable) change the move type to capture
-            if (possibleMoveSquare != null)
-                _analysisMoves.Add(new AnalysisMoveDetails
-                {
-                    StartSquare = _square,
-                    EndSquare = possibleMoveSquare,
-                    AnalysisMoveType = captureAvailable ? ANALYSIS_MOVE_TYPE.Capture : ANALYSIS_MOVE_TYPE.Protection
-                });
-        }
-
-        // en passant check
+        // en passant and capture check
         foreach (Vector2Int move in _captureMoves)
         {
             possibleMoveSquare2 = null;
             captureAvailable = false;
+            enPassantAvailable = false;
 
             // even it we en passant, move to the normal capture square
             possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
@@ -192,17 +174,35 @@ public class PiecePawn : Piece
                 possibleMoveSquare2 = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY);
                 // and the other pawn has just advanced 2 squares on its last move it can be captured as if it had only moved one square
                 if (possibleMoveSquare2 != null && possibleMoveSquare2.PieceOnSquare != null && possibleMoveSquare2.PieceOnSquare.IsCanBeEnPassanted)
-                    captureAvailable = true;
+                    enPassantAvailable = true;
             }
 
-            //if (captureAvailable) change the move type to capture
-            if (possibleMoveSquare != null && possibleMoveSquare2 != null && captureAvailable)
+            if (possibleMoveSquare != null && possibleMoveSquare2 != null && enPassantAvailable)
                 _analysisMoves.Add(new AnalysisMoveDetails
                 {
                     StartSquare = _square,
                     EndSquare = possibleMoveSquare,
                     AnalysisMoveType = ANALYSIS_MOVE_TYPE.Capture
                 });
+
+            if (!enPassantAvailable)
+            {
+                possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
+
+                if (possibleMoveSquare == null) continue;
+
+                if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
+                    captureAvailable = true;
+
+                //if (captureAvailable) change the move type to capture
+                if (possibleMoveSquare != null)
+                    _analysisMoves.Add(new AnalysisMoveDetails
+                    {
+                        StartSquare = _square,
+                        EndSquare = possibleMoveSquare,
+                        AnalysisMoveType = captureAvailable ? ANALYSIS_MOVE_TYPE.Capture : ANALYSIS_MOVE_TYPE.Protection
+                    });
+            }
         }
 
         if (checkForChecks)
