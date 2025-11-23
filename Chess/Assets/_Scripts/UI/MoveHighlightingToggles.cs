@@ -88,6 +88,8 @@ public class MoveHighlightingToggles : MonoBehaviour
         ArrowManager.Instance.DestroyAllArrows();
         BoardManager.Instance.RemoveAllHighlightingFromSquares();
 
+        _checksCountText.text = "        Calculating...";
+
         int checkCount = PieceManager.Instance.DrawArrowsForAllPossibleChecks(GameManager.Instance.IsCurrentPlayerWhite);
         _checksCountText.text = "        " + checkCount + " checks";
     }
@@ -96,6 +98,8 @@ public class MoveHighlightingToggles : MonoBehaviour
     {
         ArrowManager.Instance.DestroyAllArrows();
         BoardManager.Instance.RemoveAllHighlightingFromSquares();
+
+        _capturesCountText.text = "        Calculating...";
 
         int captureCount = PieceManager.Instance.DrawArrowsForAllPossibleCaptures(GameManager.Instance.IsCurrentPlayerWhite);
         _capturesCountText.text = "        " + captureCount + " captures";

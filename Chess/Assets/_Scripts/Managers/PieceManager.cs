@@ -39,7 +39,7 @@ public class PieceManager : MonoBehaviour
     private List<Piece> _allPieces = new();
     public List<Piece> AllPieces { get { return _allPieces; } }
 
-    private readonly string _defaultPosition = "kr6/8/8/8/8/8/1p6/3K5";
+    private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
     //private readonly string _defaultPosition = "8/1P6/3k5/8/8/8/8/KR6";
     //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
@@ -785,8 +785,8 @@ public class PieceManager : MonoBehaviour
                     // start with the king
                     SimulateMove(startSquare, endSquare, pieceToMove, false);
                     SimulateMove(secondStartSquare, secondEndSquare, secondPieceToMove, false);
-                    pieceToMove.CalculateAvailableMoves(false);
-                    move.SecondPieceToMove.CalculateAvailableMoves(false);
+                    pieceToMove.CalculateAvailableMoves(true);
+                    move.SecondPieceToMove.CalculateAvailableMoves(true);
 
                     // Check for possible check, only need to check the rook though as the king can't check a king
                     if (move.SecondPieceToMove.CheckIfPieceCanTakeKing())
@@ -799,8 +799,8 @@ public class PieceManager : MonoBehaviour
                     // Restore state
                     RestoreMove(startSquare, endSquare, pieceToMove, null, false);
                     RestoreMove(secondStartSquare, secondEndSquare, secondPieceToMove, null, false);
-                    pieceToMove.CalculateAvailableMoves(false);
-                    secondPieceToMove.CalculateAvailableMoves(false);
+                    pieceToMove.CalculateAvailableMoves(true);
+                    secondPieceToMove.CalculateAvailableMoves(true);
                 }
                 else if (move.IsPromotion)
                 {
@@ -816,7 +816,7 @@ public class PieceManager : MonoBehaviour
                         promotedPieceGO = Instantiate(promotedPiecePrefabs[i], endSquare.transform.position, Quaternion.identity);
                         promotedPiece = promotedPieceGO.GetComponent<Piece>();
                         promotedPiece.SetupPiece("Q", endSquare, move.isWhite, true);
-                        promotedPiece.CalculateAvailableMoves(false);
+                        promotedPiece.CalculateAvailableMoves(true);
 
                         if (promotedPiece.CheckIfPieceCanTakeKing())
                             canPromotedPieceCheck = true;
@@ -861,7 +861,7 @@ public class PieceManager : MonoBehaviour
         endSquare.SetPieceOnSquare(pieceToMove);
         startSquare.SetPieceOnSquare(null);
         if (updateMoves)
-            pieceToMove.CalculateAvailableMoves(false);
+            pieceToMove.CalculateAvailableMoves(true);
     }
 
     private void RestoreMove(Square startSquare, Square endSquare, Piece pieceToMove, Piece capturedPiece, bool updateMoves = true)
@@ -870,7 +870,7 @@ public class PieceManager : MonoBehaviour
         endSquare.SetPieceOnSquare(capturedPiece);
         startSquare.SetPieceOnSquare(pieceToMove);
         if (updateMoves)
-            pieceToMove.CalculateAvailableMoves(false);
+            pieceToMove.CalculateAvailableMoves(true);
     }
 
     public int DrawArrowsForAllPossibleCaptures(bool isWhite)
