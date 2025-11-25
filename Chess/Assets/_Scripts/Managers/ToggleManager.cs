@@ -12,6 +12,8 @@ public class ToggleManager : MonoBehaviour
     public bool ShowProtectionMoves { get { return _showProtectionMoves; } }
     private bool _showXRayMoves = false;
     public bool ShowXRayMoves { get { return _showXRayMoves; } }
+    private bool _showMoveIcons = false;
+    public bool ShowMoveIcons { get { return _showMoveIcons; } }
 
     private void Awake()
     {
@@ -21,6 +23,7 @@ public class ToggleManager : MonoBehaviour
         _showCaptureMoves = PlayerPrefs.GetInt("ShowCaptureMoves", 0) != 0;
         _showProtectionMoves = PlayerPrefs.GetInt("ShowProtectionMoves", 0) != 0;
         _showXRayMoves = PlayerPrefs.GetInt("ShowXRayMoves", 0) != 0;
+        _showMoveIcons = PlayerPrefs.GetInt("ShowMoveIcons", 0) != 0;
     }
 
     public void SetAnalysisModeActivated(bool active)
@@ -73,5 +76,13 @@ public class ToggleManager : MonoBehaviour
         }
         else
             PlayerPrefs.SetInt("ShowXRayMoves", 0);
+    }
+
+    public void SetShowMoveIcons(bool show)
+    {
+        _showMoveIcons = show;
+
+        if (show) PlayerPrefs.SetInt("ShowMoveIcons", 1);
+        else PlayerPrefs.SetInt("ShowMoveIcons", 0);
     }
 }

@@ -737,7 +737,7 @@ public class PieceManager : MonoBehaviour
                 if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Standard) continue;
 
                 if (move.EndSquare == square)
-                    ArrowManager.Instance.DrawArrow(piece.Square, square, move.AnalysisMoveType);
+                    ArrowManager.Instance.DrawArrow(piece.Square, square, move.AnalysisMoveType, true);
             }
         }
     }
@@ -793,7 +793,7 @@ public class PieceManager : MonoBehaviour
                     {
                         possibleCheckCount++;
                         // draw an arrow from the kings start square to end square
-                        ArrowManager.Instance.DrawArrow(startSquare, endSquare, moveType);
+                        ArrowManager.Instance.DrawArrow(startSquare, endSquare, moveType, true);
                     }
 
                     // Restore state
@@ -843,7 +843,7 @@ public class PieceManager : MonoBehaviour
                     if (pieceToMove.CheckIfPieceCanTakeKing())
                     {
                         possibleCheckCount++;
-                        ArrowManager.Instance.DrawArrow(startSquare, endSquare, moveType);
+                        ArrowManager.Instance.DrawArrow(startSquare, endSquare, moveType, true);
                     }
 
                     // Restore state
@@ -887,7 +887,7 @@ public class PieceManager : MonoBehaviour
             {
                 if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Capture)
                 {
-                    ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, ANALYSIS_MOVE_TYPE.Capture);
+                    ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, ANALYSIS_MOVE_TYPE.Capture, true);
                     possibleCaptureCount++;
                 }
             }

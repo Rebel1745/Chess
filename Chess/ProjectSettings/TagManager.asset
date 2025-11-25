@@ -50,5 +50,8 @@ TagManager:
   - name: Arrows
     uniqueID: 4145664905
     locked: 0
+  - name: ArrowIcons
+    uniqueID: 2303145771
+    locked: 0
   m_RenderingLayers:
   - Default

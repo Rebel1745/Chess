@@ -381,7 +381,7 @@ public class Piece : MonoBehaviour
         {
             if (!ToggleManager.Instance.ShowXRayMoves && move.IsXRayMove) continue;
 
-            ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, move.AnalysisMoveType);
+            ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, move.AnalysisMoveType, true);
         }
     }
 

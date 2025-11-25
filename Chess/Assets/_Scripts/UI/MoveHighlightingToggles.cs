@@ -16,6 +16,7 @@ public class MoveHighlightingToggles : MonoBehaviour
     [SerializeField] private TMP_Text _checksCountText;
     [SerializeField] private Button _checkForCapturesButton;
     [SerializeField] private TMP_Text _capturesCountText;
+    [SerializeField] private Toggle _showMoveIconsToggle;
 
     private void Awake()
     {
@@ -24,6 +25,7 @@ public class MoveHighlightingToggles : MonoBehaviour
         _showProtectionMovesToggle.onValueChanged.AddListener(OnShowProtectionMovesChanged);
         _showXRayMovesToggle.onValueChanged.AddListener(OnShowXRayMovesChanged);
         _flipBoardToggle.onValueChanged.AddListener(OnFlipBoardClicked);
+        _showMoveIconsToggle.onValueChanged.AddListener(OnShowMoveIconsChanged);
 
         _checkForChecksButton.onClick.AddListener(OnCheckForChecksClicked);
         _checkForCapturesButton.onClick.AddListener(OnCheckForCapturesClicked);
@@ -32,6 +34,7 @@ public class MoveHighlightingToggles : MonoBehaviour
         _showCaptureMovesToggle.isOn = PlayerPrefs.GetInt("ShowCaptureMoves", 0) != 0;
         _showProtectionMovesToggle.isOn = PlayerPrefs.GetInt("ShowProtectionMoves", 0) != 0;
         _showXRayMovesToggle.isOn = PlayerPrefs.GetInt("ShowXRayMoves", 0) != 0;
+        _showMoveIconsToggle.isOn = PlayerPrefs.GetInt("ShowMoveIcons", 0) != 0;
     }
 
     private void Start()
@@ -62,6 +65,11 @@ public class MoveHighlightingToggles : MonoBehaviour
     private void OnFlipBoardClicked(bool selected)
     {
         CameraManager.Instance.SetFlipBoard(selected);
+    }
+
+    private void OnShowMoveIconsChanged(bool selected)
+    {
+        ToggleManager.Instance.SetShowMoveIcons(selected);
     }
 
     private void InputManager_OnRightClickFinished(object sender, InputManager.OnRightClickArgs e)

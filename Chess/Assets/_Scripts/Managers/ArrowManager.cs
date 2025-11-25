@@ -13,6 +13,8 @@ public class ArrowManager : MonoBehaviour
     [SerializeField] private Color _captureMoveColour;
     [SerializeField] private Color _protectionMoveColour;
     [SerializeField] private Color _xRayMoveColour;
+    [SerializeField] private GameObject _shieldIconPrefab;
+    [SerializeField] private GameObject _swordIconPrefab;
     private Dictionary<string, GameObject> _arrowSquareCodesToArrowGameObjectDictionary = new();
 
     private void Awake()
@@ -20,7 +22,7 @@ public class ArrowManager : MonoBehaviour
         if (Instance == null) Instance = this;
     }
 
-    public void DrawArrow(Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Standard)
+    public void DrawArrow(Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Standard, bool drawIcon = false, PIECE_TYPE[] pieceTypeIcons = null)
     {
         string squareCodesString = startSquare.SquarePGNCode + endSquare.SquarePGNCode;
 
@@ -79,6 +81,31 @@ public class ArrowManager : MonoBehaviour
             sr = newHead.GetComponentInChildren<SpriteRenderer>();
             sr.color = arrowColour;
             sr.sortingOrder = 1000 - (_arrowSquareCodesToArrowGameObjectDictionary.Count * 2);
+
+            // should we add an icon to the arrow?
+            if (ToggleManager.Instance.ShowMoveIcons && drawIcon && moveType != ANALYSIS_MOVE_TYPE.Standard)
+            {
+                if (pieceTypeIcons == null || pieceTypeIcons.Length == 0)
+                {
+                    GameObject iconPrefab = _swordIconPrefab;
+
+                    switch (moveType)
+                    {
+                        case ANALYSIS_MOVE_TYPE.Capture:
+                            iconPrefab = _swordIconPrefab;
+                            break;
+                        case ANALYSIS_MOVE_TYPE.Protection:
+                            iconPrefab = _shieldIconPrefab;
+                            break;
+                    }
+
+                    Instantiate(iconPrefab, midpoint, Quaternion.identity, newArrow.transform);
+                }
+                else
+                {
+                    // loop through the piece type icons and stick them on the lines
+                }
+            }
 
             _arrowSquareCodesToArrowGameObjectDictionary.Add(squareCodesString, newArrow);
         }
