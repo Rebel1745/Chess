@@ -39,8 +39,8 @@ public class PieceManager : MonoBehaviour
     private List<Piece> _allPieces = new();
     public List<Piece> AllPieces { get { return _allPieces; } }
 
-    private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
-    //private readonly string _defaultPosition = "8/1P6/3k5/8/8/8/8/KR6";
+    //private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
+    private readonly string _defaultPosition = "kr6/8/8/8/8/3K4/1p6/8";
     //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
@@ -809,6 +809,7 @@ public class PieceManager : MonoBehaviour
                     pieceToMove.gameObject.SetActive(false);
 
                     canPromotedPieceCheck = false;
+                    List<PIECE_TYPE> promotedPieceTypes = new();
 
                     for (int i = 0; i < promotedPiecePrefabs.Length; i++)
                     {
@@ -819,7 +820,10 @@ public class PieceManager : MonoBehaviour
                         promotedPiece.CalculateAvailableMoves(true);
 
                         if (promotedPiece.CheckIfPieceCanTakeKing())
+                        {
                             canPromotedPieceCheck = true;
+                            promotedPieceTypes.Add(promotedPiece.PieceType);
+                        }
 
                         // now we have checked, destroy the new piece
                         Destroy(promotedPieceGO);
@@ -831,7 +835,7 @@ public class PieceManager : MonoBehaviour
                     if (canPromotedPieceCheck)
                     {
                         possibleCheckCount++;
-                        ArrowManager.Instance.DrawArrow(startSquare, endSquare, ANALYSIS_MOVE_TYPE.Standard);
+                        ArrowManager.Instance.DrawArrow(startSquare, endSquare, ANALYSIS_MOVE_TYPE.Standard, true, promotedPieceTypes.ToArray(), GameManager.Instance.IsCurrentPlayerWhite);
                     }
                 }
                 else

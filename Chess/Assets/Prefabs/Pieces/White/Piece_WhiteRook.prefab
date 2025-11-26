@@ -183,6 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceRook
   _pieceType: 4
+  _pieceValue: 5
   _basicMoves:
   - {x: 1, y: 0}
   - {x: 2, y: 0}

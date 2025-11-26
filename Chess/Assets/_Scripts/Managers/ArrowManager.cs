@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class ArrowManager : MonoBehaviour
 {
@@ -15,6 +16,19 @@ public class ArrowManager : MonoBehaviour
     [SerializeField] private Color _xRayMoveColour;
     [SerializeField] private GameObject _shieldIconPrefab;
     [SerializeField] private GameObject _swordIconPrefab;
+    [SerializeField] private GameObject _whiteKnightIcon;
+    [SerializeField] private GameObject _whiteBishopIcon;
+    [SerializeField] private GameObject _whiteRookIcon;
+    [SerializeField] private GameObject _whiteQueenIcon;
+    [SerializeField] private GameObject _whiteQueenAndBishopIcon;
+    [SerializeField] private GameObject _whiteQueenAndRookIcon;
+    [SerializeField] private GameObject _blackKnightIcon;
+    [SerializeField] private GameObject _blackBishopIcon;
+    [SerializeField] private GameObject _blackRookIcon;
+    [SerializeField] private GameObject _blackQueenIcon;
+    [SerializeField] private GameObject _blackQueenAndBishopIcon;
+    [SerializeField] private GameObject _blackQueenAndRookIcon;
+
     private Dictionary<string, GameObject> _arrowSquareCodesToArrowGameObjectDictionary = new();
 
     private void Awake()
@@ -22,7 +36,7 @@ public class ArrowManager : MonoBehaviour
         if (Instance == null) Instance = this;
     }
 
-    public void DrawArrow(Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Standard, bool drawIcon = false, PIECE_TYPE[] pieceTypeIcons = null)
+    public void DrawArrow(Square startSquare, Square endSquare, ANALYSIS_MOVE_TYPE moveType = ANALYSIS_MOVE_TYPE.Standard, bool drawIcon = false, PIECE_TYPE[] pieceTypeIcons = null, bool isWhite = true)
     {
         string squareCodesString = startSquare.SquarePGNCode + endSquare.SquarePGNCode;
 
@@ -83,27 +97,40 @@ public class ArrowManager : MonoBehaviour
             sr.sortingOrder = 1000 - (_arrowSquareCodesToArrowGameObjectDictionary.Count * 2);
 
             // should we add an icon to the arrow?
-            if (ToggleManager.Instance.ShowMoveIcons && drawIcon && moveType != ANALYSIS_MOVE_TYPE.Standard)
+            if (ToggleManager.Instance.ShowMoveIcons && drawIcon)
             {
+                GameObject iconPrefab = _swordIconPrefab;
+
                 if (pieceTypeIcons == null || pieceTypeIcons.Length == 0)
                 {
-                    GameObject iconPrefab = _swordIconPrefab;
-
-                    switch (moveType)
+                    if (moveType != ANALYSIS_MOVE_TYPE.Standard)
                     {
-                        case ANALYSIS_MOVE_TYPE.Capture:
-                            iconPrefab = _swordIconPrefab;
-                            break;
-                        case ANALYSIS_MOVE_TYPE.Protection:
-                            iconPrefab = _shieldIconPrefab;
-                            break;
-                    }
+                        switch (moveType)
+                        {
+                            case ANALYSIS_MOVE_TYPE.Capture:
+                                iconPrefab = _swordIconPrefab;
+                                break;
+                            case ANALYSIS_MOVE_TYPE.Protection:
+                                iconPrefab = _shieldIconPrefab;
+                                break;
+                        }
 
-                    Instantiate(iconPrefab, midpoint, Quaternion.identity, newArrow.transform);
+                        Instantiate(iconPrefab, midpoint, Quaternion.identity, newArrow.transform);
+                    }
                 }
                 else
                 {
                     // loop through the piece type icons and stick them on the lines
+                    if (pieceTypeIcons.Length == 1)
+                    {
+                        iconPrefab = GetPieceIconFromType(pieceTypeIcons[0], isWhite);
+                    }
+                    else if (pieceTypeIcons.Length == 2)
+                    {
+                        iconPrefab = GetPieceIconFromTypes(pieceTypeIcons, isWhite);
+                    }
+
+                    Instantiate(iconPrefab, midpoint, Quaternion.identity, newArrow.transform);
                 }
             }
 
@@ -166,5 +193,43 @@ public class ArrowManager : MonoBehaviour
         }
 
         return moveColour;
+    }
+
+    private GameObject GetPieceIconFromType(PIECE_TYPE pieceType, bool isWhite)
+    {
+        GameObject iconPrefab = _whiteQueenIcon;
+
+        switch (pieceType)
+        {
+            case PIECE_TYPE.Knight:
+                iconPrefab = isWhite ? _whiteKnightIcon : _blackKnightIcon;
+                break;
+            case PIECE_TYPE.Bishop:
+                iconPrefab = isWhite ? _whiteBishopIcon : _blackBishopIcon;
+                break;
+            case PIECE_TYPE.Rook:
+                iconPrefab = isWhite ? _whiteRookIcon : _blackRookIcon;
+                break;
+            case PIECE_TYPE.Queen:
+                iconPrefab = isWhite ? _whiteQueenIcon : _blackQueenIcon;
+                break;
+        }
+
+        return iconPrefab;
+    }
+
+    private GameObject GetPieceIconFromTypes(PIECE_TYPE[] pieceTypes, bool isWhite)
+    {
+        GameObject iconPrefab = _whiteQueenAndBishopIcon;
+
+        if (pieceTypes.Length != 2) Debug.LogError("Incorrect number of piece types");
+
+        if (pieceTypes[0] == PIECE_TYPE.Bishop || pieceTypes[1] == PIECE_TYPE.Bishop)
+            iconPrefab = isWhite ? _whiteQueenAndBishopIcon : _blackQueenAndBishopIcon;
+        else if (pieceTypes[0] == PIECE_TYPE.Rook || pieceTypes[1] == PIECE_TYPE.Rook)
+            iconPrefab = isWhite ? _whiteQueenAndRookIcon : _blackQueenAndRookIcon;
+        else Debug.LogError("Neither bishop nor rook in the piece type array. Que pasa?");
+
+        return iconPrefab;
     }
 }

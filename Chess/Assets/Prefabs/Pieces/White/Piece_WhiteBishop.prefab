@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PieceBishop
   _pieceType: 3
+  _pieceValue: 3
   _basicMoves:
   - {x: 1, y: 1}
   - {x: 2, y: 2}

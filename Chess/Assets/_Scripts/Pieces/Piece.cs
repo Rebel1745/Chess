@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Piece : MonoBehaviour
 {
     [SerializeField] protected PIECE_TYPE _pieceType;
     public PIECE_TYPE PieceType { get { return _pieceType; } }
+    [SerializeField] private int _pieceValue;
+    public int PieceValue { get { return _pieceValue; } }
     [SerializeField] protected Vector2Int[] _basicMoves;
     protected string _pieceCode;
     public string PieceCode { get { return _pieceCode; } }

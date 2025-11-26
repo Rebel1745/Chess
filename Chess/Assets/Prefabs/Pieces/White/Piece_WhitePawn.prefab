@@ -183,9 +183,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PiecePawn
   _pieceType: 1
+  _pieceValue: 1
   _basicMoves:
   - {x: 0, y: 1}
-  _moveSpeed: 20
   _firstMove: {x: 0, y: 2}
   _captureMoves:
   - {x: 1, y: 1}
