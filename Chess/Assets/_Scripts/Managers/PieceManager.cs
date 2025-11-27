@@ -26,6 +26,20 @@ public class PieceManager : MonoBehaviour
     private GameObject _promotionPiecesWhite;
     [SerializeField] private GameObject _promtionPiecesBlackPrefab;
     private GameObject _promotionPiecesBlack;
+    [SerializeField] public GameObject WhitePawnIcon;
+    [SerializeField] public GameObject WhiteKnightIcon;
+    [SerializeField] public GameObject WhiteBishopIcon;
+    [SerializeField] public GameObject WhiteRookIcon;
+    [SerializeField] public GameObject WhiteQueenIcon;
+    [SerializeField] public GameObject WhiteQueenAndBishopIcon;
+    [SerializeField] public GameObject WhiteQueenAndRookIcon;
+    [SerializeField] public GameObject BlackPawnIcon;
+    [SerializeField] public GameObject BlackKnightIcon;
+    [SerializeField] public GameObject BlackBishopIcon;
+    [SerializeField] public GameObject BlackRookIcon;
+    [SerializeField] public GameObject BlackQueenIcon;
+    [SerializeField] public GameObject BlackQueenAndBishopIcon;
+    [SerializeField] public GameObject BlackQueenAndRookIcon;
     private Piece _pawnToPromote;
 
     private MoveDetails _currentMove;
@@ -39,9 +53,12 @@ public class PieceManager : MonoBehaviour
     private List<Piece> _allPieces = new();
     public List<Piece> AllPieces { get { return _allPieces; } }
 
+    private List<PIECE_TYPE> _capturedPiecesWhite = new();
+    private List<PIECE_TYPE> _capturedPiecesBlack = new();
+
     //private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
-    private readonly string _defaultPosition = "kr6/8/8/8/8/3K4/1p6/8";
-    //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    //private readonly string _defaultPosition = "kr6/8/8/8/8/3K4/1p6/8";
+    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
     public class OnMoveCompletedArgs : EventArgs
@@ -284,9 +301,16 @@ public class PieceManager : MonoBehaviour
         }
     }
 
-    public void TakePiece(Piece piece)
+    public void TakePiece(Piece piece, bool isCapture = true)
     {
         piece.gameObject.SetActive(false);
+
+        if (!isCapture) return;
+
+        if (piece.IsWhite) _capturedPiecesWhite.Add(piece.PieceType);
+        else _capturedPiecesBlack.Add(piece.PieceType);
+
+        UpdateCapturedPieceIcons(piece.IsWhite);
     }
 
     public void ShowPromotionPieces(MoveDetails move)
@@ -322,7 +346,7 @@ public class PieceManager : MonoBehaviour
 
         Square promotionSquare = _pawnToPromote.Square;
         GameObject newPieceGO;
-        TakePiece(_pawnToPromote);
+        TakePiece(_pawnToPromote, false);
         GameObject newPiecePrefab = move.isWhite ? _whiteQueen : _blackQueen;
         string newPieceCode = move.isWhite ? "Q" : "q";
         string newPGNCode;
@@ -898,6 +922,36 @@ public class PieceManager : MonoBehaviour
         }
 
         return possibleCaptureCount;
+    }
+
+    private void UpdateCapturedPieceIcons(bool isWhite)
+    {
+        List<PIECE_TYPE> piecesToShow = isWhite ? _capturedPiecesWhite : _capturedPiecesBlack;
+        int pawnCount = 0, knightCount = 0, bishopCount = 0, rookCount = 0, queenCount = 0;
+
+        foreach (PIECE_TYPE pieceType in piecesToShow)
+        {
+            switch (pieceType)
+            {
+                case PIECE_TYPE.Pawn:
+                    pawnCount++;
+                    break;
+                case PIECE_TYPE.Knight:
+                    knightCount++;
+                    break;
+                case PIECE_TYPE.Bishop:
+                    bishopCount++;
+                    break;
+                case PIECE_TYPE.Rook:
+                    rookCount++;
+                    break;
+                case PIECE_TYPE.Queen:
+                    queenCount++;
+                    break;
+            }
+        }
+
+        UIManager.Instance.UpdatePieceIcons(isWhite, pawnCount, knightCount, bishopCount, rookCount, queenCount);
     }
 
     public void PrintMove(MoveDetails move)

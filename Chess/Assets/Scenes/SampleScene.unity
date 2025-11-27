@@ -468,6 +468,39 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0, y: 1}
+--- !u!1 &161609237
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 161609238}
+  m_Layer: 0
+  m_Name: CapturedPieces
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &161609238
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161609237}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 925257721}
+  - {fileID: 1281581978}
+  m_Father: {fileID: 606709569}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &162752432
 GameObject:
   m_ObjectHideFlags: 0
@@ -858,6 +891,8 @@ MonoBehaviour:
   _lastMovePGNButton: {fileID: 600773475}
   _tabMenu: {fileID: 258015690}
   _togglesTab: {fileID: 2077814985}
+  _whiteCapturedPieces: {fileID: 925257721}
+  _blackCapturedPieces: {fileID: 1281581978}
 --- !u!1 &226544970
 GameObject:
   m_ObjectHideFlags: 0
@@ -947,18 +982,6 @@ MonoBehaviour:
   _xRayMoveColour: {r: 0.3066038, g: 0.3066038, b: 0.3066038, a: 0.5019608}
   _shieldIconPrefab: {fileID: 3747028520701800780, guid: 6173a435a6240aa4eb471047945c6df6, type: 3}
   _swordIconPrefab: {fileID: 4725671092868254663, guid: ab74db99615f340438ce01a7c24ca895, type: 3}
-  _whiteKnightIcon: {fileID: 1119919289574599443, guid: 9f5c4136eb3b7604491610aacd754291, type: 3}
-  _whiteBishopIcon: {fileID: 4990903496081764653, guid: 374c303984918b34696fa68912eca8cd, type: 3}
-  _whiteRookIcon: {fileID: 5947118255617371382, guid: 92019c05a3340b14ea10f930647fa632, type: 3}
-  _whiteQueenIcon: {fileID: 3936227306300413480, guid: 401c5740c83f7154caf699e2c5c507dd, type: 3}
-  _whiteQueenAndBishopIcon: {fileID: 7913071892914095424, guid: e070fef4dbf6dd4479f4777c9cc3e193, type: 3}
-  _whiteQueenAndRookIcon: {fileID: 6241439724281740396, guid: d122f3d59450af8448b9b6a5e6052258, type: 3}
-  _blackKnightIcon: {fileID: 1119919289574599443, guid: 1ed738d2ff4cf4543815da07f89a209b, type: 3}
-  _blackBishopIcon: {fileID: 4990903496081764653, guid: 299df668eccd9ae4390517d90086d3eb, type: 3}
-  _blackRookIcon: {fileID: 5947118255617371382, guid: a039a9ba8ee75de4da9c0c0283fd4ace, type: 3}
-  _blackQueenIcon: {fileID: 3936227306300413480, guid: 5922d3841669ab247bcecd68a7efb00a, type: 3}
-  _blackQueenAndBishopIcon: {fileID: 7913071892914095424, guid: ee043da85a5811a4392d3d4ed55a3694, type: 3}
-  _blackQueenAndRookIcon: {fileID: 6241439724281740396, guid: 4a2c2be2338ba344d9e207280c387429, type: 3}
 --- !u!1 &258015686
 GameObject:
   m_ObjectHideFlags: 0
@@ -997,8 +1020,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -270}
-  m_SizeDelta: {x: 750, y: 540}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 750, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &258015688
 MonoBehaviour:
@@ -3068,6 +3091,7 @@ Transform:
   - {fileID: 750120864}
   - {fileID: 51261203}
   - {fileID: 2055373500}
+  - {fileID: 161609238}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &619394800
@@ -3568,6 +3592,20 @@ MonoBehaviour:
   _blackPawn: {fileID: 7559596393190870394, guid: 17dba58263e2c8d4e96c3aa04ad2d665, type: 3}
   _promtionPiecesWhitePrefab: {fileID: 4573902114905135514, guid: e74651dcd7941634bac8687d0add0262, type: 3}
   _promtionPiecesBlackPrefab: {fileID: 8881507680313807570, guid: d73b6091e604e8644a17c567d13a6a95, type: 3}
+  WhitePawnIcon: {fileID: 3349066401209071988, guid: 0c087fc52a8ac0548a5bf624644eaa32, type: 3}
+  WhiteKnightIcon: {fileID: 1119919289574599443, guid: 9f5c4136eb3b7604491610aacd754291, type: 3}
+  WhiteBishopIcon: {fileID: 4990903496081764653, guid: 374c303984918b34696fa68912eca8cd, type: 3}
+  WhiteRookIcon: {fileID: 5947118255617371382, guid: 92019c05a3340b14ea10f930647fa632, type: 3}
+  WhiteQueenIcon: {fileID: 3936227306300413480, guid: 401c5740c83f7154caf699e2c5c507dd, type: 3}
+  WhiteQueenAndBishopIcon: {fileID: 7913071892914095424, guid: e070fef4dbf6dd4479f4777c9cc3e193, type: 3}
+  WhiteQueenAndRookIcon: {fileID: 6241439724281740396, guid: d122f3d59450af8448b9b6a5e6052258, type: 3}
+  BlackPawnIcon: {fileID: 3349066401209071988, guid: 022333ea512bbe3459f0bf041f5a9b50, type: 3}
+  BlackKnightIcon: {fileID: 1119919289574599443, guid: 1ed738d2ff4cf4543815da07f89a209b, type: 3}
+  BlackBishopIcon: {fileID: 4990903496081764653, guid: 299df668eccd9ae4390517d90086d3eb, type: 3}
+  BlackRookIcon: {fileID: 5947118255617371382, guid: a039a9ba8ee75de4da9c0c0283fd4ace, type: 3}
+  BlackQueenIcon: {fileID: 3936227306300413480, guid: 5922d3841669ab247bcecd68a7efb00a, type: 3}
+  BlackQueenAndBishopIcon: {fileID: 7913071892914095424, guid: ee043da85a5811a4392d3d4ed55a3694, type: 3}
+  BlackQueenAndRookIcon: {fileID: 6241439724281740396, guid: 4a2c2be2338ba344d9e207280c387429, type: 3}
   _checkmateSquareColour: {r: 0.9056604, g: 0.37166253, b: 0.37166253, a: 1}
   _checkmateOutlineColour: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &775386469
@@ -4048,6 +4086,37 @@ MonoBehaviour:
   _camera: {fileID: 519420031}
   _cameraFlippedPosition: {x: 0, y: 3.5, z: -10}
   _flipCameraAfterEachMove: 0
+--- !u!1 &925257720
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 925257721}
+  m_Layer: 0
+  m_Name: WhiteCapturedPieces
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &925257721
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925257720}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 7.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 161609238}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &961532224
 GameObject:
   m_ObjectHideFlags: 0
@@ -6009,6 +6078,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1272504280}
   m_CullTransparentMesh: 1
+--- !u!1 &1281581977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1281581978}
+  m_Layer: 0
+  m_Name: BlackCapturedPieces
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1281581978
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281581977}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 161609238}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1287490626
 GameObject:
   m_ObjectHideFlags: 0

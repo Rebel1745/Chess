@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button _lastMovePGNButton;
     [SerializeField] private TabMenu _tabMenu;
     [SerializeField] private MoveHighlightingToggles _togglesTab;
+    [SerializeField] private Transform _whiteCapturedPieces;
+    [SerializeField] private Transform _blackCapturedPieces;
 
     public static UIManager Instance { get; private set; }
 
@@ -88,5 +90,73 @@ public class UIManager : MonoBehaviour
     public void HideActiveSquare()
     {
         _togglesTab.RemoveSquareDetails();
+    }
+
+    public void UpdatePieceIcons(bool isWhite, int pawnCount, int knightCount, int bishopCount, int rookCount, int queenCount)
+    {
+        Transform pieceHolder = isWhite ? _whiteCapturedPieces : _blackCapturedPieces;
+        GameObject pieceIcon = isWhite ? PieceManager.Instance.WhitePawnIcon : PieceManager.Instance.BlackPawnIcon;
+        GameObject newIcon;
+        float xPos = 0f;
+        float samePieceOffset = 0.15f;
+        float newPieceOffset = 0.2f;
+        int pieceCount = 0;
+
+        for (int i = 0; i < pieceHolder.childCount; i++)
+        {
+            Destroy(pieceHolder.GetChild(i).gameObject);
+        }
+
+        for (int i = 0; i < pawnCount; i++)
+        {
+            newIcon = Instantiate(pieceIcon, pieceHolder.position + new Vector3(xPos, 0f, 0f), Quaternion.identity, pieceHolder);
+            newIcon.GetComponentInChildren<SpriteRenderer>().sortingOrder = pieceCount;
+            xPos += samePieceOffset;
+            pieceCount++;
+        }
+
+        pieceIcon = isWhite ? PieceManager.Instance.WhiteKnightIcon : PieceManager.Instance.BlackKnightIcon;
+        if (pawnCount > 0) xPos += newPieceOffset;
+
+        for (int i = 0; i < knightCount; i++)
+        {
+            newIcon = Instantiate(pieceIcon, pieceHolder.position + new Vector3(xPos, 0f, 0f), Quaternion.identity, pieceHolder);
+            newIcon.GetComponentInChildren<SpriteRenderer>().sortingOrder = pieceCount;
+            xPos += samePieceOffset;
+            pieceCount++;
+        }
+
+        pieceIcon = isWhite ? PieceManager.Instance.WhiteBishopIcon : PieceManager.Instance.BlackBishopIcon;
+        if (knightCount > 0) xPos += newPieceOffset;
+
+        for (int i = 0; i < bishopCount; i++)
+        {
+            newIcon = Instantiate(pieceIcon, pieceHolder.position + new Vector3(xPos, 0f, 0f), Quaternion.identity, pieceHolder);
+            newIcon.GetComponentInChildren<SpriteRenderer>().sortingOrder = pieceCount;
+            xPos += samePieceOffset;
+            pieceCount++;
+        }
+
+        pieceIcon = isWhite ? PieceManager.Instance.WhiteRookIcon : PieceManager.Instance.BlackRookIcon;
+        if (bishopCount > 0) xPos += newPieceOffset;
+
+        for (int i = 0; i < rookCount; i++)
+        {
+            newIcon = Instantiate(pieceIcon, pieceHolder.position + new Vector3(xPos, 0f, 0f), Quaternion.identity, pieceHolder);
+            newIcon.GetComponentInChildren<SpriteRenderer>().sortingOrder = pieceCount;
+            xPos += samePieceOffset;
+            pieceCount++;
+        }
+
+        pieceIcon = isWhite ? PieceManager.Instance.WhiteQueenIcon : PieceManager.Instance.BlackQueenIcon;
+        if (rookCount > 0) xPos += newPieceOffset;
+
+        for (int i = 0; i < queenCount; i++)
+        {
+            newIcon = Instantiate(pieceIcon, pieceHolder.position + new Vector3(xPos, 0f, 0f), Quaternion.identity, pieceHolder);
+            newIcon.GetComponentInChildren<SpriteRenderer>().sortingOrder = pieceCount;
+            xPos += samePieceOffset;
+            pieceCount++;
+        }
     }
 }

@@ -16,18 +16,6 @@ public class ArrowManager : MonoBehaviour
     [SerializeField] private Color _xRayMoveColour;
     [SerializeField] private GameObject _shieldIconPrefab;
     [SerializeField] private GameObject _swordIconPrefab;
-    [SerializeField] private GameObject _whiteKnightIcon;
-    [SerializeField] private GameObject _whiteBishopIcon;
-    [SerializeField] private GameObject _whiteRookIcon;
-    [SerializeField] private GameObject _whiteQueenIcon;
-    [SerializeField] private GameObject _whiteQueenAndBishopIcon;
-    [SerializeField] private GameObject _whiteQueenAndRookIcon;
-    [SerializeField] private GameObject _blackKnightIcon;
-    [SerializeField] private GameObject _blackBishopIcon;
-    [SerializeField] private GameObject _blackRookIcon;
-    [SerializeField] private GameObject _blackQueenIcon;
-    [SerializeField] private GameObject _blackQueenAndBishopIcon;
-    [SerializeField] private GameObject _blackQueenAndRookIcon;
 
     private Dictionary<string, GameObject> _arrowSquareCodesToArrowGameObjectDictionary = new();
 
@@ -197,21 +185,21 @@ public class ArrowManager : MonoBehaviour
 
     private GameObject GetPieceIconFromType(PIECE_TYPE pieceType, bool isWhite)
     {
-        GameObject iconPrefab = _whiteQueenIcon;
+        GameObject iconPrefab = PieceManager.Instance.WhiteQueenIcon;
 
         switch (pieceType)
         {
             case PIECE_TYPE.Knight:
-                iconPrefab = isWhite ? _whiteKnightIcon : _blackKnightIcon;
+                iconPrefab = isWhite ? PieceManager.Instance.WhiteKnightIcon : PieceManager.Instance.BlackKnightIcon;
                 break;
             case PIECE_TYPE.Bishop:
-                iconPrefab = isWhite ? _whiteBishopIcon : _blackBishopIcon;
+                iconPrefab = isWhite ? PieceManager.Instance.WhiteBishopIcon : PieceManager.Instance.BlackBishopIcon;
                 break;
             case PIECE_TYPE.Rook:
-                iconPrefab = isWhite ? _whiteRookIcon : _blackRookIcon;
+                iconPrefab = isWhite ? PieceManager.Instance.WhiteRookIcon : PieceManager.Instance.BlackRookIcon;
                 break;
             case PIECE_TYPE.Queen:
-                iconPrefab = isWhite ? _whiteQueenIcon : _blackQueenIcon;
+                iconPrefab = isWhite ? PieceManager.Instance.WhiteQueenIcon : PieceManager.Instance.BlackQueenIcon;
                 break;
         }
 
@@ -220,14 +208,14 @@ public class ArrowManager : MonoBehaviour
 
     private GameObject GetPieceIconFromTypes(PIECE_TYPE[] pieceTypes, bool isWhite)
     {
-        GameObject iconPrefab = _whiteQueenAndBishopIcon;
+        GameObject iconPrefab = PieceManager.Instance.WhiteQueenAndBishopIcon;
 
         if (pieceTypes.Length != 2) Debug.LogError("Incorrect number of piece types");
 
         if (pieceTypes[0] == PIECE_TYPE.Bishop || pieceTypes[1] == PIECE_TYPE.Bishop)
-            iconPrefab = isWhite ? _whiteQueenAndBishopIcon : _blackQueenAndBishopIcon;
+            iconPrefab = isWhite ? PieceManager.Instance.WhiteQueenAndBishopIcon : PieceManager.Instance.BlackQueenAndBishopIcon;
         else if (pieceTypes[0] == PIECE_TYPE.Rook || pieceTypes[1] == PIECE_TYPE.Rook)
-            iconPrefab = isWhite ? _whiteQueenAndRookIcon : _blackQueenAndRookIcon;
+            iconPrefab = isWhite ? PieceManager.Instance.WhiteQueenAndRookIcon : PieceManager.Instance.BlackQueenAndRookIcon;
         else Debug.LogError("Neither bishop nor rook in the piece type array. Que pasa?");
 
         return iconPrefab;
