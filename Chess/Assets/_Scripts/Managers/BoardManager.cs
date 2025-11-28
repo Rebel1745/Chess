@@ -277,4 +277,11 @@ public class BoardManager : MonoBehaviour
 
         ArrowManager.Instance.RemoveArrowsFromSquare(square);
     }
+
+    public void GetPiecesAttackingSquare(Square square, out Piece[] whitePieces, out Piece[] blackPieces)
+    {
+        // we want to know how many white or black pieces can attack this square
+        whitePieces = PieceManager.Instance.GetPiecesAttackingSquare(square, true);
+        blackPieces = PieceManager.Instance.GetPiecesAttackingSquare(square, false);
+    }
 }

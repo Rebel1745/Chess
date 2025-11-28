@@ -56,9 +56,9 @@ public class PieceManager : MonoBehaviour
     private List<PIECE_TYPE> _capturedPiecesWhite = new();
     private List<PIECE_TYPE> _capturedPiecesBlack = new();
 
-    //private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
+    private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
     //private readonly string _defaultPosition = "kr6/8/8/8/8/3K4/1p6/8";
-    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
     public class OnMoveCompletedArgs : EventArgs
@@ -757,8 +757,8 @@ public class PieceManager : MonoBehaviour
             {
                 // don't show if we don't want x-ray moves
                 if (!ToggleManager.Instance.ShowXRayMoves && move.IsXRayMove) continue;
-                // don't show standard moves as they can't control the square
-                if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Standard) continue;
+                // don't show standard pawn moves as they can't control the square
+                if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.NonCapture) continue;
 
                 if (move.EndSquare == square)
                     ArrowManager.Instance.DrawArrow(piece.Square, square, move.AnalysisMoveType, true);
@@ -952,6 +952,30 @@ public class PieceManager : MonoBehaviour
         }
 
         UIManager.Instance.UpdatePieceIcons(isWhite, pawnCount, knightCount, bishopCount, rookCount, queenCount);
+    }
+
+    public Piece[] GetPiecesAttackingSquare(Square square, bool isWhite)
+    {
+        List<Piece> pieceList = new();
+
+        foreach (Piece piece in _allPieces)
+        {
+            if (piece.IsWhite != isWhite) continue;
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.AvailableMoves.Count == 0) continue;
+
+            foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
+            {
+                if (move.EndSquare != square) continue;
+                if (move.AnalysisMoveType != ANALYSIS_MOVE_TYPE.NonCapture)
+                {
+                    pieceList.Add(piece);
+                    break;
+                }
+            }
+        }
+
+        return pieceList.ToArray();
     }
 
     public void PrintMove(MoveDetails move)

@@ -141,7 +141,7 @@ public class PiecePawn : Piece
             {
                 StartSquare = _square,
                 EndSquare = possibleMoveSquare,
-                AnalysisMoveType = ANALYSIS_MOVE_TYPE.Standard
+                AnalysisMoveType = ANALYSIS_MOVE_TYPE.NonCapture
             });
 
         // only check to see if we can move two squares if we can already move one
@@ -154,7 +154,7 @@ public class PiecePawn : Piece
                 {
                     StartSquare = _square,
                     EndSquare = possibleMoveSquare,
-                    AnalysisMoveType = ANALYSIS_MOVE_TYPE.Standard
+                    AnalysisMoveType = ANALYSIS_MOVE_TYPE.NonCapture
                 });
         }
 
