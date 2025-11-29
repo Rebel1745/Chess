@@ -17,6 +17,9 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Color _squareHighlightColour;
     [SerializeField] private Color _squareHighlightOutlineColour;
     [SerializeField] private Color _currentHighlightedSquareColour;
+    [SerializeField] private Color _safeSquareColour;
+    [SerializeField] private Color _dangerousSquareColour;
+
     private List<Square> _highlightedSquaresList = new();
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
     private Square[,] _squares = new Square[8, 8];
@@ -283,5 +286,28 @@ public class BoardManager : MonoBehaviour
         // we want to know how many white or black pieces can attack this square
         whitePieces = PieceManager.Instance.GetPiecesAttackingSquare(square, true);
         blackPieces = PieceManager.Instance.GetPiecesAttackingSquare(square, false);
+    }
+
+    public void ShowSafeAndDangerousSquares()
+    {
+        Piece[] ourPieces, opponentPieces;
+
+        // loop through all the squares, count the pieces, if we have more, the square is safe, if the opponent has more it is dangerous
+        foreach (Square square in _squares)
+        {
+            ourPieces = PieceManager.Instance.GetPiecesAttackingSquare(square, GameManager.Instance.IsCurrentPlayerWhite);
+            opponentPieces = PieceManager.Instance.GetPiecesAttackingSquare(square, !GameManager.Instance.IsCurrentPlayerWhite);
+
+            if (ourPieces.Length > opponentPieces.Length)
+            {
+                // square is safe
+                square.SetSquareColour(_safeSquareColour);
+            }
+            else if (opponentPieces.Length > ourPieces.Length)
+            {
+                // square is dangerous
+                square.SetSquareColour(_dangerousSquareColour);
+            }
+        }
     }
 }

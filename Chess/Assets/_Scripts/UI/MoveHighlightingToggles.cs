@@ -17,6 +17,7 @@ public class MoveHighlightingToggles : MonoBehaviour
     [SerializeField] private Button _checkForCapturesButton;
     [SerializeField] private TMP_Text _capturesCountText;
     [SerializeField] private Toggle _showMoveIconsToggle;
+    [SerializeField] private Button _showSafeSquaresButton;
 
     private void Awake()
     {
@@ -29,6 +30,7 @@ public class MoveHighlightingToggles : MonoBehaviour
 
         _checkForChecksButton.onClick.AddListener(OnCheckForChecksClicked);
         _checkForCapturesButton.onClick.AddListener(OnCheckForCapturesClicked);
+        _showSafeSquaresButton.onClick.AddListener(OnShowSafeSquaresClicked);
 
         _activateAnalysisModeToggle.isOn = PlayerPrefs.GetInt("AnalysisModeActivated", 0) != 0;
         _showCaptureMovesToggle.isOn = PlayerPrefs.GetInt("ShowCaptureMoves", 0) != 0;
@@ -111,5 +113,10 @@ public class MoveHighlightingToggles : MonoBehaviour
 
         int captureCount = PieceManager.Instance.DrawArrowsForAllPossibleCaptures(GameManager.Instance.IsCurrentPlayerWhite);
         _capturesCountText.text = "        " + captureCount + " captures";
+    }
+
+    private void OnShowSafeSquaresClicked()
+    {
+        BoardManager.Instance.ShowSafeAndDangerousSquares();
     }
 }
