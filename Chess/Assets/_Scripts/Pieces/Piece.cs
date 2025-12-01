@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -11,13 +12,13 @@ public class Piece : MonoBehaviour
     protected string _pieceCode;
     public string PieceCode { get { return _pieceCode; } }
     protected bool _isWhite;
+    public bool IsWhite { get { return _isWhite; } }
     private bool _isPromotedPiece;
     public bool IsPromotedPiece { get { return _isPromotedPiece; } }
     protected Square _square;
     public Square Square { get { return _square; } }
     private Square _initialSquare;
     public Square InitialSquare { get { return _initialSquare; } }
-    public bool IsWhite { get { return _isWhite; } }
     protected bool _isFirstMove = true;
     public bool IsFirstMove { get { return _isFirstMove; } }
     private bool _canBeEnPassanted = false;
@@ -174,63 +175,67 @@ public class Piece : MonoBehaviour
         float lastXSign = Mathf.Sign(_basicMoves[0].x);
         float lastYSign = Mathf.Sign(_basicMoves[0].y);
         bool isCurrentDirectionXRay = false;
+        List<Piece> piecesToXRayThrough = new();
 
         foreach (Vector2Int move in _basicMoves)
         {
-            // if the signs don't match, we are checking in a different direction, reset the ignore variable
-            if (Mathf.Sign(move.x) != lastXSign || Mathf.Sign(move.y) != lastYSign)
-                isCurrentDirectionXRay = false;
-
             possibleMoveSquare = BoardManager.Instance.GetSquare(_square.SquareX + move.x, _square.SquareY + move.y);
 
             // if there is no square, move on
             if (possibleMoveSquare == null) continue;
 
-            // if we are to ignore x-ray moves and this is an x-ray, bail
-            if (!ToggleManager.Instance.ShowXRayMoves && isCurrentDirectionXRay) continue;
+            // if the signs don't match, we are checking in a different direction, reset the ignore variable
+            if (Mathf.Sign(move.x) != lastXSign || Mathf.Sign(move.y) != lastYSign)
+            {
+                isCurrentDirectionXRay = false;
+                piecesToXRayThrough.Clear();
+            }
 
             // if the piece is landing on a piece of the same colour, it is a protection move
             // following moves will be XRay moves
             if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite == _isWhite)
             {
-                // we don't care about x-ray protection moves
-                if (ToggleManager.Instance.ShowProtectionMoves && !isCurrentDirectionXRay)
-                    _analysisMoves.Add(new AnalysisMoveDetails
-                    {
-                        StartSquare = _square,
-                        EndSquare = possibleMoveSquare,
-                        AnalysisMoveType = ANALYSIS_MOVE_TYPE.Protection,
-                        IsXRayMove = isCurrentDirectionXRay
-                    });
+                _analysisMoves.Add(new AnalysisMoveDetails
+                {
+                    StartSquare = _square,
+                    EndSquare = possibleMoveSquare,
+                    AnalysisMoveType = ANALYSIS_MOVE_TYPE.Protection,
+                    IsXRayMove = isCurrentDirectionXRay,
+                    PiecesToXRayThrough = new List<Piece>(piecesToXRayThrough)
+                });
 
                 isCurrentDirectionXRay = true;
+                piecesToXRayThrough.Add(possibleMoveSquare.PieceOnSquare);
                 lastXSign = Mathf.Sign(move.x);
                 lastYSign = Mathf.Sign(move.y);
             }
-            // if we land on an oponent piece, we can't move past it
             else if (possibleMoveSquare.PieceOnSquare != null && possibleMoveSquare.PieceOnSquare.IsWhite != _isWhite)
             {
-                if (ToggleManager.Instance.ShowCaptureMoves)
-                    _analysisMoves.Add(new AnalysisMoveDetails
-                    {
-                        StartSquare = _square,
-                        EndSquare = possibleMoveSquare,
-                        AnalysisMoveType = ANALYSIS_MOVE_TYPE.Capture,
-                        IsXRayMove = isCurrentDirectionXRay
-                    });
+                _analysisMoves.Add(new AnalysisMoveDetails
+                {
+                    StartSquare = _square,
+                    EndSquare = possibleMoveSquare,
+                    AnalysisMoveType = ANALYSIS_MOVE_TYPE.Capture,
+                    IsXRayMove = isCurrentDirectionXRay,
+                    PiecesToXRayThrough = new List<Piece>(piecesToXRayThrough)
+                });
 
                 isCurrentDirectionXRay = true;
+                piecesToXRayThrough.Add(possibleMoveSquare.PieceOnSquare);
                 lastXSign = Mathf.Sign(move.x);
                 lastYSign = Mathf.Sign(move.y);
             }
             else
+            {
                 _analysisMoves.Add(new AnalysisMoveDetails
                 {
                     StartSquare = _square,
                     EndSquare = possibleMoveSquare,
                     AnalysisMoveType = ANALYSIS_MOVE_TYPE.Standard,
-                    IsXRayMove = false
+                    IsXRayMove = isCurrentDirectionXRay,
+                    PiecesToXRayThrough = new List<Piece>(piecesToXRayThrough)
                 });
+            }
         }
 
         if (checkForChecks)

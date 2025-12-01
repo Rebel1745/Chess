@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -7,6 +8,7 @@ public struct AnalysisMoveDetails
     public Square EndSquare;
     public ANALYSIS_MOVE_TYPE AnalysisMoveType;
     public bool IsXRayMove;
+    public List<Piece> PiecesToXRayThrough; // a list of the pieces in the way of the current move
 }
 
 public enum ANALYSIS_MOVE_TYPE

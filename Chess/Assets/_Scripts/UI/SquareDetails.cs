@@ -20,6 +20,8 @@ public class SquareDetails : MonoBehaviour
     [SerializeField] private GameObject _blackRookUIIcon;
     [SerializeField] private GameObject _blackQueenUIIcon;
     [SerializeField] private GameObject _blackKingUIIcon;
+    public Piece[] WhitePieces;
+    public Piece[] BlackPieces;
 
     public void SetSquareDetails(Square square)
     {
@@ -27,6 +29,11 @@ public class SquareDetails : MonoBehaviour
         _squareText.text = square.SquarePGNCode;
 
         BoardManager.Instance.GetPiecesAttackingSquare(square, out Piece[] whitePieces, out Piece[] blackPieces);
+
+        // DEBUG
+        WhitePieces = whitePieces;
+        BlackPieces = blackPieces;
+        //END DEBUG
 
         ShowPieceIcons(true, whitePieces, _whiteAttackingPiecesHolder);
         ShowPieceIcons(false, blackPieces, _blackAttackingPiecesHolder);

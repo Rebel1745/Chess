@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework.Constraints;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
@@ -185,7 +184,7 @@ public class PieceManager : MonoBehaviour
                     squareToSpawnPieceOn.SetPieceOnSquare(newPiece);
                     _allPieces.Add(newPiece);
                     fileIndex++;
-                    newPieceGO.name = (isWhite ? "White " : "Black ") + newPiece.PieceType.ToString() + " " + fileIndex;
+                    newPieceGO.name = (isWhite ? "White " : "Black ") + newPiece.PieceType.ToString() + " " + squareToSpawnPieceOn.SquarePGNCode;
                     // if the piece is a pawn, and it is on the stating rank, mark it as first move
                     if ((currentChar == "p" && i != 6) || (currentChar == "P" && i != 1))
                     {
@@ -751,12 +750,21 @@ public class PieceManager : MonoBehaviour
 
     public void DrawArrowsToSquareFromAnalysisMoves(Square square)
     {
-        foreach (Piece piece in _allPieces)
+        Piece[] whitePieces = GetPiecesAttackingSquare(square, true);
+        Piece[] blackPieces = GetPiecesAttackingSquare(square, false);
+
+        Piece[] allPieces = new Piece[whitePieces.Length + blackPieces.Length];
+        Array.Copy(whitePieces, allPieces, whitePieces.Length);
+        Array.Copy(blackPieces, 0, allPieces, whitePieces.Length, blackPieces.Length);
+
+        foreach (Piece piece in allPieces)
         {
             foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
             {
                 // don't show if we don't want x-ray moves
-                if (!ToggleManager.Instance.ShowXRayMoves && move.IsXRayMove) continue;
+                // if (!ToggleManager.Instance.ShowXRayMoves && move.IsXRayMove) continue;
+                // if (!ToggleManager.Instance.ShowProtectionMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Protection) continue;
+                // if (!ToggleManager.Instance.ShowCaptureMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Capture) continue;
                 // don't show standard pawn moves as they can't control the square
                 if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.NonCapture) continue;
 
@@ -966,8 +974,12 @@ public class PieceManager : MonoBehaviour
 
             foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
             {
+                // we have a move, if it is not to the target square, bail
                 if (move.EndSquare != square) continue;
-                if (move.AnalysisMoveType != ANALYSIS_MOVE_TYPE.NonCapture)
+                // if it is not the right type of move, bail
+                if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.NonCapture) continue;
+
+                if (CheckIfPieceCanAttackSquare(move, square, isWhite))
                 {
                     pieceList.Add(piece);
                     break;
@@ -976,6 +988,42 @@ public class PieceManager : MonoBehaviour
         }
 
         return pieceList.ToArray();
+    }
+
+    private bool CheckIfPieceCanAttackSquare(AnalysisMoveDetails move, Square targetSquare, bool isWhite)
+    {
+        bool canAttack = false;
+
+        // we have a move, if it is not to the target square, bail
+        if (move.EndSquare != targetSquare) return false;
+        // if it is not the right type of move, bail
+        if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.NonCapture) return false;
+
+        // if it is an x-ray move, check the moves of all of the pieces that are in the way
+        if (move.IsXRayMove)
+        {
+            foreach (Piece piece in move.PiecesToXRayThrough)
+            {
+                // if the piece that is in the way is not our colour, bail
+                if (piece.IsWhite != isWhite) return false;
+                // loop through the analysis moves of this piece
+                foreach (AnalysisMoveDetails pieceMove in piece.AnalysisMoves)
+                {
+                    // we have a move, if it is not to the target square, bail
+                    if (pieceMove.EndSquare != targetSquare) continue;
+                    // if it is not the right type of move, bail
+                    if (pieceMove.AnalysisMoveType == ANALYSIS_MOVE_TYPE.NonCapture) continue;
+
+                    // now we get recursive up in this biatch to check if this move can attack the square
+                    canAttack = CheckIfPieceCanAttackSquare(pieceMove, targetSquare, isWhite);
+                }
+
+                // if the piece that is in the way can't attack the square, then there is no way for us to attack it after
+                if (!canAttack) return false;
+            }
+        }
+
+        return true;
     }
 
     public void PrintMove(MoveDetails move)
