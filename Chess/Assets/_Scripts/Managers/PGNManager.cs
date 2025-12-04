@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class PGNManager : MonoBehaviour
@@ -51,11 +51,44 @@ public class PGNManager : MonoBehaviour
 
     public void ParsePGN(string pgn)
     {
+        List<string> moveListStrings = new();
         _moveDetailsList = new List<MoveDetails>();
 
-        string[] fieldStrings = pgn.Split(']');
-        string moveList = fieldStrings[^1].Trim();
-        string[] moves = moveList.Split(' ');
+        string cleanData = pgn;
+
+        // Find the split point (last ']' character)
+        int splitPoint = cleanData.LastIndexOf(']') + 1;
+
+        // Extract the move list
+        string moveList = cleanData[splitPoint..];
+
+        // Remove line breaks
+        moveList = moveList.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+
+        // remove annotations ($2, $6 etc)
+        string pattern = @"\s*\$[0-9]+";
+        moveList = Regex.Replace(moveList, pattern, "");
+
+        // remove alternative lines e.g. (8... Ng4 9. hxg4 Bxe5 10. Nxe5 Nxe5 11. dxe5)
+        pattern = @"\([^\)]+\)";
+        moveList = Regex.Replace(moveList, pattern, "");
+
+        // remove comments e.g. { That was an incredible move Darren }
+        pattern = @"\{[^\}]+\}";
+        moveList = Regex.Replace(moveList, pattern, "");
+
+        pattern = @"([0-9]+\.\s*)([\w\-]+)(\+|\#)?(?:\$[0-9]+)?\s*([\w\-]+)(\+|\#)?";
+        MatchCollection matches = Regex.Matches(moveList, pattern);
+
+        foreach (Match match in matches)
+        {
+            Debug.Log(match.Groups[2].Value + " - " + match.Groups[4].Value);
+            moveListStrings.Add(match.Groups[2].Value);
+            moveListStrings.Add(match.Groups[4].Value);
+        }
+
+        //string[] moves = moveList.Split(' ');
+        string[] moves = moveListStrings.ToArray();
         bool isWhite = false;
         Square moveSquare, secondMoveSquare;
         PIECE_TYPE pieceType = PIECE_TYPE.None, promotionPieceType = PIECE_TYPE.None;
@@ -92,6 +125,9 @@ public class PGNManager : MonoBehaviour
             pieceColour = isWhite ? "White" : "Black";
 
             moves[i] = moves[i].Trim();
+
+            if (moves[i] == "") continue;
+
             if (moves[i].IndexOf('.') != -1)
                 moves[i] = moves[i].Substring(moves[i].IndexOf('.') + 1, moves[i].Length - moves[i].IndexOf('.') - 1);
 
@@ -111,11 +147,11 @@ public class PGNManager : MonoBehaviour
                 pieceType = PIECE_TYPE.Pawn;
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i]);
 
-                if (moveSquare == null) Debug.LogError($"{moves[i]} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {moves[i]} square not found");
 
                 movePiece = PieceManager.Instance.GetPieceByMove(moveSquare, isWhite, pieceType);
 
-                if (movePiece == null) Debug.LogError($"{moves[i]} piece not found");
+                if (movePiece == null) Debug.LogError($"{i} - {moves[i]} piece not found");
 
                 if (Mathf.Abs(int.Parse(moveSquare.SquarePGNCode.Substring(1, 1)) - int.Parse(movePiece.Square.SquarePGNCode.Substring(1, 1))) == 2)
                     isEnPassantable = true;
@@ -132,25 +168,25 @@ public class PGNManager : MonoBehaviour
                 // first get the king
                 movePiece = PieceManager.Instance.GetPieceFromCharacter("K", isWhite);
 
-                if (movePiece == null) Debug.LogError($"{moves[i]} piece not found");
+                if (movePiece == null) Debug.LogError($"{i} - {moves[i]} piece not found");
 
                 // get the square to castle to - G1 or G8
                 squareCode = isWhite ? "G1" : "G8";
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(squareCode);
 
-                if (moveSquare == null) Debug.LogError($"{squareCode} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {squareCode} square not found");
 
                 // get the king side rook - on H1 or H8
                 squareCode = isWhite ? "H1" : "H8";
                 secondMovePiece = BoardManager.Instance.GetSquareFromPGNCode(squareCode).PieceOnSquare;
 
-                if (secondMovePiece == null) Debug.LogError($"{moves[i]} (second move) piece not found");
+                if (secondMovePiece == null) Debug.LogError($"{i} - {moves[i]} (second move) piece not found");
 
                 // get the square to move the rook to - F1 or F8
                 squareCode = isWhite ? "F1" : "F8";
                 secondMoveSquare = BoardManager.Instance.GetSquareFromPGNCode(squareCode);
 
-                if (secondMoveSquare == null) Debug.LogError($"{moves[i]} (second move) square not found");
+                if (secondMoveSquare == null) Debug.LogError($"{i} - {moves[i]} (second move) square not found");
 
                 //Debug.Log($"{pieceColour} castle king side");
 
@@ -164,25 +200,25 @@ public class PGNManager : MonoBehaviour
                 // castling queen side, first get the king
                 movePiece = PieceManager.Instance.GetPieceFromCharacter("K", isWhite);
 
-                if (movePiece == null) Debug.LogError($"{moves[i]} piece not found");
+                if (movePiece == null) Debug.LogError($"{i} - {moves[i]} piece not found");
 
                 // get the square to castle to - C1 or C8
                 squareCode = isWhite ? "C1" : "C8";
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(squareCode);
 
-                if (moveSquare == null) Debug.LogError($"{moves[i]} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {moves[i]} square not found");
 
                 // get the king side rook - on A1 or A8
                 squareCode = isWhite ? "A1" : "A8";
                 secondMovePiece = BoardManager.Instance.GetSquareFromPGNCode(squareCode).PieceOnSquare;
 
-                if (secondMovePiece == null) Debug.LogError($"{moves[i]} (second move) piece not found");
+                if (secondMovePiece == null) Debug.LogError($"{i} - {moves[i]} (second move) piece not found");
 
                 // get the square to move the rook to - D1 or D8
                 squareCode = isWhite ? "D1" : "D8";
                 secondMoveSquare = BoardManager.Instance.GetSquareFromPGNCode(squareCode);
 
-                if (secondMoveSquare == null) Debug.LogError($"{moves[i]} (second move) square not found");
+                if (secondMoveSquare == null) Debug.LogError($"{i} - {moves[i]} (second move) square not found");
 
                 //Debug.Log($"{pieceColour} castle queen side");
 
@@ -193,11 +229,16 @@ public class PGNManager : MonoBehaviour
             // check for a capture
             if (moves[i].ToUpper().IndexOf("X") != -1)
             {
-                // there is a capture here
-                pieceType = PieceManager.Instance.GetPieceTypeFromCharacter(pieceCode);
+                // first check if the character is lower case, if it is then it is a pawn
+                if (pieceCode == pieceCode.ToLower())
+                    pieceType = PIECE_TYPE.Pawn;
+                else
+                    // there is a capture here
+                    pieceType = PieceManager.Instance.GetPieceTypeFromCharacter(pieceCode);
+
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(moves[i].Length - 2, 2));
 
-                if (moveSquare == null) Debug.LogError($"{moves[i].Substring(2, 2)} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {moves[i].Substring(2, 2)} square not found");
 
                 // check to see if this capture is en passant
                 if (moveSquare.PieceOnSquare == null)
@@ -207,8 +248,8 @@ public class PGNManager : MonoBehaviour
                     rank = int.Parse(moves[i].Substring(3, 1));
                     rank = isWhite ? rank - 1 : rank + 1;
                     secondMoveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(2, 1) + rank.ToString());
-                    if (secondMoveSquare == null) Debug.LogError($"{moves[i].Substring(2, 1) + rank.ToString()} square not found");
-                    if (secondMoveSquare.PieceOnSquare == null) Debug.LogError($"Piece on {moves[i].Substring(2, 1) + rank.ToString()} not found");
+                    if (secondMoveSquare == null) Debug.LogError($"{i} - {moves[i].Substring(2, 1) + rank.ToString()} square not found");
+                    if (secondMoveSquare.PieceOnSquare == null) Debug.LogError($"{i} - Piece on {moves[i].Substring(2, 1) + rank.ToString()} not found");
                     secondMovePiece = secondMoveSquare.PieceOnSquare;
                 }
 
@@ -221,7 +262,7 @@ public class PGNManager : MonoBehaviour
                     // there is no piece type, that means the letter is a-h and refers to a pawn on that file capturing on the square code
                     movePiece = BoardManager.Instance.GetSquareFromPGNCode(squareCode).PieceOnSquare;
 
-                    if (movePiece == null) Debug.LogError($"{pieceColour} Pawn on {moves[i][..1].ToUpper()} take on {squareCode} piece not found");
+                    if (movePiece == null) Debug.LogError($"{i} - {pieceColour} Pawn on {moves[i][..1].ToUpper()} take on {squareCode} piece not found");
                 }
                 else
                 {
@@ -247,7 +288,7 @@ public class PGNManager : MonoBehaviour
                         movePiece = PieceManager.Instance.GetPieceByRankAndFile(int.Parse(moves[i].Substring(1, 1)), moves[i].Substring(2, 1), isWhite, pieceType);
                     }
 
-                    if (movePiece == null) Debug.LogError($"{pieceColour} {pieceType} that takes on {moveSquare.SquarePGNCode} not found");
+                    if (movePiece == null) Debug.LogError($"{i} - {pieceColour} {pieceType} that takes on {moveSquare.SquarePGNCode} not found");
                     //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} take on {moveSquare.SquarePGNCode} ");
                 }
 
@@ -269,11 +310,11 @@ public class PGNManager : MonoBehaviour
                 pieceType = PieceManager.Instance.GetPieceTypeFromCharacter(moves[i].Substring(moves[i].Length - 1, 1));
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i][..2]);
 
-                if (moveSquare == null) Debug.LogError($"{moves[i][..2]} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {moves[i][..2]} square not found");
 
                 movePiece = PieceManager.Instance.GetPieceByMove(moveSquare, isWhite, PIECE_TYPE.Pawn);
 
-                if (movePiece == null) Debug.LogError($"{pieceColour} Pawn to promote on {moveSquare} piece not found");
+                if (movePiece == null) Debug.LogError($"{i} - {pieceColour} Pawn to promote on {moveSquare} piece not found");
 
                 AddMove(moves[i], isWhite, movePiece, moveSquare, null, null, pieceType);
                 continue;
@@ -284,11 +325,11 @@ public class PGNManager : MonoBehaviour
                 pieceType = PieceManager.Instance.GetPieceTypeFromCharacter(pieceCode);
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(1, 2));
 
-                if (moveSquare == null) Debug.LogError($"{moves[i].Substring(1, 2)} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {moves[i].Substring(1, 2)} square not found");
 
                 movePiece = PieceManager.Instance.GetPieceByMove(moveSquare, isWhite, pieceType);
 
-                if (movePiece == null) Debug.LogError($"{moves[i][..1]} {pieceType} {moves[i].Substring(1, 2)} piece not found");
+                if (movePiece == null) Debug.LogError($"{i} - {moves[i][..1]} {pieceType} {moves[i].Substring(1, 2)} piece not found");
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
@@ -302,14 +343,14 @@ public class PGNManager : MonoBehaviour
                 pieceType = PieceManager.Instance.GetPieceTypeFromCharacter(pieceCode);
                 moveSquare = BoardManager.Instance.GetSquareFromPGNCode(moves[i].Substring(2, 2));
 
-                if (moveSquare == null) Debug.LogError($"{moves[i].Substring(1, 2)} square not found");
+                if (moveSquare == null) Debug.LogError($"{i} - {moves[i].Substring(1, 2)} square not found");
 
                 if (int.TryParse(file, out rank))
                     movePiece = PieceManager.Instance.GetPieceByRank(rank, isWhite, pieceType);
                 else
                     movePiece = PieceManager.Instance.GetPieceByFile(file, isWhite, pieceType);
 
-                if (movePiece == null) Debug.LogError($"{moves[i][..1]} {pieceType} {moves[i].Substring(1, 2)} piece not found");
+                if (movePiece == null) Debug.LogError($"{i} - {moves[i][..1]} {pieceType} {moves[i].Substring(1, 2)} piece not found");
 
                 //Debug.Log($"{pieceColour} {pieceType} on {movePiece.Square.SquarePGNCode} move to {moveSquare.SquarePGNCode}");
 
@@ -320,7 +361,7 @@ public class PGNManager : MonoBehaviour
 
         TriggerOnMoveListUpdatedEvent();
         UIManager.Instance.SetTabMenuTab(1);
-        // FirstMove();
+        // FirstMove();*/
     }
 
     private void AddMove(string pgnString, bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
@@ -396,6 +437,8 @@ public class PGNManager : MonoBehaviour
         _currentMove = 0;
         PieceManager.Instance.ResetBoardPosition();
         BoardManager.Instance.ResetSquareColours();
+        PieceManager.Instance.ResetCapturedPieces();
+        UIManager.Instance.ResetPieceIcons();
     }
 
     public void LastMove()

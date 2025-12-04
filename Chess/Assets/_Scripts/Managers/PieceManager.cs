@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
@@ -55,9 +56,9 @@ public class PieceManager : MonoBehaviour
     private List<PIECE_TYPE> _capturedPiecesWhite = new();
     private List<PIECE_TYPE> _capturedPiecesBlack = new();
 
-    private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
+    //private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
     //private readonly string _defaultPosition = "kr6/8/8/8/8/3K4/1p6/8";
-    //private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
     public class OnMoveCompletedArgs : EventArgs
@@ -310,6 +311,12 @@ public class PieceManager : MonoBehaviour
         else _capturedPiecesBlack.Add(piece.PieceType);
 
         UpdateCapturedPieceIcons(piece.IsWhite);
+    }
+
+    public void ResetCapturedPieces()
+    {
+        _capturedPiecesWhite.Clear();
+        _capturedPiecesBlack.Clear();
     }
 
     public void ShowPromotionPieces(MoveDetails move)
@@ -921,11 +928,11 @@ public class PieceManager : MonoBehaviour
 
             foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
             {
-                if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Capture)
-                {
-                    ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, ANALYSIS_MOVE_TYPE.Capture, true);
-                    possibleCaptureCount++;
-                }
+                if (move.IsXRayMove) continue;
+                if (move.AnalysisMoveType != ANALYSIS_MOVE_TYPE.Capture) continue;
+
+                ArrowManager.Instance.DrawArrow(move.StartSquare, move.EndSquare, ANALYSIS_MOVE_TYPE.Capture, true);
+                possibleCaptureCount++;
             }
         }
 

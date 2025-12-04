@@ -19,6 +19,7 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private Color _currentHighlightedSquareColour;
     [SerializeField] private Color _safeSquareColour;
     [SerializeField] private Color _dangerousSquareColour;
+    [SerializeField] private Color _contestedSquareColour;
 
     private List<Square> _highlightedSquaresList = new();
     private readonly string[] _fileNames = { "a", "b", "c", "d", "e", "f", "g", "h" };
@@ -298,15 +299,20 @@ public class BoardManager : MonoBehaviour
             ourPieces = PieceManager.Instance.GetPiecesAttackingSquare(square, GameManager.Instance.IsCurrentPlayerWhite);
             opponentPieces = PieceManager.Instance.GetPiecesAttackingSquare(square, !GameManager.Instance.IsCurrentPlayerWhite);
 
-            if (ourPieces.Length > opponentPieces.Length)
+            if (ourPieces.Length > 0 && opponentPieces.Length == 0)
             {
                 // square is safe
                 square.SetSquareColour(_safeSquareColour);
             }
-            else if (opponentPieces.Length > ourPieces.Length)
+            else if (opponentPieces.Length > 0 && ourPieces.Length == 0)
             {
                 // square is dangerous
                 square.SetSquareColour(_dangerousSquareColour);
+            }
+            else if (ourPieces.Length > 0 && opponentPieces.Length > 0)
+            {
+                // square is contested
+                square.SetSquareColour(_contestedSquareColour);
             }
         }
     }

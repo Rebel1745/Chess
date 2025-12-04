@@ -159,4 +159,17 @@ public class UIManager : MonoBehaviour
             pieceCount++;
         }
     }
+
+    public void ResetPieceIcons()
+    {
+        for (int i = 0; i < _whiteCapturedPieces.childCount; i++)
+        {
+            Destroy(_whiteCapturedPieces.GetChild(i).gameObject);
+        }
+
+        for (int i = 0; i < _blackCapturedPieces.childCount; i++)
+        {
+            Destroy(_blackCapturedPieces.GetChild(i).gameObject);
+        }
+    }
 }
