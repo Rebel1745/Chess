@@ -17,6 +17,12 @@ public class PGNManager : MonoBehaviour
         public List<MoveDetails> MoveDetailsList;
     }
 
+    public event EventHandler<OnMoveNumberChangedArgs> OnMoveNumberChanged;
+    public class OnMoveNumberChangedArgs : EventArgs
+    {
+        public int MoveNumber;
+    }
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -82,7 +88,6 @@ public class PGNManager : MonoBehaviour
 
         foreach (Match match in matches)
         {
-            Debug.Log(match.Groups[2].Value + " - " + match.Groups[4].Value);
             moveListStrings.Add(match.Groups[2].Value);
             moveListStrings.Add(match.Groups[4].Value);
         }
@@ -361,7 +366,7 @@ public class PGNManager : MonoBehaviour
 
         TriggerOnMoveListUpdatedEvent();
         UIManager.Instance.SetTabMenuTab(1);
-        // FirstMove();*/
+        FirstMove();
     }
 
     private void AddMove(string pgnString, bool isWhite, Piece pieceToMove, Square squareToMoveTo, Piece secondPieceToMove = null, Square secondSquareToMoveTo = null, PIECE_TYPE pieceToPromoteTo = PIECE_TYPE.None, bool isEnPassantable = false, Piece pieceToTakeEnPassant = null)
@@ -439,6 +444,11 @@ public class PGNManager : MonoBehaviour
         BoardManager.Instance.ResetSquareColours();
         PieceManager.Instance.ResetCapturedPieces();
         UIManager.Instance.ResetPieceIcons();
+
+        OnMoveNumberChanged?.Invoke(this, new OnMoveNumberChangedArgs
+        {
+            MoveNumber = -1
+        });
     }
 
     public void LastMove()
@@ -454,8 +464,14 @@ public class PGNManager : MonoBehaviour
     {
         if (_currentMove == _moveDetailsList.Count) return;
 
+        OnMoveNumberChanged?.Invoke(this, new OnMoveNumberChangedArgs
+        {
+            MoveNumber = _currentMove
+        });
+
         MoveDetails move = _moveDetailsList[_currentMove];
         PieceManager.Instance.MovePiece(move, false, animate);
+
         _currentMove++;
     }
 

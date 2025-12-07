@@ -8,10 +8,9 @@ public class MoveList : MonoBehaviour
 {
     [SerializeField] private Transform _moveListContainer;
     [SerializeField] private GameObject _moveDetailsPrefab;
+    [SerializeField] private Color _moveHighlightColour;
 
-    // move click toggle stuff
-    [SerializeField] private ToggleGroup _toggleGroup;
-    [SerializeField] private List<Toggle> _moveListToggles = new();
+    private List<MoveListElement> _moveListElements = new();
 
     public event EventHandler<OnMoveListClickedArgs> OnMoveListClicked;
     public class OnMoveListClickedArgs : EventArgs
@@ -22,6 +21,7 @@ public class MoveList : MonoBehaviour
     private void Start()
     {
         PGNManager.Instance.OnMoveDetailsChanged += PGNManager_OnMoveDetailsChanged;
+        PGNManager.Instance.OnMoveNumberChanged += PGNManager_OnMoveNumberChanged;
     }
 
     private void PGNManager_OnMoveDetailsChanged(object sender, PGNManager.OnMoveDetailsChangedArgs e)
@@ -47,6 +47,7 @@ public class MoveList : MonoBehaviour
             iPlusOne = i + 1;
             newMoveListElement = Instantiate(_moveDetailsPrefab, _moveListContainer);
             moveListElement = newMoveListElement.GetComponent<MoveListElement>();
+            _moveListElements.Add(moveListElement);
             whiteMove = moveDetailsList[i];
             blackMove = moveDetailsList.Count > iPlusOne ? moveDetailsList[iPlusOne] : emptyMove;
 
@@ -63,6 +64,8 @@ public class MoveList : MonoBehaviour
         {
             Destroy(_moveListContainer.GetChild(i).gameObject);
         }
+
+        _moveListElements.Clear();
     }
 
     public void TriggerMoveClicked(MoveDetails move)
@@ -71,5 +74,16 @@ public class MoveList : MonoBehaviour
         {
             Move = move
         });
+    }
+
+    private void PGNManager_OnMoveNumberChanged(object sender, PGNManager.OnMoveNumberChangedArgs e)
+    {
+        foreach (MoveListElement element in _moveListElements)
+        {
+            element.ResetColours();
+        }
+
+        if (e.MoveNumber >= 0)
+            _moveListElements[Mathf.FloorToInt(e.MoveNumber / 2)].HighlightMove(_moveHighlightColour);
     }
 }

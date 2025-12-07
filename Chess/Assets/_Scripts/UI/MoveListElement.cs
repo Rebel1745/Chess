@@ -8,18 +8,23 @@ public class MoveListElement : MonoBehaviour
     [SerializeField] private TMP_Text _moveNumberText;
     [SerializeField] private Button _whiteMoveButton;
     [SerializeField] private Button _blackMoveButton;
+    private Color _defaultColour;
 
     private MoveList _moveList;
     private MoveDetails _whiteMove;
     private MoveDetails _blackMove;
+    private int _moveNumber;
+    public int MoveNumber { get { return _moveNumber; } }
 
     private void Start()
     {
         _whiteMoveButton.onClick.AddListener(OnWhiteMoveClicked);
         _blackMoveButton.onClick.AddListener(OnBlackMoveClicked);
+
+        _defaultColour = _whiteMoveButton.GetComponent<Image>().color;
     }
 
-    private void Oestroy()
+    private void OnDestroy()
     {
         _whiteMoveButton.onClick.RemoveListener(OnWhiteMoveClicked);
         _blackMoveButton.onClick.RemoveListener(OnBlackMoveClicked);
@@ -42,10 +47,22 @@ public class MoveListElement : MonoBehaviour
         _whiteMove = whiteMove;
         _blackMove = blackMove;
 
-        int moveNumber = Mathf.FloorToInt(whiteMove.MoveNumber / 2) + 1;
-        _moveNumberText.text = moveNumber.ToString();
+        _moveNumber = Mathf.FloorToInt(whiteMove.MoveNumber / 2) + 1;
+        _moveNumberText.text = _moveNumber.ToString();
 
         _whiteMoveButton.GetComponentInChildren<TMP_Text>().text = whiteMove.PGNCode;
         _blackMoveButton.GetComponentInChildren<TMP_Text>().text = blackMove.MoveNumber == -1 ? "..." : blackMove.PGNCode;
+    }
+
+    public void HighlightMove(Color color)
+    {
+        Button moveButton = GameManager.Instance.IsCurrentPlayerWhite ? _whiteMoveButton : _blackMoveButton;
+        moveButton.GetComponent<Image>().color = color;
+    }
+
+    public void ResetColours()
+    {
+        _whiteMoveButton.GetComponent<Image>().color = _defaultColour;
+        _blackMoveButton.GetComponent<Image>().color = _defaultColour;
     }
 }

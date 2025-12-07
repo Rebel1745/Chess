@@ -9639,8 +9639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MoveList
   _moveListContainer: {fileID: 313680092}
   _moveDetailsPrefab: {fileID: 8920281591984201149, guid: aec45810508c31941a7a895f60c32c34, type: 3}
-  _toggleGroup: {fileID: 1946080519}
-  _moveListToggles: []
+  _moveHighlightColour: {r: 0, g: 0, b: 0, a: 0.5019608}
 --- !u!114 &1946080521
 MonoBehaviour:
   m_ObjectHideFlags: 0
