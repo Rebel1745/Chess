@@ -11,6 +11,11 @@ public class PGNManager : MonoBehaviour
     private int _currentMove = 0;
     [SerializeField] private MoveList _moveListDisplay;
 
+    // play stuff
+    private bool _isPlaying = false;
+    private float _timeBetweenMoves = 1.0f;
+    private float _nextMoveTime;
+
     public event EventHandler<OnMoveDetailsChangedArgs> OnMoveDetailsChanged;
     public class OnMoveDetailsChangedArgs : EventArgs
     {
@@ -33,6 +38,17 @@ public class PGNManager : MonoBehaviour
         GameManager.Instance.OnGameStarted += GameManager_OnGameStarted;
         PieceManager.Instance.OnMoveCompleted += PieceManager_OnMoveCompleted;
         _moveListDisplay.OnMoveListClicked += MoveList_OnMoveListClicked;
+    }
+
+    private void Update()
+    {
+        if (!_isPlaying) return;
+
+        if (Time.time >= _nextMoveTime)
+        {
+            _nextMoveTime = Time.time + _timeBetweenMoves;
+            NextMove();
+        }
     }
 
     private void GameManager_OnGameStarted(object sender, EventArgs e)
@@ -438,6 +454,7 @@ public class PGNManager : MonoBehaviour
 
     public void FirstMove()
     {
+        PauseGame();
         GameManager.Instance.SetCurrentPlayerColour(true);
         _currentMove = 0;
         PieceManager.Instance.ResetBoardPosition();
@@ -462,7 +479,11 @@ public class PGNManager : MonoBehaviour
 
     public void NextMove(bool animate = true)
     {
-        if (_currentMove == _moveDetailsList.Count) return;
+        if (_currentMove == _moveDetailsList.Count)
+        {
+            PauseGame();
+            return;
+        }
 
         OnMoveNumberChanged?.Invoke(this, new OnMoveNumberChangedArgs
         {
@@ -477,6 +498,8 @@ public class PGNManager : MonoBehaviour
 
     public void PreviousMove()
     {
+        if (_isPlaying) PauseGame();
+
         if (_currentMove == 0) return;
 
         int moveTo = _currentMove - 1;
@@ -491,6 +514,7 @@ public class PGNManager : MonoBehaviour
 
     private void GoToMove(int moveNumber)
     {
+        if (_isPlaying) PauseGame();
         FirstMove();
         for (int i = 0; i <= moveNumber; i++)
         {
@@ -501,5 +525,22 @@ public class PGNManager : MonoBehaviour
     public int GetNextMoveNumber()
     {
         return _moveDetailsList.Count;
+    }
+
+    public void PlayGame()
+    {
+        UIManager.Instance.ShowHidePlayButton(false);
+        UIManager.Instance.ShowHidePauseButton(true);
+
+        _isPlaying = true;
+        _nextMoveTime = Time.time + _timeBetweenMoves;
+    }
+
+    public void PauseGame()
+    {
+        UIManager.Instance.ShowHidePlayButton(true);
+        UIManager.Instance.ShowHidePauseButton(false);
+
+        _isPlaying = false;
     }
 }

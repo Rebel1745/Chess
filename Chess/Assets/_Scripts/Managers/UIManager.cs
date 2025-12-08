@@ -13,6 +13,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button _previousMovePGNButton;
     [SerializeField] private Button _firstMovePGNButton;
     [SerializeField] private Button _lastMovePGNButton;
+    [SerializeField] private Button _playButton;
+    [SerializeField] private Button _pauseButton;
     [SerializeField] private TabMenu _tabMenu;
     [SerializeField] private MoveHighlightingToggles _togglesTab;
     [SerializeField] private Transform _whiteCapturedPieces;
@@ -30,11 +32,15 @@ public class UIManager : MonoBehaviour
         _previousMovePGNButton.onClick.AddListener(_previousMovePGNButtonClicked);
         _firstMovePGNButton.onClick.AddListener(OnFirstMovePGNButtonClicked);
         _lastMovePGNButton.onClick.AddListener(OnLastMovePGNButtonClicked);
+        _playButton.onClick.AddListener(OnPlayButtonClicked);
+        _pauseButton.onClick.AddListener(OnPauseButtonClicked);
 
         _nextMovePGNButton.gameObject.SetActive(false);
         _previousMovePGNButton.gameObject.SetActive(false);
         _firstMovePGNButton.gameObject.SetActive(false);
         _lastMovePGNButton.gameObject.SetActive(false);
+        ShowHidePlayButton(false);
+        ShowHidePauseButton(false);
     }
 
     private void OnLoadFENButtonClicked()
@@ -50,6 +56,7 @@ public class UIManager : MonoBehaviour
         _previousMovePGNButton.gameObject.SetActive(true);
         _firstMovePGNButton.gameObject.SetActive(true);
         _lastMovePGNButton.gameObject.SetActive(true);
+        ShowHidePlayButton(true);
     }
 
     private void _nextMovePGNButtonClicked()
@@ -70,6 +77,26 @@ public class UIManager : MonoBehaviour
     private void OnLastMovePGNButtonClicked()
     {
         PGNManager.Instance.LastMove();
+    }
+
+    private void OnPlayButtonClicked()
+    {
+        PGNManager.Instance.PlayGame();
+    }
+
+    public void ShowHidePlayButton(bool enabled)
+    {
+        _playButton.gameObject.SetActive(enabled);
+    }
+
+    public void ShowHidePauseButton(bool enabled)
+    {
+        _pauseButton.gameObject.SetActive(enabled);
+    }
+
+    private void OnPauseButtonClicked()
+    {
+        PGNManager.Instance.PauseGame();
     }
 
     public void UpdateFENText(string text)
