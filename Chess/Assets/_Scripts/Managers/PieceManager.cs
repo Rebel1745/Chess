@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class PieceManager : MonoBehaviour
 {
@@ -127,7 +128,7 @@ public class PieceManager : MonoBehaviour
         {
             // check if the current square is part of the available move set of the piece
             if (_selectedPiece.CheckIfValidMove(e.CurrentSquare, out MoveDetails move))
-                MovePiece(move);
+                MovePiece(move, true, true, true);
             else
             {
                 ResetPiecePosition(_selectedPiece, _selectedPiece.Square);
@@ -605,7 +606,7 @@ public class PieceManager : MonoBehaviour
     #endregion
 
     #region Piece Movement
-    public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true, bool animate = true)
+    public void MovePiece(MoveDetails move, bool triggerMoveCompletedEvent = true, bool animate = true, bool playAudio = false)
     {
         if (move.MoveNumber == -1)
             move.MoveNumber = PGNManager.Instance.GetNextMoveNumber();
@@ -659,9 +660,11 @@ public class PieceManager : MonoBehaviour
             move.SecondPieceToMove.SetIsFirstMove(false);
         }
 
-
         //_currentSquare = null;
         _isMovingPiece = false;
+
+        if (playAudio)
+            AudioManager.Instance.PlayAudioClip(AudioManager.Instance.PieceMovementClip, AudioManager.Instance.MinimumMovementSoundPitch, AudioManager.Instance.MaximumMovementSoundPitch);
 
         // if we didn't en passant this move, set any available en passantable pieces back to not en passantable
         SetPiecesAsNotEnPassantable(!GameManager.Instance.IsCurrentPlayerWhite);
@@ -676,11 +679,11 @@ public class PieceManager : MonoBehaviour
         else
         {
             UpdateAllPieceMoves();
-            PieceMoved(move, triggerMoveCompletedEvent);
+            PieceMoved(move, triggerMoveCompletedEvent, playAudio);
         }
     }
 
-    public void PieceMoved(MoveDetails move, bool triggerMoveCompletedEvent = true)
+    public void PieceMoved(MoveDetails move, bool triggerMoveCompletedEvent = true, bool playAudio = true)
     {
         Piece attackedKing;
 
@@ -711,6 +714,8 @@ public class PieceManager : MonoBehaviour
             {
                 // check mate baby
                 Debug.Log("CheckMate");
+                if (playAudio)
+                    AudioManager.Instance.PlayAudioClip(AudioManager.Instance.CheckMateClip);
                 PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode.Replace('#', ' ').Trim() + "#");
                 attackedKing.Square.SetSquareColour(_checkmateSquareColour, _checkmateOutlineColour);
                 GameManager.Instance.UpdateGameState(GameState.GameOver);
@@ -718,6 +723,8 @@ public class PieceManager : MonoBehaviour
             else
             {
                 //Debug.Log("Check");
+                if (playAudio)
+                    AudioManager.Instance.PlayAudioClip(AudioManager.Instance.CheckClip);
                 PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode.Replace('+', ' ').Trim() + "+");
                 attackedKing.Square.SetSquareOutlineColour(_checkmateOutlineColour);
                 GameManager.Instance.UpdateGameState(GameState.NextTurn);

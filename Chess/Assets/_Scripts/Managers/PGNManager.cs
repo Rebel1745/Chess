@@ -47,7 +47,7 @@ public class PGNManager : MonoBehaviour
         if (Time.time >= _nextMoveTime)
         {
             _nextMoveTime = Time.time + _timeBetweenMoves;
-            NextMove();
+            NextMove(true);
         }
     }
 
@@ -408,7 +408,7 @@ public class PGNManager : MonoBehaviour
 
             AddMove(move, false);
 
-            PieceManager.Instance.MovePiece(move, false, false);
+            PieceManager.Instance.MovePiece(move, false, false, false);
         }
     }
 
@@ -491,7 +491,7 @@ public class PGNManager : MonoBehaviour
         });
 
         MoveDetails move = _moveDetailsList[_currentMove];
-        PieceManager.Instance.MovePiece(move, false, animate);
+        PieceManager.Instance.MovePiece(move, false, animate, animate); // use the animate flag for the play audio option as they will be the same
 
         _currentMove++;
     }
