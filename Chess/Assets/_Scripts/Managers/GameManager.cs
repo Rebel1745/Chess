@@ -11,8 +11,11 @@ public class GameManager : MonoBehaviour
 
     public bool _isCurrentPlayerWhite = true;
     public bool IsCurrentPlayerWhite { get { return _isCurrentPlayerWhite; } }
+    [SerializeField] private bool[] _cpuPlayers;
+    public bool IsCurrentPlayerCPU { get { return _isCurrentPlayerWhite ? _cpuPlayers[0] : _cpuPlayers[1]; } }
 
     public event EventHandler OnGameStarted;
+    public event EventHandler OnWaitingForMove;
 
     private void Awake()
     {
@@ -71,6 +74,7 @@ public class GameManager : MonoBehaviour
     private void NextTurn()
     {
         _isCurrentPlayerWhite = !_isCurrentPlayerWhite;
+        OnWaitingForMove?.Invoke(this, EventArgs.Empty);
         UpdateGameState(GameState.WaitingForMove);
     }
 

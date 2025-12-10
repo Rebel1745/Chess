@@ -1040,6 +1040,23 @@ public class PieceManager : MonoBehaviour
         return true;
     }
 
+    public void CreateMoveFromUCIString(string uciString)
+    {
+        Square startSquare = BoardManager.Instance.GetSquareFromPGNCode(uciString.Substring(0, 2));
+        Square endSquare = BoardManager.Instance.GetSquareFromPGNCode(uciString.Substring(2, 2));
+        Piece pieceToMove = startSquare.PieceOnSquare;
+
+        MoveDetails move = new()
+        {
+            StartSquare = startSquare,
+            EndSquare = endSquare,
+            PieceToMove = pieceToMove,
+            isWhite = GameManager.Instance.IsCurrentPlayerWhite
+        };
+
+        MovePiece(move, true, true, true);
+    }
+
     public void PrintMove(MoveDetails move)
     {
         Debug.Log($"Move Number: {move.MoveNumber}");
