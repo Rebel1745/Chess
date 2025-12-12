@@ -14,6 +14,7 @@ public struct MoveDetails
     public bool ActivatesEnPassant;
     public Piece RemovePieceEnPassant;
     public PIECE_TYPE PromotionPieceType;
+    public bool AIPromotion;
     public GameObject PromotedPiece;
     public string PGNCode;
 }

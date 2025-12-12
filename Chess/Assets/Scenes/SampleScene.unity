@@ -4089,7 +4089,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   _isCurrentPlayerWhite: 1
-  _cpuPlayers: 0001
+  _cpuPlayers: 0101
 --- !u!1 &750120863
 GameObject:
   m_ObjectHideFlags: 0
@@ -8607,7 +8607,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e976fe646c801e941ac35c2f6dae35c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIManager
-  exeFileName: stockfish/stockfish-windows-x86-64-avx2.exe
+  _exeFileName: stockfish/stockfish.exe
+  _timeBetweenMoves: 0.25
 --- !u!1 &1543090772
 GameObject:
   m_ObjectHideFlags: 0

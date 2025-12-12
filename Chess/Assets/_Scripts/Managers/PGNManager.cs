@@ -11,6 +11,10 @@ public class PGNManager : MonoBehaviour
     private int _currentMove = 0;
     [SerializeField] private MoveList _moveListDisplay;
 
+    // draw rule checks
+    private Dictionary<string, int> _fenMoveCount = new();
+    private int _fiftyMoveDrawCount = 0;
+
     // play stuff
     private bool _isPlaying = false;
     private float _timeBetweenMoves = 1.0f;
@@ -64,6 +68,10 @@ public class PGNManager : MonoBehaviour
     private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
     {
         AddMove(e.Move);
+
+        AddPositionToDictionary();
+
+        UpdateFiftyMoveRule(e.Move);
     }
 
     private void MoveList_OnMoveListClicked(object sender, MoveList.OnMoveListClickedArgs e)
@@ -542,5 +550,49 @@ public class PGNManager : MonoBehaviour
         UIManager.Instance.ShowHidePauseButton(false);
 
         _isPlaying = false;
+    }
+
+    private void AddPositionToDictionary()
+    {
+        string fenString = BoardManager.Instance.GenerateBoardPositionFEN();
+
+        if (_fenMoveCount.ContainsKey(fenString))
+            _fenMoveCount[fenString] = _fenMoveCount[fenString] + 1;
+        else
+            _fenMoveCount.Add(fenString, 1);
+    }
+
+    public bool CheckForRepetition()
+    {
+        foreach (KeyValuePair<string, int> kvp in _fenMoveCount)
+        {
+            if (kvp.Value >= 3) return true;
+        }
+
+        return false;
+    }
+
+    private void UpdateFiftyMoveRule(MoveDetails move)
+    {
+        // if a pawn has moved, we can reset the count and bail
+        if (move.PieceToMove.PieceType == PIECE_TYPE.Pawn)
+        {
+            _fiftyMoveDrawCount = 0;
+            return;
+        }
+
+        // if there is a capture, we can reset the count and bail
+        if (move.PGNCode.ToLower().Contains('x'))
+        {
+            _fiftyMoveDrawCount = 0;
+            return;
+        }
+
+        _fiftyMoveDrawCount++;
+    }
+
+    public bool CheckForFiftyMoveRule()
+    {
+        return _fiftyMoveDrawCount >= 50;
     }
 }

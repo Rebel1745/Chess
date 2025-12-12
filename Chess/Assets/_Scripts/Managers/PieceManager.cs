@@ -58,7 +58,7 @@ public class PieceManager : MonoBehaviour
     private List<PIECE_TYPE> _capturedPiecesBlack = new();
 
     //private readonly string _defaultPosition = "6kr/3b2pp/Q1p2b2/3p4/1p3q2/1B5P/PP2RPP1/4R1K1";
-    //private readonly string _defaultPosition = "kr6/8/8/8/8/3K4/1p6/8";
+    //private readonly string _defaultPosition = "8/8/8/8/8/3K4/3Q4/3k4";
     private readonly string _defaultPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     public event EventHandler<OnMoveCompletedArgs> OnMoveCompleted;
@@ -672,7 +672,7 @@ public class PieceManager : MonoBehaviour
         // this should only be used moving through the PGN moves
         if (move.PromotionPieceType != PIECE_TYPE.None)
         {
-            SetAutomaticPromotion(move, false);
+            SetAutomaticPromotion(move, move.AIPromotion);
         }
         else if (move.IsPromotion && move.PromotionPieceType == PIECE_TYPE.None)
             ShowPromotionPieces(move);
@@ -704,7 +704,6 @@ public class PieceManager : MonoBehaviour
             PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode);
         }
 
-
         // check for check
         if (CheckIfAnyPieceCanTakeKing(GameManager.Instance.IsCurrentPlayerWhite))
         {
@@ -715,7 +714,7 @@ public class PieceManager : MonoBehaviour
                 // check mate baby
                 Debug.Log("CheckMate");
                 if (playAudio)
-                    AudioManager.Instance.PlayAudioClip(AudioManager.Instance.CheckMateClip);
+                    AudioManager.Instance.PlayAudioClip(AudioManager.Instance.CheckMateClip, 1f, 1f, 0.25f);
                 PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode.Replace('#', ' ').Trim() + "#");
                 attackedKing.Square.SetSquareColour(_checkmateSquareColour, _checkmateOutlineColour);
                 GameManager.Instance.UpdateGameState(GameState.GameOver);
@@ -724,14 +723,49 @@ public class PieceManager : MonoBehaviour
             {
                 //Debug.Log("Check");
                 if (playAudio)
-                    AudioManager.Instance.PlayAudioClip(AudioManager.Instance.CheckClip);
+                    AudioManager.Instance.PlayAudioClip(AudioManager.Instance.CheckClip, 1f, 1f, 0.25f);
                 PGNManager.Instance.UpdatePGNString(move.MoveNumber, move.PGNCode.Replace('+', ' ').Trim() + "+");
                 attackedKing.Square.SetSquareOutlineColour(_checkmateOutlineColour);
                 GameManager.Instance.UpdateGameState(GameState.NextTurn);
             }
         }
+        else if (CheckForStalemate())
+        {
+            Debug.Log("Stalemate - draw");
+            GameManager.Instance.UpdateGameState(GameState.GameOver);
+        }
+        else if (PGNManager.Instance.CheckForRepetition())
+        {
+            Debug.Log("Threefold repetition - draw");
+            GameManager.Instance.UpdateGameState(GameState.GameOver);
+        }
+        else if (PGNManager.Instance.CheckForFiftyMoveRule())
+        {
+            Debug.Log("50 move rule - draw");
+            GameManager.Instance.UpdateGameState(GameState.GameOver);
+        }
+        else if (CheckForInsufficientMaterial())
+        {
+            Debug.Log("Insufficient material - draw");
+            GameManager.Instance.UpdateGameState(GameState.GameOver);
+        }
         else
             GameManager.Instance.UpdateGameState(GameState.NextTurn);
+    }
+
+    private bool CheckForStalemate()
+    {
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (piece.IsWhite == GameManager.Instance.IsCurrentPlayerWhite) continue;
+            piece.CalculateAvailableMoves(true);
+
+            // if there are any legal moves at all, it is not a stalemate
+            if (piece.AvailableMoveCount > 0) return false;
+        }
+
+        return true;
     }
 
     private void ResetPiecePosition(Piece piece, Square square)
@@ -775,11 +809,6 @@ public class PieceManager : MonoBehaviour
         {
             foreach (AnalysisMoveDetails move in piece.AnalysisMoves)
             {
-                // don't show if we don't want x-ray moves
-                // if (!ToggleManager.Instance.ShowXRayMoves && move.IsXRayMove) continue;
-                // if (!ToggleManager.Instance.ShowProtectionMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Protection) continue;
-                // if (!ToggleManager.Instance.ShowCaptureMoves && move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.Capture) continue;
-                // don't show standard pawn moves as they can't control the square
                 if (move.AnalysisMoveType == ANALYSIS_MOVE_TYPE.NonCapture) continue;
 
                 if (move.EndSquare == square)
@@ -1046,35 +1075,93 @@ public class PieceManager : MonoBehaviour
         Square endSquare = BoardManager.Instance.GetSquareFromPGNCode(uciString.Substring(2, 2));
         Piece pieceToMove = startSquare.PieceOnSquare;
 
-        MoveDetails move = new()
+        MoveDetails move = GetMoveFromPieceAndTargetSquare(pieceToMove, endSquare);
+        if (move.IsPromotion)
         {
-            StartSquare = startSquare,
-            EndSquare = endSquare,
-            PieceToMove = pieceToMove,
-            isWhite = GameManager.Instance.IsCurrentPlayerWhite
-        };
+            move.PromotionPieceType = GetPieceTypeFromCharacter(uciString.Substring(uciString.Length - 1, 1));
+            move.AIPromotion = true;
+        }
 
-        MovePiece(move, true, true, true);
+        if (move.MoveNumber != -2)
+            MovePiece(move, true, true, true);
     }
 
-    public void PrintMove(MoveDetails move)
+    private MoveDetails GetMoveFromPieceAndTargetSquare(Piece piece, Square square)
     {
-        Debug.Log($"Move Number: {move.MoveNumber}");
-        Debug.Log($"Is White: {move.isWhite}");
-        Debug.Log($"Piece To Move: {move.PieceToMove.name}");
-        Debug.Log($"Starting Square: {move.StartSquare.name}");
-        Debug.Log($"Move To Square: {move.EndSquare.name}");
-        if (move.SecondPieceToMove != null)
-            Debug.Log($"Second Piece To Move: {move.SecondPieceToMove.name}");
-        if (move.SecondEndSquare != null)
-            Debug.Log($"Second Move To Square: {move.SecondEndSquare.name}");
-        Debug.Log($"Is Promotion: {move.IsPromotion}");
-        Debug.Log($"Activates En Passant: {move.ActivatesEnPassant}");
-        if (move.RemovePieceEnPassant != null)
-            Debug.Log($"Remove Piece En Passant: {move.RemovePieceEnPassant.name}");
-        Debug.Log($"Promotion Piece Type: {move.PromotionPieceType}");
-        if (move.PromotedPiece != null)
-            Debug.Log($"Promoted Piece: {move.PromotedPiece.name}");
-        Debug.Log($"PGN Code: {move.PGNCode}");
+        foreach (MoveDetails move in piece.AvailableMoves)
+        {
+            if (move.EndSquare == square) return move;
+        }
+
+
+        return new MoveDetails() { MoveNumber = -2 };
+    }
+
+    private void GetActivePieceCounts(bool isWhite, out int pawnCount, out int knightCount, out int bishopCount, out int rookCount, out int queenCount)
+    {
+        pawnCount = 0;
+        knightCount = 0;
+        bishopCount = 0;
+        rookCount = 0;
+        queenCount = 0;
+
+        foreach (Piece piece in _allPieces)
+        {
+            if (!piece.gameObject.activeInHierarchy) continue;
+            if (!piece.IsWhite != isWhite) continue;
+
+            switch (piece.PieceType)
+            {
+                case PIECE_TYPE.Pawn:
+                    pawnCount++;
+                    break;
+                case PIECE_TYPE.Knight:
+                    knightCount++;
+                    break;
+                case PIECE_TYPE.Bishop:
+                    bishopCount++;
+                    break;
+                case PIECE_TYPE.Rook:
+                    rookCount++;
+                    break;
+                case PIECE_TYPE.Queen:
+                    queenCount++;
+                    break;
+            }
+        }
+    }
+
+    private bool CheckForInsufficientMaterial()
+    {
+        GetActivePieceCounts(true, out int whitePawnCount, out int whiteKnightCount, out int whiteBishopCount, out int whiteRookCount, out int whiteQueenCount);
+        GetActivePieceCounts(false, out int blackPawnCount, out int blackKnightCount, out int blackBishopCount, out int blackRookCount, out int blackQueenCount);
+
+        // if we have either colour pawn left, we have sufficient material
+        if (whitePawnCount > 0 || blackPawnCount > 0) return false;
+
+        // if we have either colour Rook left, we have sufficient material
+        if (whiteRookCount > 0 || blackRookCount > 0) return false;
+
+        // if we have either colour Queen left, we have sufficient material
+        if (whiteQueenCount > 0 || blackQueenCount > 0) return false;
+
+        // if we are down to only kings
+        if (whitePawnCount == 0 && whiteKnightCount == 0 && whiteBishopCount == 0 && whiteRookCount == 0 && whiteQueenCount == 0 &&
+        blackPawnCount == 0 && blackKnightCount == 0 && blackBishopCount == 0 && blackRookCount == 0 && blackQueenCount == 0)
+            return true;
+
+        // if we are down to one bishop vs king
+        if (whitePawnCount == 0 && whiteKnightCount == 0 && whiteRookCount == 0 && whiteQueenCount == 0 &&
+        blackPawnCount == 0 && blackKnightCount == 0 && blackRookCount == 0 && blackQueenCount == 0 &&
+        (whiteBishopCount == 1 || blackBishopCount == 1))
+            return true;
+
+        // if we are down to one knight vs king
+        if (whitePawnCount == 0 && whiteBishopCount == 0 && whiteRookCount == 0 && whiteQueenCount == 0 &&
+        blackPawnCount == 0 && blackBishopCount == 0 && blackRookCount == 0 && blackQueenCount == 0 &&
+        (whiteKnightCount == 1 || blackKnightCount == 1))
+            return true;
+
+        return false;
     }
 }

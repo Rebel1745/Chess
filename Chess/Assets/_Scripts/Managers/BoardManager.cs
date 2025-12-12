@@ -45,7 +45,7 @@ public class BoardManager : MonoBehaviour
 
     private void PieceManager_OnMoveCompleted(object sender, PieceManager.OnMoveCompletedArgs e)
     {
-        GenerateBoardPositionFEN();
+        UIManager.Instance.UpdateFENText(GenerateBoardPositionFEN());
     }
 
     private void InputManager_OnClickFinished(object sender, InputManager.OnClickArgs e)
@@ -143,7 +143,7 @@ public class BoardManager : MonoBehaviour
         return null;
     }
 
-    public void GenerateBoardPositionFEN()
+    public string GenerateBoardPositionFEN()
     {
         Square currentSquare;
         int emptyCount;
@@ -175,7 +175,7 @@ public class BoardManager : MonoBehaviour
                 fen.Append("/");
         }
 
-        UIManager.Instance.UpdateFENText(fen.ToString());
+        return fen.ToString();
     }
 
     public void ResetSquareColours()

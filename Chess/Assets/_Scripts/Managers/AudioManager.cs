@@ -16,7 +16,7 @@ public class AudioManager : MonoBehaviour
         if (Instance == null) Instance = this;
     }
 
-    public void PlayAudioClip(AudioClip clip, float minPitch = 1f, float maxPitch = 1f)
+    public void PlayAudioClip(AudioClip clip, float minPitch = 1f, float maxPitch = 1f, float volume = 1f)
     {
         _source.pitch = Random.Range(minPitch, maxPitch);
         _source.PlayOneShot(clip);

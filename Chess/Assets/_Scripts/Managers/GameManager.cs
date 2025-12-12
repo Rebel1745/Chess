@@ -24,6 +24,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        Invoke(nameof(StartGame), 0.5f);
+    }
+
+    private void StartGame()
+    {
         UpdateGameState(GameState.CreateBoard);
     }
 
@@ -41,6 +46,7 @@ public class GameManager : MonoBehaviour
                 SetupPieces();
                 break;
             case GameState.WaitingForMove:
+                WaitingForMove();
                 break;
             case GameState.WaitingForPromotion:
                 break;
@@ -71,10 +77,14 @@ public class GameManager : MonoBehaviour
         UpdateGameState(GameState.WaitingForMove);
     }
 
+    private void WaitingForMove()
+    {
+        OnWaitingForMove?.Invoke(this, EventArgs.Empty);
+    }
+
     private void NextTurn()
     {
         _isCurrentPlayerWhite = !_isCurrentPlayerWhite;
-        OnWaitingForMove?.Invoke(this, EventArgs.Empty);
         UpdateGameState(GameState.WaitingForMove);
     }
 
