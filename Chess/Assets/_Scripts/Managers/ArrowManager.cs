@@ -103,7 +103,7 @@ public class ArrowManager : MonoBehaviour
                                 break;
                         }
 
-                        Instantiate(iconPrefab, midpoint, Quaternion.identity, newArrow.transform);
+                        Instantiate(iconPrefab, headSpawnPoint, Quaternion.identity, newArrow.transform);
                     }
                 }
                 else
@@ -118,7 +118,7 @@ public class ArrowManager : MonoBehaviour
                         iconPrefab = GetPieceIconFromTypes(pieceTypeIcons, isWhite);
                     }
 
-                    Instantiate(iconPrefab, midpoint, Quaternion.identity, newArrow.transform);
+                    Instantiate(iconPrefab, headSpawnPoint, Quaternion.identity, newArrow.transform);
                 }
             }
 
